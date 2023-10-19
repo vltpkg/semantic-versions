@@ -3,13 +3,12 @@
   "version": "0.0.0-pre.1",
   "description": "The semantic version parser used by vlt",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "tap"
   },
   "devDependencies": {
     "tap": "^16.0.0"
   },
-  "dependencies": {
-    "lru-cache": "^6.0.0"
-  }
+  "dependencies": {}
 }

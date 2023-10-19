@@ -3,7 +3,7 @@
 
 ### semantic version parsing, validation & comparison
 
-### Website
+#### Website
 
 `semver.xyz`
 
@@ -15,15 +15,21 @@
 - defines implementations (ie. `semantic-versions`)
 - online visual/validation tool
 
-### Differences between `semantic-versions` & `npm`'s `semver`
+#### Major differences between `npm`'s `semver`
 
-- no CLI implementation
-- build metadata is kept when calculating ranges
-- cleaner API
+- no dependencies
+- build metadata is respected when doing comparisons
+- methods removed: `...`
 - various bug fixes
 - x% faster parsing
+- prerelease comparison is not optional
+  - note: if you want this, pre-prune the version set
+- loose comparison is not optional
+  - note: if you want this, coerce your versions prior to comparison
+- no CLI implementation
+  - note: if you want this, run `vlxf semantic-versions ...` 
 
-## Usage
+### Usage
 
 ```js
 import {
@@ -316,6 +322,15 @@ zero.
 * `^1.x` := `>=1.0.0 <2.0.0-0`
 * `^0.x` := `>=0.0.0 <1.0.0-0`
 
+### Approximate Ranges
+
+The operator `~>` treats the last digit of corresponding version as the beginning of the range & matches only within that respective value.
+
+- `~>1` is equivalent to the range `>=1.0.0, <2.0.0`
+- `~>1.2` is equivalent to the range `>=1.2, <1.2` or `^1.2`
+- `~>1.2.3` is equivalent to the range `>=1.2.3, <1.3.0` or `~1.2.3`
+- `~>1.2.3-alpha.1` is equivalent 
+
 ### Range Grammar
 
 Putting all this together, here is a Backus-Naur grammar for ranges,
@@ -491,25 +506,3 @@ ex.
 * `s.clean('  =v2.1.5')`: `2.1.5`
 * `s.clean('      2.1.5   ')`: `'2.1.5'`
 * `s.clean('~1.0.0')`: `null`
-
-
-### TODO: `semver` distributed a `range.bnf`
-
-```bnf
-range-set  ::= range ( logical-or range ) *
-logical-or ::= ( ' ' ) * '||' ( ' ' ) *
-range      ::= hyphen | simple ( ' ' simple ) * | ''
-hyphen     ::= partial ' - ' partial
-simple     ::= primitive | partial | tilde | caret
-primitive  ::= ( '<' | '>' | '>=' | '<=' | '=' ) partial
-partial    ::= xr ( '.' xr ( '.' xr qualifier ? )? )?
-xr         ::= 'x' | 'X' | '*' | nr
-nr         ::= '0' | [1-9] ( [0-9] ) *
-tilde      ::= '~' partial
-caret      ::= '^' partial
-qualifier  ::= ( '-' pre )? ( '+' build )?
-pre        ::= parts
-build      ::= parts
-parts      ::= part ( '.' part ) *
-part       ::= nr | [-0-9A-Za-z]+
-```
