@@ -18,13 +18,13 @@
 #### Major differences between `npm`'s `semver`
 
 - no dependencies
-- build metadata is respected when doing comparisons
+- build metadata is respected in `min` / `max` functions
 - methods removed: `...`
 - various bug fixes
 - x% faster parsing
 - prerelease comparison is not optional
-  - note: if you want this, pre-prune the version set
-- loose comparison is not optional
+  - note: if you want this, pre-prune the set of versions
+- loose comparison is not optional (ex. `v1` will fail to parse/compare but `1` is fine - ref. https://semver.org/#is-v123-a-semantic-version)
   - note: if you want this, coerce your versions prior to comparison
 - no CLI implementation
   - note: if you want this, run `vlxf semantic-versions ...` 
@@ -55,7 +55,7 @@ import {
   minSatisfying,
   maxSatisfying,
   intersects,
-  inc,
+  increment,
   satisfies,
   rsort,
   sort,
@@ -129,92 +129,38 @@ or `1.1.0`.
 The range `1.2.7 || >=1.2.9 <2.0.0` would match the versions `1.2.7`,
 `1.2.9`, and `1.4.6`, but not the versions `1.2.8` or `2.0.0`.
 
-### Prerelease Tags
-
-If a version has a prerelease tag (for example, `1.2.3-alpha.3`) then
-it will only be allowed to satisfy comparator sets if at least one
-comparator with the same `[major, minor, patch]` tuple also has a
-prerelease tag.
-
-For example, the range `>1.2.3-alpha.3` would be allowed to match the
-version `1.2.3-alpha.7`, but it would *not* be satisfied by
-`3.4.5-alpha.9`, even though `3.4.5-alpha.9` is technically "greater
-than" `1.2.3-alpha.3` according to the SemVer sort rules.  The version
-range only accepts prerelease tags on the `1.2.3` version.  The
-version `3.4.5` *would* satisfy the range, because it does not have a
-prerelease flag, and `3.4.5` is greater than `1.2.3-alpha.7`.
-
-The purpose for this behavior is twofold.  First, prerelease versions
-frequently are updated very quickly, and contain many breaking changes
-that are (by the author's design) not yet fit for public consumption.
-Therefore, by default, they are excluded from range matching
-semantics.
-
-Second, a user who has opted into using a prerelease version has
-clearly indicated the intent to use *that specific* set of
-alpha/beta/rc versions.  By including a prerelease tag in the range,
-the user is indicating that they are aware of the risk.  However, it
-is still not appropriate to assume that they have opted into taking a
-similar risk on the *next* set of prerelease versions.
-
-Note that this behavior can be suppressed (treating all prerelease
-versions as if they were normal versions, for the purpose of range
-matching) by setting the `includePrerelease` flag on the options
-object to any
-[functions](https://github.com/npm/node-semver#functions) that do
-range matching.
+> TODO: Remove "Prerelease Identifier Base"
 
 #### Prerelease Identifiers
 
-The method `.inc` takes an additional `identifier` string argument that
-will append the value of the string as a prerelease identifier:
-
 ```javascript
-semver.inc('1.2.3', 'prerelease', 'beta')
+increment('1.2.3', 'prerelease', 'beta')
 // '1.2.4-beta.0'
 ```
 
-command-line example:
-
-```bash
-$ semver 1.2.3 -i prerelease --preid beta
-1.2.4-beta.0
-```
-
-Which then can be used to increment further:
-
-```bash
-$ semver 1.2.4-beta.0 -i prerelease
-1.2.4-beta.1
-```
-
-#### Prerelease Identifier Base
-
-The method `.inc` takes an optional parameter 'identifierBase' string
-that will let you let your prerelease number as zero-based or one-based.
-Set to `false` to omit the prerelease number altogether.
-If you do not specify this parameter, it will default to zero-based.
-
+##### Old
 ```javascript
-semver.inc('1.2.3', 'prerelease', 'beta', '1')
+
+increment('1.2.3', 'prerelease', 'beta', '1')
 // '1.2.4-beta.1'
 ```
 
 ```javascript
-semver.inc('1.2.3', 'prerelease', 'beta', false)
+increment('1.2.3', 'prerelease', 'beta', false)
 // '1.2.4-beta'
 ```
+---
 
-command-line example:
+##### New
 
-```bash
-$ semver 1.2.3 -i prerelease --preid beta -n 1
-1.2.4-beta.1
+```javascript
+increment('1.2.3-beta', 'prerelease')
+// '1.2.4-beta.1'
 ```
 
-```bash
-$ semver 1.2.3 -i prerelease --preid beta -n false
-1.2.4-beta
+```javascript
+increment('1.2.3-beta.0', 'prerelease')
+// '1.2.4-beta.1'
 ```
 
 ### Advanced Range Syntax
@@ -331,52 +277,10 @@ The operator `~>` treats the last digit of corresponding version as the beginnin
 - `~>1.2.3` is equivalent to the range `>=1.2.3, <1.3.0` or `~1.2.3`
 - `~>1.2.3-alpha.1` is equivalent 
 
-### Range Grammar
-
-Putting all this together, here is a Backus-Naur grammar for ranges,
-for the benefit of parser authors:
-
-```bnf
-range-set  ::= range ( logical-or range ) *
-logical-or ::= ( ' ' ) * '||' ( ' ' ) *
-range      ::= hyphen | simple ( ' ' simple ) * | ''
-hyphen     ::= partial ' - ' partial
-simple     ::= primitive | partial | tilde | caret
-primitive  ::= ( '<' | '>' | '>=' | '<=' | '=' ) partial
-partial    ::= xr ( '.' xr ( '.' xr qualifier ? )? )?
-xr         ::= 'x' | 'X' | '*' | nr
-nr         ::= '0' | ['1'-'9'] ( ['0'-'9'] ) *
-tilde      ::= '~' partial
-caret      ::= '^' partial
-qualifier  ::= ( '-' pre )? ( '+' build )?
-pre        ::= parts
-build      ::= parts
-parts      ::= part ( '.' part ) *
-part       ::= nr | [-0-9A-Za-z]+
-```
-
 ## Functions
 
-All methods and classes take a final `options` object argument.  All
-options in this object are `false` by default.  The options supported
-are:
-
-- `loose`  Be more forgiving about not-quite-valid semver strings.
-  (Any resulting output will always be 100% strict compliant, of
-  course.)  For backwards compatibility reasons, if the `options`
-  argument is a boolean value instead of an object, it is interpreted
-  to be the `loose` param.
-- `includePrerelease`  Set to suppress the [default
-  behavior](https://github.com/npm/node-semver#prerelease-tags) of
-  excluding prerelease tagged versions from ranges unless they are
-  explicitly opted into.
-
-Strict-mode Comparators and Ranges will be strict about the SemVer
-strings that they parse.
-
 * `valid(v)`: Return the parsed version, or null if it's not valid.
-* `inc(v, release)`: Return the version incremented by the release
-  type (`major`,   `premajor`, `minor`, `preminor`, `patch`,
+* `increment(v, type)`: Return the version incremented by the type (`major`,   `premajor`, `minor`, `preminor`, `patch`,
   `prepatch`, or `prerelease`), or null if it's not valid
   * `premajor` in one call will bump the version up to the next major
     version and down to a prerelease of that major version.
@@ -387,6 +291,7 @@ strings that they parse.
     increments it.
 * `prerelease(v)`: Returns an array of prerelease components, or null
   if none exist. Example: `prerelease('1.2.3-alpha.1') -> ['alpha', 1]`
+* `stable(v)`: Returns an array of releases that are considered "stable" (ie. no prereleases), or null if non exist.
 * `major(v)`: Return the major version number.
 * `minor(v)`: Return the minor version number.
 * `patch(v)`: Return the patch version number.
