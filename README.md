@@ -11,6 +11,7 @@
 - leading `"="` or `"v"` characters are **only** ever stripped off & ignored when passed through `.coerce`
 - adds ranges (pulling in Ruby gems concepts, ie. `~>`)
 - adds clear licensing
+- adds definition for build metadata sorting (aka. alpha-numeric )
 - date-versioned (ie. "semver-2023" rhymes with `semver.xyz`)
 - defines implementations (ie. `semantic-versions`)
 - online visual/validation tool
