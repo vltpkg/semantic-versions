@@ -1,4 +1,2 @@
-export { SemVer } from './lib/semver.js'
-export { Range } from './lib/range.js'
 export * from './lib/parse.js'
 export * from './lib/compare.js'

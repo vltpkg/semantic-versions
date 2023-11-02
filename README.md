@@ -1,20 +1,11 @@
 
-## `semantic-versions`
+<img src="https://github.com/darcyclarke/octofiles/assets/459713/8ee74129-34e6-4bd4-8686-82954f424709" width="85" />
 
-### semantic version parsing, validation & comparison
+## Semantic Versions
 
-#### Website
+##### parsing, validation & comparison
 
 `semver.xyz`
-
-- creates new "semver" spec
-- leading `"="` or `"v"` characters are **only** ever stripped off & ignored when passed through `.coerce`
-- adds ranges (pulling in Ruby gems concepts, ie. `~>`)
-- adds clear licensing
-- adds definition for build metadata sorting (aka. alpha-numeric )
-- date-versioned (ie. "semver-2023" rhymes with `semver.xyz`)
-- defines implementations (ie. `semantic-versions`)
-- online visual/validation tool
 
 #### Major differences between `npm`'s `semver`
 
@@ -34,12 +25,7 @@
 
 ```js
 import {
-  SemVer,
-  Comparator,
-  Range,
   parse,
-  clean,
-  coerce,
   major,
   minor,
   patch,
@@ -49,8 +35,6 @@ import {
   validRange,
   simplifyRange,
   compare,
-  rcompare,
-  compareBuild,
   subset,
   minVersion,
   minSatisfying,
@@ -58,8 +42,8 @@ import {
   intersects,
   increment,
   satisfies,
-  rsort,
   sort,
+  rsort,
   cmp,
   outside,
   eq,
@@ -69,7 +53,7 @@ import {
   ltr,
   gt,
   gte,
-  gtr
+  gtr,
 } from 'semantic-versions'
 ```
 
@@ -316,12 +300,7 @@ The operator `~>` treats the last digit of corresponding version as the beginnin
   string comparison, but are included for completeness.  Throws if an
   invalid comparison string is provided.
 * `compare(v1, v2)`: Return `0` if `v1 == v2`, or `1` if `v1` is greater, or `-1` if
-  `v2` is greater.  Sorts in ascending order if passed to `Array.sort()`.
-* `rcompare(v1, v2)`: The reverse of compare.  Sorts an array of versions
-  in descending order when passed to `Array.sort()`.
-* `compareBuild(v1, v2)`: The same as `compare` but considers `build` when two versions
-  are equal.  Sorts in ascending order if passed to `Array.sort()`.
-  `v2` is greater.  Sorts in ascending order if passed to `Array.sort()`.
+  `v2` is greater. Sorts in ascending order if passed to `Array.sort()`.
 * `diff(v1, v2)`: Returns difference between two versions by the release type
   (`major`, `premajor`, `minor`, `preminor`, `patch`, `prepatch`, or `prerelease`),
   or null if the versions are the same.
@@ -371,44 +350,3 @@ satisfy the range.
 
 If you want to know if a version satisfies or does not satisfy a
 range, use the `satisfies(version, range)` function.
-
-### Coercion
-
-* `coerce(version, options)`: Coerces a string to semver if possible
-
-This aims to provide a very forgiving translation of a non-semver string to
-semver. It looks for the first digit in a string, and consumes all
-remaining characters which satisfy at least a partial semver (e.g., `1`,
-`1.2`, `1.2.3`) up to the max permitted length (256 characters).  Longer
-versions are simply truncated (`4.6.3.9.2-alpha2` becomes `4.6.3`).  All
-surrounding text is simply ignored (`v3.4 replaces v3.3.1` becomes
-`3.4.0`).  Only text which lacks digits will fail coercion (`version one`
-is not valid).  The maximum  length for any semver component considered for
-coercion is 16 characters; longer components will be ignored
-(`10000000000000000.4.7.4` becomes `4.7.4`).  The maximum value for any
-semver component is `Number.MAX_SAFE_INTEGER || (2**53 - 1)`; higher value
-components are invalid (`9999999999999999.4.7.4` is likely invalid).
-
-If the `options.rtl` flag is set, then `coerce` will return the right-most
-coercible tuple that does not share an ending index with a longer coercible
-tuple.  For example, `1.2.3.4` will return `2.3.4` in rtl mode, not
-`4.0.0`.  `1.2.3/4` will return `4.0.0`, because the `4` is not a part of
-any other overlapping SemVer tuple.
-
-### Clean
-
-* `clean(version)`: Clean a string to be a valid semver if possible
-
-This will return a cleaned and trimmed semver version. If the provided
-version is not valid a null will be returned. This does not work for
-ranges.
-
-ex.
-* `s.clean(' = v 2.1.5foo')`: `null`
-* `s.clean(' = v 2.1.5foo', { loose: true })`: `'2.1.5-foo'`
-* `s.clean(' = v 2.1.5-foo')`: `null`
-* `s.clean(' = v 2.1.5-foo', { loose: true })`: `'2.1.5-foo'`
-* `s.clean('=v2.1.5')`: `'2.1.5'`
-* `s.clean('  =v2.1.5')`: `2.1.5`
-* `s.clean('      2.1.5   ')`: `'2.1.5'`
-* `s.clean('~1.0.0')`: `null`
