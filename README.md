@@ -3,20 +3,22 @@
 
 ## Semantic Versions
 
-##### parsing, validation & comparison
+##### Parsing, validating & comparing Semantic Versions
 
 `semver.xyz`
 
 #### Major differences between `npm`'s `semver`
 
+- `x%` faster
+- build metadata is respected
 - no dependencies
-- build metadata is respected in `min` / `max` functions
+- bug fixes: `...`
 - methods removed: `...`
-- various bug fixes
-- x% faster parsing
-- prerelease comparison is not optional
+- methods renamed: `...`
+- no coercion
+- comparing prereleases is not optional
   - note: if you want this, pre-prune the set of versions
-- loose comparison is not optional (ex. `v1` will fail to parse/compare but `1` is fine - ref. https://semver.org/#is-v123-a-semantic-version)
+- loose comparison is not optional (ex. `v1` will fail to parse but `1` is fine - ref. https://semver.org/#is-v123-a-semantic-version)
   - note: if you want this, coerce your versions prior to comparison
 - no CLI implementation
   - note: if you want this, run `vlxf semantic-versions ...` 
@@ -24,36 +26,37 @@
 ### Usage
 
 ```js
-import {
+import { 
   parse,
+  valid,
   major,
   minor,
   patch,
   prerelease,
+  build,
   diff,
+  cmp,
+  eq,
+  neq,
+  lt,
+  lte,
+  gt,
+  gte
   valid,
-  validRange,
-  simplifyRange,
+  simplify,
   compare,
   subset,
-  minVersion,
-  minSatisfying,
-  maxSatisfying,
+  minimum,
+  lowest,
+  highest,
   intersects,
   increment,
   satisfies,
   sort,
   rsort,
-  cmp,
   outside,
-  eq,
-  neq,
-  lt,
-  lte,
   ltr,
-  gt,
-  gte,
-  gtr,
+  gtr
 } from 'semantic-versions'
 ```
 
@@ -314,11 +317,11 @@ The operator `~>` treats the last digit of corresponding version as the beginnin
 * `validRange(range)`: Return the valid range or null if it's not valid
 * `satisfies(version, range)`: Return true if the version satisfies the
   range.
-* `maxSatisfying(versions, range)`: Return the highest version in the list
+* `highest(versions, range)`: Return the highest version in the list
   that satisfies the range, or `null` if none of them do.
-* `minSatisfying(versions, range)`: Return the lowest version in the list
+* `lowest(versions, range)`: Return the lowest version in the list
   that satisfies the range, or `null` if none of them do.
-* `minVersion(range)`: Return the lowest version that can possibly match
+* `minimum(range)`: Return the lowest version that can possibly match
   the given range.
 * `gtr(version, range)`: Return `true` if version is greater than all the
   versions possible in the range.
@@ -329,7 +332,7 @@ The operator `~>` treats the last digit of corresponding version as the beginnin
   `hilo` argument must be either the string `'>'` or `'<'`.  (This is
   the function called by `gtr` and `ltr`.)
 * `intersects(range)`: Return true if any of the ranges comparators intersect
-* `simplifyRange(versions, range)`: Return a "simplified" range that
+* `simplify(versions, range)`: Return a "simplified" range that
   matches the same items in `versions` list as the range specified.  Note
   that it does *not* guarantee that it would match the same versions in all
   cases, only for the set of versions provided.  This is useful when
