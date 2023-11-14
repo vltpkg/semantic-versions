@@ -7,7 +7,11 @@
 
 `semver.xyz`
 
-#### Major differences between `npm`'s `semver`
+## FAQ
+
+##### What are the differences between `Semantic Versioning - 2.0.0`?
+
+##### What are the differences between `npm`'s `semver`?
 
 - `x%` faster
 - build metadata is respected
