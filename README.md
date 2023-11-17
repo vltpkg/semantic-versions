@@ -211,7 +211,9 @@ comparator.  Allows minor-level changes if not.
 * `~0.2.3` := `>=0.2.3 <0.(2+1).0` := `>=0.2.3 <0.3.0-0`
 * `~0.2` := `>=0.2.0 <0.(2+1).0` := `>=0.2.0 <0.3.0-0` (Same as `0.2.x`)
 * `~0` := `>=0.0.0 <(0+1).0.0` := `>=0.0.0 <1.0.0-0` (Same as `0.x`)
-* `~1.2.3-beta.2` := `>=1.2.3-beta.2 <1.3.0-0` Note that prereleases in
+* `~1.2.3-beta.2` := `>=1.2.3-beta.2 <1.3.0-0` 
+
+Note that prereleases in
   the `1.2.3` version will be allowed, if they are greater than or
   equal to `beta.2`.  So, `1.2.3-beta.4` would be allowed, but
   `1.2.4-beta.2` would not, because it is a prerelease of a
@@ -264,9 +266,9 @@ zero.
 
 The operator `~>` treats the last digit of corresponding version as the beginning of the range & matches only within that respective value.
 
-- `~>1` is equivalent to the range `>=1.0.0, <2.0.0`
-- `~>1.2` is equivalent to the range `>=1.2, <1.2` or `^1.2`
-- `~>1.2.3` is equivalent to the range `>=1.2.3, <1.3.0` or `~1.2.3`
+- `~>1` is equivalent to the range `>=1.0.0, <2.0.0-0` or `^1.x`
+- `~>1.2` is equivalent to the range `>=1.2.0, <1.2.0-0` or `^1.2.x`
+- `~>1.2.3` is equivalent to the range `>=1.2.3, <1.3.0-0` or `~1.2.3`
 - `~>1.2.3-alpha.1` is equivalent 
 
 ## Functions

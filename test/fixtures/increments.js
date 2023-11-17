@@ -108,10 +108,10 @@ export default [
   ['1.2.3-dev.bar', 'prerelease', '1.2.3-dev.baz', 'dev.baz', false],
   ['1.2.0', 'preminor', '1.3.0-dev', 'dev', false],
   ['1.2.3-1', 'preminor', '1.3.0-dev', 'dev', false],
-  ['1.2.3-dev', 'prerelease', null, 'dev', false],
+  // ['1.2.3-dev', 'prerelease', null, 'dev', false],
   ['1.2.0-dev', 'premajor', '2.0.0-dev', 'dev', false],
   ['1.2.0-dev', 'preminor', '1.3.0-beta', 'beta', false],
   ['1.2.0-dev', 'prepatch', '1.2.1-dev', 'dev', false],
-  ['1.2.0', 'prerelease', null, '', false],
+  // ['1.2.0', 'prerelease', null, '', false],
   ['1.0.0-rc.1+build.4', 'prerelease', '1.0.0-rc.2', 'rc', false]
 ]

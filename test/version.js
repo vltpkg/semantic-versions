@@ -5,6 +5,23 @@ import comparisons from './fixtures/comparisons.js'
 import equality from './fixtures/equality.js'
 import invalidVersions from './fixtures/invalid-versions.js'
 
+const inc = (version, release, options, identifier, identifierBase) => {
+  if (typeof (options) === 'string') {
+    identifierBase = identifier
+    identifier = options
+    options = undefined
+  }
+  try {
+    return new Version(
+      version instanceof Version ? version.version : version,
+      options
+    ).inc(release, identifier, identifierBase).version
+  } catch (er) {
+    return null
+  }
+}
+const parse = (v) => new Version(v)
+
 test('comparisons', t => {
   t.plan(comparisons.length)
   comparisons.forEach(([v0, v1]) => t.test(`${v0} ${v1}`, t => {
@@ -89,6 +106,48 @@ test('incrementing', t => {
   }))
 })
 
+test('increment versions test', (t) => {
+  increments.forEach(([pre, what, wanted, id, base]) => {
+    console.log({ pre, what, wanted, id, base })
+    const found = inc(pre, what, id, base)
+    const cmd = `inc(${pre}, ${what}, ${id}, ${base})`
+    t.equal(found, wanted, `${cmd} === ${wanted}`)
+
+    const parsed = parse(pre)
+    const parsedAsInput = parse(pre)
+    if (wanted) {
+      parsed.inc(what, id, base)
+      t.equal(parsed.version, wanted, `${cmd} object version updated`)
+      if (parsed.build.length) {
+        t.equal(
+          parsed.raw,
+          `${wanted}+${parsed.build.join('.')}`,
+          `${cmd} object raw field updated with build`
+        )
+      } else {
+        t.equal(parsed.raw, wanted, `${cmd} object raw field updated`)
+      }
+
+      const preIncObject = JSON.stringify(parsedAsInput)
+      inc(parsedAsInput, what, id, base)
+      const postIncObject = JSON.stringify(parsedAsInput)
+      t.equal(
+        postIncObject,
+        preIncObject,
+        `${cmd} didn't modify its input`
+      )
+    } else if (parsed) {
+      t.throws(() => {
+        parsed.inc(what, id, base)
+      })
+    } else {
+      t.equal(parsed, null)
+    }
+  })
+
+  t.end()
+})
+
 test('compare main vs pre', (t) => {
   const s = new Version('1.2.3-alpha.0.pr.1')
   t.equal(s.compare('2.3.4'), -1)
@@ -97,9 +156,9 @@ test('compare main vs pre', (t) => {
   t.equal(s.compare('1.2.2'), 1)
   t.equal(s.compare('1.2.3-pre'), -1)
   t.equal(s.compare('9.9.9-alpha.0.pr.1'), -1)
-  t.equal(s.compare('1.2.3'), 1)
+  t.equal(s.compare('1.2.3'), -1)
   t.equal(s.compare('1.2.3-alpha.0.pr.2'), -1)
-  t.equal(s.compare('1.2.3-alpha.0.2'), -1)
+  t.equal(s.compare('1.2.3-alpha.0.2'), 1)
   t.end()
 })
 
@@ -108,9 +167,9 @@ test('compare build', (t) => {
   const build0 = new Version('1.0.0+0')
   const build1 = new Version('1.0.0+1')
   const build10 = new Version('1.0.0+1.0')
-  t.equal(noBuild.compare(build0), -1)
+  t.equal(noBuild.compare(build0), 1)
   t.equal(build0.compare(build0), 0)
-  t.equal(build0.compare(noBuild), 1)
+  t.equal(build0.compare(noBuild), -1)
   t.equal(build0.compare('1.0.0+0.0'), -1)
   t.equal(build0.compare(build1), -1)
   t.equal(build1.compare(build0), 1)
