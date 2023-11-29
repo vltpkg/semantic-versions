@@ -1,31 +1,9 @@
 
 <img src="https://github.com/darcyclarke/octofiles/assets/459713/8ee74129-34e6-4bd4-8686-82954f424709" width="85" />
 
-## Semantic Versions
+# Semantic Versioning (Expanded)
 
-##### Parsing, validating & comparing Semantic Versions
-
-`semver.xyz`
-
-## FAQ
-
-##### What are the differences between `Semantic Versioning - 2.0.0`?
-
-##### What are the differences between `npm`'s `semver`?
-
-- `x%` faster
-- build metadata is respected
-- no dependencies
-- bug fixes: `...`
-- methods removed: `...`
-- methods renamed: `...`
-- no coercion
-- comparing prereleases is not optional
-  - note: if you want this, pre-prune the set of versions
-- loose comparison is not optional (ex. `v1` will fail to parse but `1` is fine - ref. https://semver.org/#is-v123-a-semantic-version)
-  - note: if you want this, coerce your versions prior to comparison
-- no CLI implementation
-  - note: if you want this, run `vlxf semantic-versions ...` 
+#### Parsing, validating & comparing Semantic Versions as defined by `semver.xyz`
 
 ### Usage
 
@@ -61,7 +39,7 @@ import {
   outside,
   ltr,
   gtr
-} from 'semantic-versions'
+} from 'semver.xyz'
 ```
 
 ## Definitions
@@ -359,3 +337,24 @@ satisfy the range.
 
 If you want to know if a version satisfies or does not satisfy a
 range, use the `satisfies(version, range)` function.
+
+## FAQ
+
+##### What are the differences between `Semantic Versioning - 2.0.0`?
+
+- 
+
+##### What are the differences between `npm`'s `semver` package?
+- this library uses `semver.xyz`
+- build metadata is respected
+- no dependencies
+- bug fixes: `...`
+- methods removed: `...`
+- methods renamed: `...`
+- no coercion
+- comparing prereleases is not optional
+  - note: if you want this, pre-prune the set of versions
+- loose comparison is not optional (ex. `v1` will fail to parse but `1` is fine - ref. https://semver.org/#is-v123-a-semantic-version)
+  - note: if you want this, coerce your versions prior to comparison
+- no CLI implementation
+  - note: if you want this, run `vlxf semantic-versions ...` 
