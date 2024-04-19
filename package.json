@@ -5,13 +5,12 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "benchmark": "hyperfine --warmup 3 'npm run benchmark-svs' 'npm run benchmark-semver'",
-    "benchmark-svs": "tap ./test/benchmarks/semantic-versions.js",
-    "benchmark-semver": "tap ./test/benchmarks/semver.js",
+    "bun": "hyperfine --warmup 3 'bun ./benchmarks/bun.js' 'bun ./benchmarks/npm.js' 'bun ./benchmarks/this.js'",
+    "node": "hyperfine --warmup 3 'node ./benchmarks/npm.js' 'node ./benchmarks/this.js'",
     "test": "tap"
   },
   "devDependencies": {
+    "semver": "^7.6.0",
     "tap": "^16.0.0"
-  },
-  "dependencies": {}
+  }
 }
