@@ -1,0 +1,7 @@
+{
+  "name": "my-app",
+  "dependencies": {
+    "express": "npm:express@5.2.1+lock.AQABAAECAwQFBgc",
+    "lodash": "npm:lodash@4.18.1+lock.AQABAAECAwQFBgc"
+  }
+}
