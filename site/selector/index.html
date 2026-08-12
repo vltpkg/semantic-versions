@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Try it: test what matches what · semver.xyz</title>
+    <meta
+      name="description"
+      content="A client-side range selector: type a range and a set of versions and see exactly what the Semantic Versions grammar matches, powered by the reference parser."
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#fbfbfb" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <div data-nav></div>
+
+    <main>
+      <section class="page-hero reveal">
+        <p class="eyebrow">Try it</p>
+        <h1>Test what matches what.</h1>
+        <p class="lead">
+          Type a range and a list of versions. This resolves the range against the
+          <strong>Semantic Versions</strong> grammar and shows exactly which versions satisfy it,
+          entirely in your browser, powered by the reference <code>semantic-versions</code> parser.
+          Start from a <em>sample set</em> to explore pre-release trains, build variants and
+          contexts, or pull real versions from npm or any npm-compatible registry origin.
+        </p>
+      </section>
+
+      <section class="selector">
+        <div class="field reveal">
+          <label for="range">Range</label>
+          <input id="range" type="text" spellcheck="false" autocomplete="off"
+            placeholder="^1.2.3   ·   ~>1.2   ·   1.2.7 || >=1.2.9 <2.0.0" value="^1.2.3" />
+          <span class="hint">Comparators, hyphen ranges, x-ranges, tilde, caret, approximate (<code>~&gt;</code>), build channels (<code>+win</code>) and pre-release channels (<code>-rc</code>, <code>-*</code>, <code>*-*</code>). Prefix a <a href="/spec/#context">context</a> (<code>npm:react@^1.0.0</code>) to scope the match to one identity.</span>
+        </div>
+
+        <div class="chips reveal" id="examples" aria-label="Example ranges"></div>
+
+        <div class="sel-toolbar sel-fetch reveal">
+          <div class="sel-origin">
+            <input id="registry" type="text" spellcheck="false" autocomplete="off"
+              aria-label="Registry origin"
+              placeholder="https://registry.npmjs.org" value="https://registry.npmjs.org" />
+            <input id="pkg" type="text" spellcheck="false" autocomplete="off"
+              aria-label="Package name"
+              placeholder="package (e.g. debug or @scope/name)" />
+          </div>
+          <div class="sel-actions">
+            <button class="btn btn-primary" id="load-npm" type="button">Fetch versions</button>
+            <button class="btn btn-ghost" id="reset" type="button">Reset</button>
+          </div>
+        </div>
+        <p class="hint reveal" style="margin:-6px 0 14px">
+          Fetches the package document directly from any npm-compatible registry origin
+          (npm, Verdaccio, GitHub Packages, a private mirror, and so on), entirely client-side.
+          Note that public registries don't publish <strong>build metadata</strong> and rarely
+          carry long pre-release trains, so the <em>Build variants</em> and
+          <em>Release train</em> sample sets above are the best way to explore those parts
+          of the grammar.
+        </p>
+
+        <p class="range-echo reveal" id="echo"></p>
+
+        <div class="sel-grid">
+          <div class="reveal">
+            <div class="field">
+              <label for="versions">Candidate versions</label>
+              <div class="chips" id="samples" aria-label="Sample version sets"></div>
+              <p class="sample-note" id="sample-note"></p>
+              <textarea id="versions" spellcheck="false"></textarea>
+              <span class="hint">One per line (whitespace- or comma-separated also works).</span>
+            </div>
+          </div>
+
+          <div class="reveal">
+            <div class="field">
+              <label>Desugared comparators</label>
+              <div class="desugar" id="desugar"></div>
+            </div>
+            <div class="sel-summary" id="summary"></div>
+            <div class="vlist" id="results" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div data-footer></div>
+
+    <script type="module" src="/src/shell.js"></script>
+    <script type="module" src="/selector/selector.js"></script>
+  </body>
+</html>

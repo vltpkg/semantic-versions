@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BNF grammar — versions, ranges &amp; comparators · semver.xyz</title>
+    <meta
+      name="description"
+      content="Backus-Naur Form grammars for Semantic Versions, ranges and comparators: everything needed to build a compliant library."
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#fbfbfb" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <div data-nav></div>
+
+    <main>
+      <section class="page-hero reveal">
+        <p class="eyebrow">Grammar</p>
+        <h1>Build a library <span class="grad">from the grammar.</span></h1>
+        <p class="lead">
+          Formal Backus–Naur forms for versions, ranges and comparators. Each is downloadable as a
+          <code>.bnf</code> file, and mirrored by the reference
+          <a href="https://github.com/vltpkg/semantic-versions/tree/main/packages/parser">semantic-versions</a>
+          parser. A <a href="https://regex101.com/r/vkijKf/1/" target="_blank" rel="noopener">regular expression</a> is
+          also available for quick validation.
+        </p>
+      </section>
+
+      <div class="doc-layout">
+        <aside class="toc reveal" aria-label="Table of contents">
+          <div class="toc-title">Grammars</div>
+          <a href="#versions">Versions</a>
+          <a href="#references">References &amp; context</a>
+          <a href="#ranges">Ranges</a>
+          <a href="#comparators">Comparators</a>
+          <a href="#implementation">Reference parser</a>
+        </aside>
+
+        <article class="doc reveal">
+          <h2 id="versions">Versions</h2>
+          <p>A valid version is a version core with optional pre-release and build labels.</p>
+          <div class="grammar-actions">
+            <a class="btn btn-ghost" href="/spec/VERSION.bnf" download>Download VERSION.bnf</a>
+          </div>
+          <pre class="bnf" data-copy><button class="copy-btn" type="button" aria-label="Copy" style="float:right">Copy</button><code>&lt;valid semver&gt; ::= &lt;version core&gt;
+                 | &lt;version core&gt; "-" &lt;pre-release&gt;
+                 | &lt;version core&gt; "+" &lt;build&gt;
+                 | &lt;version core&gt; "-" &lt;pre-release&gt; "+" &lt;build&gt;
+
+&lt;version core&gt; ::= &lt;major&gt; "." &lt;minor&gt; "." &lt;patch&gt;
+
+&lt;major&gt; ::= &lt;numeric identifier&gt;
+&lt;minor&gt; ::= &lt;numeric identifier&gt;
+&lt;patch&gt; ::= &lt;numeric identifier&gt;
+
+&lt;pre-release&gt; ::= &lt;dot-separated pre-release identifiers&gt;
+
+&lt;dot-separated pre-release identifiers&gt; ::= &lt;pre-release identifier&gt;
+                                          | &lt;pre-release identifier&gt; "." &lt;dot-separated pre-release identifiers&gt;
+
+&lt;build&gt; ::= &lt;dot-separated build identifiers&gt;
+
+&lt;dot-separated build identifiers&gt; ::= &lt;build identifier&gt;
+                                    | &lt;build identifier&gt; "." &lt;dot-separated build identifiers&gt;
+
+&lt;pre-release identifier&gt; ::= &lt;alphanumeric identifier&gt;
+                           | &lt;numeric identifier&gt;
+
+&lt;build identifier&gt; ::= &lt;alphanumeric identifier&gt;
+                     | &lt;digits&gt;
+
+&lt;numeric identifier&gt; ::= "0"
+                       | &lt;positive digit&gt;
+                       | &lt;positive digit&gt; &lt;digits&gt;
+
+&lt;positive digit&gt; ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"</code></pre>
+          <p class="caption" style="text-align:left">The full leaf definitions (identifier characters, letters, digits) are in the downloadable file.</p>
+
+          <h2 id="references">References &amp; context</h2>
+          <p>
+            A version rarely travels alone. A <strong>reference</strong> pairs a version (or a range)
+            with the <a href="/spec/#context">context</a> it belongs to: the identity of a package,
+            module, image, crate or service. The context is optional and, when present, is separated
+            from the version by <code>@</code>. An ecosystem qualifies a context with a
+            <strong>source</strong> (<code>source:name</code>), so the same grammar names artifacts
+            anywhere: <code>npm:react@18.2.0</code>, <code>pypi:flask@3.0.0</code>,
+            <code>gem:rails@7.1.3</code>, <code>golang:golang.org/x/text@0.14.0</code>. A context
+            never contains whitespace and a
+            version never contains <code>@</code>, so the split is unambiguous.
+          </p>
+          <div class="grammar-actions">
+            <a class="btn btn-ghost" href="/spec/REFERENCE.bnf" download>Download REFERENCE.bnf</a>
+          </div>
+          <pre class="bnf" data-copy><button class="copy-btn" type="button" aria-label="Copy" style="float:right">Copy</button><code>&lt;reference&gt;       ::= &lt;valid semver&gt;
+                  | &lt;context&gt; "@" &lt;valid semver&gt;
+
+&lt;range reference&gt; ::= &lt;range set&gt;
+                  | &lt;context&gt; "@" &lt;range set&gt;
+
+&lt;context&gt;         ::= &lt;name&gt;
+                  | &lt;source&gt; ":" &lt;name&gt;
+
+&lt;source&gt;          ::= &lt;lowercase letter&gt; ( &lt;lowercase letter&gt; | &lt;digit&gt; | "-" ) *
+
+&lt;name&gt;            ::= &lt;name path&gt;
+                  | "@" &lt;name path&gt;                ; scoped, e.g. @scope/pkg
+
+&lt;name path&gt;       ::= &lt;name segment&gt; ( "/" &lt;name segment&gt; ) *
+
+&lt;name segment&gt;    ::= &lt;name character&gt; +
+
+&lt;name character&gt;  ::= &lt;letter&gt; | &lt;digit&gt; | "-" | "." | "_"</code></pre>
+          <p class="caption" style="text-align:left">Context is identity, not precedence: it never changes how versions order. It scopes a range to a <a href="/spec/#contextual-sets">Contextual Set</a>, so <code>npm:react@^1.2.3</code> admits only versions of <code>npm:react</code>.</p>
+
+          <h2 id="ranges">Ranges</h2>
+          <p>A range-set is one or more comparator sets joined by <code>||</code>. Hyphen, x-range, tilde, caret and approximate forms desugar to primitive comparators.</p>
+          <div class="grammar-actions">
+            <a class="btn btn-ghost" href="/spec/RANGE.bnf" download>Download RANGE.bnf</a>
+          </div>
+          <pre class="bnf" data-copy><button class="copy-btn" type="button" aria-label="Copy" style="float:right">Copy</button><code>&lt;range set&gt;    ::= &lt;range&gt; ( &lt;logical or&gt; &lt;range&gt; ) *
+
+&lt;logical or&gt;   ::= ( " " ) * "||" ( " " ) *
+
+&lt;range&gt;        ::= &lt;hyphen&gt;
+                 | &lt;simple&gt; ( " " &lt;simple&gt; ) *
+                 | ""
+
+&lt;hyphen&gt;       ::= &lt;partial&gt; " - " &lt;partial&gt;
+
+&lt;simple&gt;       ::= &lt;primitive&gt;
+                 | &lt;partial&gt;
+                 | &lt;tilde&gt;
+                 | &lt;caret&gt;
+
+&lt;primitive&gt;    ::= &lt;operator&gt; &lt;partial&gt;
+
+&lt;operator&gt;     ::= "&lt;" | "&gt;" | "&gt;=" | "&lt;=" | "="
+
+&lt;tilde&gt;        ::= "~" [ "&gt;" ] &lt;partial&gt;
+
+&lt;caret&gt;        ::= "^" &lt;partial&gt;
+
+&lt;partial&gt;      ::= &lt;xr&gt; [ "." &lt;xr&gt; [ "." &lt;xr&gt; &lt;qualifier&gt; ? ] ]
+
+&lt;xr&gt;           ::= "x" | "X" | "*" | &lt;numeric identifier&gt;
+
+&lt;qualifier&gt;    ::= ( "-" &lt;pre-release&gt; ) ? ( "+" &lt;build&gt; ) ?</code></pre>
+
+          <h2 id="comparators">Comparators</h2>
+          <p>A comparator is an operator and a version; a comparator set is the intersection of whitespace-joined comparators.</p>
+          <div class="grammar-actions">
+            <a class="btn btn-ghost" href="/spec/COMPARATOR.bnf" download>Download COMPARATOR.bnf</a>
+          </div>
+          <pre class="bnf" data-copy><button class="copy-btn" type="button" aria-label="Copy" style="float:right">Copy</button><code>&lt;comparator set&gt; ::= &lt;comparator&gt; ( &lt;whitespace&gt; &lt;comparator&gt; ) *
+
+&lt;comparator&gt;     ::= &lt;operator&gt; &lt;partial&gt;
+                   | &lt;partial&gt;
+
+&lt;operator&gt;       ::= "&lt;" | "&gt;" | "&gt;=" | "&lt;=" | "="
+
+&lt;whitespace&gt;     ::= ( " " ) +
+
+&lt;partial&gt;        ::= &lt;xr&gt; [ "." &lt;xr&gt; [ "." &lt;xr&gt; &lt;qualifier&gt; ? ] ]
+
+&lt;xr&gt;             ::= "x" | "X" | "*" | &lt;numeric identifier&gt;
+
+&lt;qualifier&gt;      ::= ( "-" &lt;pre-release&gt; ) ? ( "+" &lt;build&gt; ) ?</code></pre>
+
+          <h2 id="implementation">Reference parser</h2>
+          <p>
+            The <code>semantic-versions</code> package implements this grammar. It exposes
+            <code>Version</code>, <code>Range</code>, <code>satisfies</code>, <code>compare</code>,
+            <code>valid</code>, <code>validRange</code> and the usual comparison helpers, and is the
+            engine behind the <a href="/selector/">range selector</a>.
+          </p>
+          <div class="code-window" data-copy>
+            <div class="code-bar">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="code-title">semantic-versions</span>
+              <button class="copy-btn" type="button" aria-label="Copy">Copy</button>
+            </div>
+            <pre class="code"><code><span class="t-cmt">import</span> { <span class="t-key">Range</span>, <span class="t-key">satisfies</span>, <span class="t-key">validRange</span> } <span class="t-cmt">from</span> <span class="t-str">"semantic-versions"</span>
+
+validRange(<span class="t-str">"~&gt;1.2"</span>)            <span class="t-cmt">// "&gt;=1.2.0 &lt;1.3.0-0"</span>
+satisfies(<span class="t-str">"1.4.0"</span>, <span class="t-str">"^1.2.3"</span>)  <span class="t-cmt">// true</span>
+<span class="t-cmt">new</span> Range(<span class="t-str">"1.2.7 || &gt;=1.2.9 &lt;2.0.0"</span>).test(<span class="t-str">"1.4.6"</span>)  <span class="t-cmt">// true</span></code></pre>
+          </div>
+        </article>
+      </div>
+    </main>
+
+    <div data-footer></div>
+
+    <script type="module" src="/src/shell.js"></script>
+  </body>
+</html>

@@ -1,0 +1,67 @@
+{
+  "name": "semantic-versions",
+  "version": "1.0.0",
+  "description": "The reference parser for Semantic Versions (semver.xyz): parse, validate, compare and range-match versions, with build metadata that participates in precedence.",
+  "keywords": [
+    "semver",
+    "semantic-versions",
+    "semantic-versioning",
+    "version",
+    "versions",
+    "range",
+    "ranges",
+    "comparator",
+    "precedence",
+    "build-metadata",
+    "parser",
+    "vlt"
+  ],
+  "homepage": "https://semver.xyz",
+  "bugs": [
+    {
+      "type": "link",
+      "url": "https://github.com/vltpkg/semantic-versions/issues"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vltpkg/semantic-versions.git",
+    "directory": "packages/parser"
+  },
+  "license": "Apache-2.0",
+  "author": {
+    "name": "vlt",
+    "url": "https://www.vlt.io"
+  },
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "test": "tap",
+    "test:coverage": "tap --coverage",
+    "bench:bun": "hyperfine --warmup 3 'bun ./benchmarks/bun.js' 'bun ./benchmarks/npm.js' 'bun ./benchmarks/this.js'",
+    "bench:node": "hyperfine --warmup 3 'node ./benchmarks/npm.js' 'node ./benchmarks/this.js'",
+    "prepublishOnly": "tap"
+  },
+  "devDependencies": {
+    "semver": "^7.6.0",
+    "tap": "^16.0.0"
+  }
+}

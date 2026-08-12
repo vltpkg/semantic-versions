@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>History: how build metadata lost its meaning · semver.xyz</title>
+    <meta
+      name="description"
+      content="A short history of Semantic Versioning: how builds were introduced in 2.0.0-rc.1, and how 2.0.0-rc.2 turned them into inert build metadata."
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#fbfbfb" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div class="bg-grid" aria-hidden="true"></div>
+
+    <div data-nav></div>
+
+    <main>
+      <section class="page-hero reveal">
+        <p class="eyebrow">History</p>
+        <h1>How <span class="grad">build</span> lost its meaning.</h1>
+        <p class="lead">
+          Semantic Versioning is well intentioned, but it carries a few bad definitions and a few
+          missing ones. The most consequential mistake happened between two release candidates, and
+          we still live with it today. Here is the paper trail.
+        </p>
+      </section>
+
+      <section class="timeline">
+        <div class="tl-item reveal">
+          <span class="tl-dot"></span>
+          <div class="tl-date">2010</div>
+          <h3>Node &amp; npm sidestep dependency hell</h3>
+          <p>
+            Node introduces nested modules and npm arrives. Because you can safely scope while
+            still consuming conflicting transitive dependencies, JavaScript avoids the first circle
+            of dependency hell that trapped single-version ecosystems. The community goes on to
+            publish more packages than anywhere else.
+          </p>
+        </div>
+
+        <div class="tl-item reveal">
+          <span class="tl-dot"></span>
+          <div class="tl-date">Nov 2011 · @mojombo</div>
+          <h3>Builds are introduced</h3>
+          <p>
+            Tom Preston-Werner adds <em>build versions</em> to the spec. A build functions as the
+            antithesis of a pre-release (you could call it a post-release) and it
+            <strong>participates in precedence</strong>. Two builds of the same normal version can
+            be ordered.
+          </p>
+          <p>
+            <a href="https://github.com/semver/semver/commit/70921127564efdb54263de3243a7cb279d020d2a" target="_blank" rel="noopener">semver@7092112 — "add build versions"</a>
+          </p>
+        </div>
+
+        <div class="tl-item reveal">
+          <span class="tl-dot"></span>
+          <div class="tl-date">Dec 2011 · 2.0.0-rc.1</div>
+          <h3>The high-water mark</h3>
+          <p>
+            <code>2.0.0-rc.1</code> is published. As far as we can tell it is the most accurate
+            versioning spec to date: it encompasses common practice of generating builds and build
+            variants, and keeps their precedence intact. This is the document
+            <strong>Semantic Versions</strong> takes as its starting point.
+          </p>
+          <p>
+            <a href="https://semver.org/spec/v2.0.0-rc.1.html" target="_blank" rel="noopener">semver.org/spec/v2.0.0-rc.1.html</a>
+          </p>
+        </div>
+
+        <div class="tl-item bad reveal">
+          <span class="tl-dot"></span>
+          <div class="tl-date">Mar 2013 · 2.0.0-rc.2 · @haacked &amp; @jeffhandley</div>
+          <h3>Builds become inert "build metadata"</h3>
+          <p>
+            Two years later, Phil Haack and Jeff Handley, contributors from the NuGet and .NET
+            ecosystem, redefine builds as <em>build metadata</em> and strip away their precedence.
+            Overnight, every version with build metadata becomes equivalent to any other of the same
+            normal or pre-release version. Six artifacts with different git hashes and architectures
+            are now <em>semantically identical</em>, with no way in the spec to order or choose
+            between them. <a href="#the-exact-change">See the exact wording that changed ↓</a>
+          </p>
+          <p>
+            <a href="https://www.diffchecker.com/UFodzNqy/" target="_blank" rel="noopener">rc.1 → rc.2 diff</a> ·
+            <a href="https://github.com/semver/semver/pull/77" target="_blank" rel="noopener">semver/semver#77</a> ·
+            <a href="https://github.com/semver/semver/commit/57fd19400f53b5d4559de4dcf6ede2e638250625" target="_blank" rel="noopener">57fd194</a> ·
+            <a href="https://github.com/semver/semver/commit/13aaadaadb0d572b59c84a9851540ed1caeea35f" target="_blank" rel="noopener">13aaada</a>
+          </p>
+        </div>
+
+        <div class="tl-item bad reveal">
+          <span class="tl-dot"></span>
+          <div class="tl-date">Since 2013</div>
+          <h3>The ecosystem forgets builds exist</h3>
+          <p>
+            npm's own SemVer implementation, which itself adds grammars and logic on top of the
+            spec, defaults to <strong>stripping build metadata</strong> from versions. The result:
+            there are effectively no packages in the registry carrying build metadata, even though
+            it is supposed to be a valid part of a version. A legitimate, useful concept was
+            co-opted into a non-functional one, confusing tooling authors ever since.
+          </p>
+        </div>
+
+        <div class="tl-item reveal">
+          <span class="tl-dot"></span>
+          <div class="tl-date">Today · 1.0.0</div>
+          <h3>Semantic Versions</h3>
+          <p>
+            <a href="/spec/">Semantic Versions</a> reverts the build change, restores build
+            precedence, corrects the definition of a patch, and finally writes down the sets,
+            ranges and comparators the ecosystem already relies on. If we want to avoid becoming
+            heretics in the sixth circle, we have to codify what we actually do.
+          </p>
+          <p>
+            <a href="https://gitnation.com/contents/spec-tacular-semver-and-beyond" target="_blank" rel="noopener">Watch the talk: "Spec-tacular — SemVer &amp; Beyond"</a>
+          </p>
+        </div>
+      </section>
+
+      <section class="wrap origin-diff">
+        <div class="section-head left reveal">
+          <p class="eyebrow">The exact change</p>
+          <h2 id="the-exact-change" class="section-title big">Two sentences, a decade of confusion.</h2>
+          <p class="lead">
+            The intent of the <code>+</code> build was never in doubt in
+            <code>2.0.0-rc.1</code>: a build was a <em>post-release</em> that ordered above its
+            normal version. Between the two release candidates, the sentence that gave it meaning
+            was struck and replaced. Here is that change, as a diff of the verbatim spec text.
+          </p>
+        </div>
+
+        <div class="gh-diff reveal">
+          <div class="gh-diff-head">
+            <span class="gh-diff-file">
+              SEMVER.md
+              <span class="gh-diff-rev">2.0.0-rc.1 → 2.0.0-rc.2</span>
+            </span>
+            <span class="gh-diff-stat">
+              <span class="gh-add">+6</span><span class="gh-del">−5</span>
+            </span>
+          </div>
+          <div class="gh-diff-body">
+            <div class="gh-hunk"><span class="gh-hunk-at">@@ -33,3 +31,4 @@</span> Build definition</div>
+            <div class="gh-row del"><span class="ln ln-old">33</span><span class="ln ln-new"></span><span class="gh-sign">-</span><span class="gh-code">A <b>build version</b> MAY be denoted by appending a plus sign …</span></div>
+            <div class="gh-row del"><span class="ln ln-old">34</span><span class="ln ln-new"></span><span class="gh-sign">-</span><span class="gh-code"><mark>Build versions satisfy and have a higher precedence than the associated normal version.</mark></span></div>
+            <div class="gh-row del"><span class="ln ln-old">35</span><span class="ln ln-new"></span><span class="gh-sign">-</span><span class="gh-code">Examples: <code>1.0.0+build.1</code>, <code>1.3.7+build.11.e0f985a</code></span></div>
+            <div class="gh-row add"><span class="ln ln-old"></span><span class="ln ln-new">31</span><span class="gh-sign">+</span><span class="gh-code"><b>Build metadata</b> MAY be denoted by appending a plus sign …</span></div>
+            <div class="gh-row add"><span class="ln ln-old"></span><span class="ln ln-new">32</span><span class="gh-sign">+</span><span class="gh-code"><mark>Build metadata SHOULD be ignored when determining version precedence.</mark></span></div>
+            <div class="gh-row add"><span class="ln ln-old"></span><span class="ln ln-new">33</span><span class="gh-sign">+</span><span class="gh-code"><mark>Thus two packages with the same version but different build metadata are considered to be the same version.</mark></span></div>
+            <div class="gh-row add"><span class="ln ln-old"></span><span class="ln ln-new">34</span><span class="gh-sign">+</span><span class="gh-code">Examples: <code>1.0.0-alpha+001</code>, <code>1.0.0+20130313144700</code></span></div>
+
+            <div class="gh-hunk"><span class="gh-hunk-at">@@ -40,2 +38,2 @@</span> Precedence</div>
+            <div class="gh-row del"><span class="ln ln-old">40</span><span class="ln ln-new"></span><span class="gh-sign">-</span><span class="gh-code">Precedence MUST be calculated by separating the version into major, minor, patch, pre-release, <mark>and build</mark> identifiers in that order. …</span></div>
+            <div class="gh-row del"><span class="ln ln-old">41</span><span class="ln ln-new"></span><span class="gh-sign">-</span><span class="gh-code"><mark>Pre-release and build version precedence MUST be determined by comparing each dot separated identifier.</mark></span></div>
+            <div class="gh-row add"><span class="ln ln-old"></span><span class="ln ln-new">38</span><span class="gh-sign">+</span><span class="gh-code">Precedence MUST be calculated by separating the version into major, minor, patch and pre-release identifiers in that order.</span></div>
+            <div class="gh-row add"><span class="ln ln-old"></span><span class="ln ln-new">39</span><span class="gh-sign">+</span><span class="gh-code"><mark>(Build metadata does not figure into precedence.)</mark> …</span></div>
+          </div>
+        </div>
+
+        <p class="diff-source reveal">
+          See the full side-by-side:
+          <a href="https://www.diffchecker.com/UFodzNqy/" target="_blank" rel="noopener">rc.1 → rc.2 diff</a>
+          · <a href="https://semver.org/spec/v2.0.0-rc.1.html" target="_blank" rel="noopener">rc.1 text</a>
+          · <a href="https://semver.org/spec/v2.0.0-rc.2.html" target="_blank" rel="noopener">rc.2 text</a>
+        </p>
+
+        <div class="diff-why reveal">
+          <h3>Why they did it, and the opening it left</h3>
+          <p>
+            It wasn't malice; it answered a real need. NuGet was designing its v3 feed and wanted
+            build metadata to be <strong>diagnostic only</strong>: a commit hash, date, or build
+            number that never changes a package's identity. If build affected precedence, then
+            <code>1.0.0+a</code> and <code>1.0.0+b</code> would be <em>different</em> packages:
+            ambiguous equality, duplicate registry entries, and unpredictable folder paths, URLs and
+            <code>.nupkg</code> filenames that NuGet constructs from the <em>normalized</em> version.
+            Declaring build “ignored” made identity deterministic. That local win became the global
+            default, and npm's own SemVer, which strips build, sealed it.
+          </p>
+          <p>
+            The irony is the opportunity. Because the ecosystem then stopped using build
+            <em>at all</em>, the slot is empty real estate. Semantic Versions restores its precedence
+            and puts it to work exactly where nothing else lives:
+            <a href="/extensions/dependency-locks/">Dependency Locks</a> and
+            <a href="/extensions/integrity/">Package Integrity</a> are what a meaningful build was
+            always for.
+          </p>
+          <p class="diff-why-src">
+            Reasoning drawn from
+            <a href="https://devblogs.microsoft.com/dotnet/supporting-semver-2-0-0/" target="_blank" rel="noopener">“Supporting Semantic Versioning 2.0.0” (.NET Blog)</a>
+            and the
+            <a href="https://github.com/NuGet/Home/wiki/SemVer-2.0.0-support" target="_blank" rel="noopener">NuGet SemVer 2.0.0 support</a> notes.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <div data-footer></div>
+
+    <script type="module" src="/src/shell.js"></script>
+  </body>
+</html>

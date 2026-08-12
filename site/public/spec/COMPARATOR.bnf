@@ -1,0 +1,41 @@
+; Backus-Naur Form Grammar for a Semantic Version Comparator
+; https://semver.xyz/grammar/#comparators
+;
+; A comparator is an operator and a version. A comparator set is one or more
+; comparators joined by whitespace, satisfied by the intersection of all of
+; the comparators it includes.
+
+<comparator set> ::= <comparator> ( <whitespace> <comparator> ) *
+
+<comparator>     ::= <operator> <partial>
+                   | <partial>
+
+<operator>       ::= "<" | ">" | ">=" | "<=" | "="
+
+<whitespace>     ::= ( " " ) +
+
+<partial>        ::= <xr> [ "." <xr> [ "." <xr> <qualifier> ? ] ]
+
+<xr>             ::= "x" | "X" | "*" | <numeric identifier>
+
+<qualifier>      ::= ( "-" <range pre-release> ) ? ( "+" <build> ) ?
+
+; A comparator pre-release may be the wildcard "*" (any pre-release of this
+; tuple); versions themselves never use it (see VERSION.bnf's <pre-release>).
+<range pre-release> ::= "*" | <pre-release>
+
+; <pre-release>, <build> and <numeric identifier> are defined by the version
+; grammar (see VERSION.bnf).
+;
+; A "+ <build>" on a comparator is a CHANNEL FILTER: the numeric comparison
+; ignores build metadata on both sides, and the candidate must additionally
+; carry a build whose identifiers begin with the channel's (prefix match).
+;   >=1.0.0+win   satisfied by 1.4.2+win.x64, not by 1.4.2+linux.x64 or 1.4.2
+;
+; A "- <pre-release>" on a comparator is likewise a CHANNEL FILTER, scoped to
+; the comparator's [major, minor, patch] tuple and matched as a PREFIX. Stable
+; versions are unaffected; a pre-release candidate is admitted only if its
+; identifiers begin with the channel's, on the same tuple. Pre-releases are
+; excluded by default (they rank below their release); "-*" admits any
+; pre-release of the tuple.
+;   >=1.0.0-rc   admits 1.0.0-rc, 1.0.0-rc.1, …; never 1.0.0-beta

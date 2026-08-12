@@ -1,16 +1,21 @@
 {
-  "name": "semantic-versions",
-  "version": "0.0.0-pre.1",
-  "description": "The semantic version parser used by vlt",
-  "main": "index.js",
+  "name": "semver-xyz",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The semver.xyz specification site and reference parser",
   "type": "module",
   "scripts": {
-    "bun": "hyperfine --warmup 3 'bun ./benchmarks/bun.js' 'bun ./benchmarks/npm.js' 'bun ./benchmarks/this.js'",
-    "node": "hyperfine --warmup 3 'node ./benchmarks/npm.js' 'node ./benchmarks/this.js'",
-    "test": "tap"
+    "dev": "vlt run dev -w site",
+    "build": "vlt run build -w site",
+    "preview": "vlt run preview -w site",
+    "deploy": "vlt run build -w site && wrangler pages deploy site/dist --project-name semver-xyz",
+    "deploy:preview": "vlt run build -w site && wrangler pages deploy site/dist --project-name semver-xyz --branch preview",
+    "cf:whoami": "wrangler whoami",
+    "test": "vlt run test -w packages/parser",
+    "publish:dry": "vlt publish --dry-run --workspace packages/parser",
+    "release": "vlt run test -w packages/parser && vlt publish --workspace packages/parser --access public"
   },
   "devDependencies": {
-    "semver": "^7.6.0",
-    "tap": "^16.0.0"
+    "wrangler": "^4.121.0"
   }
 }

@@ -1,0 +1,5 @@
+# Cloudflare Pages configuration for the semver.xyz static site.
+# Deploy with `vlt run deploy` (builds the site, then publishes site/dist).
+name = "semver-xyz"
+compatibility_date = "2026-08-12"
+pages_build_output_dir = "site/dist"

@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Build Variants: platform and arch subsets in a version · semver.xyz</title>
+    <meta
+      name="description"
+      content="Build Variants is a Semantic Versions extension that encodes os/arch/abi/feature coordinates as build metadata, e.g. npm:esbuild@0.21.0+darwin.arm64, so ranges can select a coherent subset of platform builds."
+    />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#fbfbfb" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div class="bg-grid" aria-hidden="true"></div>
+    <div class="bg-glow" aria-hidden="true"></div>
+
+    <div data-nav></div>
+
+    <main id="top">
+      <section class="hero">
+        <div class="reveal">
+          <p class="eyebrow">Extension · Build Variants</p>
+          <h1 class="hero-title">One version, <span class="grad">every target.</span></h1>
+          <p class="hero-sub">
+            <em>Build Variants</em> encodes deployment-target coordinates (os, arch, abi and
+            features) as build metadata, so a single release addresses a whole family of
+            artifacts. Because Semantic Versions restores build precedence, each variant is a real,
+            orderable version, and a <a href="/spec/#build-channels">build channel</a> can select a
+            coherent <strong>subset</strong> that no numeric range can express.
+          </p>
+
+          <div class="code-window hero-code" data-copy>
+            <div class="code-bar">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="code-title">variant specifier</span>
+              <button class="copy-btn" type="button" aria-label="Copy">Copy</button>
+            </div>
+            <pre class="code"><code><span class="t-known"><span class="t-src">napi:</span><span class="t-name">sharp</span><span class="t-at">@</span><span class="t-ver">0.33.0</span></span><span class="lock-new"><span class="t-plus">+linux.x64.musl</span></span></code></pre>
+          </div>
+
+          <p class="hero-annot">
+            <code>napi:sharp@0.33.0</code> is the release.
+            <span class="annot-new"><code>+linux.x64.musl</code> is the target</span>, an
+            os·arch·abi coordinate, ordered coarse→fine so ranges can drill down.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#matrix">Select a subset</a>
+            <a class="btn btn-ghost" href="#coordinates">Read the format</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ─────────────────────────── Why ─────────────────────────── -->
+      <section class="wrap why">
+        <div class="section-head left reveal">
+          <p class="eyebrow">Why build metadata</p>
+          <h2 class="section-title big">A target isn't a pre-release, or a new package.</h2>
+          <p class="lead">
+            A platform build is a <em>finished sibling</em> of a release, not a step toward it, so it
+            <a href="/spec/#precedence">ranks at or above</a> the plain release, never below it like a
+            pre-release. And it needn't fork the identity: instead of scattering software across
+            <code>pkg-linux-x64</code>, <code>pkg-darwin-arm64</code>, … wired together with
+            <code>optionalDependencies</code> and <code>os</code>/<code>cpu</code>/<code>libc</code>
+            filters, Build Variants keeps <strong>one name, one version</strong>, and moves target
+            selection back into the range grammar.
+          </p>
+        </div>
+      </section>
+
+      <!-- ─────────────────────────── Live matrix ─────────────────────────── -->
+      <section id="matrix" class="selector">
+        <div class="section-head left reveal">
+          <p class="eyebrow">Live</p>
+          <h2 class="section-title big">Range over a variant subset.</h2>
+          <p class="lead">
+            Every cell is a concrete artifact: a release built for one target. Type a
+            <strong>build channel</strong> and watch the selected subset light up. Shorter channels
+            are broader subsets; the plain release column has no build, so a channel excludes it.
+            This runs entirely in your browser on the reference <code>semantic-versions</code> parser.
+          </p>
+        </div>
+
+        <div class="field reveal" style="margin-top:20px">
+          <label for="channel">Build channel</label>
+          <input id="channel" type="text" spellcheck="false" autocomplete="off"
+            placeholder="^1.0.0+linux.x64   ·   >=1.1.0+darwin.arm64   ·   1.2.0+win32.x64"
+            value="^1.0.0+linux.x64" />
+          <div class="chips" id="channel-examples" aria-label="Example channels" style="margin-top:12px"></div>
+        </div>
+
+        <p class="range-echo reveal" id="echo"></p>
+        <p class="vmx-summary reveal" id="summary"></p>
+
+        <div class="vmx-wrap reveal">
+          <table class="vmx" id="matrix-table" aria-label="Version × variant matrix"></table>
+        </div>
+        <p class="hint reveal" id="legend"></p>
+      </section>
+
+      <!-- ─────────────────────────── Format ─────────────────────────── -->
+      <div class="doc-layout" id="coordinates">
+        <aside class="toc reveal" aria-label="Table of contents">
+          <div class="toc-title">Contents</div>
+          <a href="#f-coords">Coordinates</a>
+          <a href="#f-select">Selection</a>
+          <a href="#f-relationship">Other schemes</a>
+          <a href="#f-compose">Composability</a>
+          <a href="#f-grammar">Grammar</a>
+        </aside>
+
+        <article class="doc reveal">
+          <h2 id="f-coords">Coordinates</h2>
+          <p>A Build Variant is build metadata whose identifiers name target axes, ordered coarse→fine:</p>
+          <div class="doc-example"><code>&lt;version&gt;+&lt;os&gt;[.&lt;arch&gt;[.&lt;abi&gt;]][.&lt;feature&gt;]*</code></div>
+          <ul>
+            <li>The fixed axes appear in order (<strong>os</strong>, then <strong>arch</strong>, then <strong>abi</strong>) and each <strong>MAY</strong> be omitted only if every later fixed axis is too. A variant is therefore always a <em>prefix</em> of the axis sequence: <code>linux</code>, <code>linux.x64</code>, <code>linux.x64.musl</code> are valid; <code>x64</code> alone (arch without os) is not.</li>
+            <li><strong>Feature tags</strong> (<code>avx2</code>, <code>cuda</code>, …) are optional, lowercase and free-form; they <strong>MUST</strong> follow the fixed axes and <strong>SHOULD</strong> be sorted for a canonical form.</li>
+            <li>Each axis value is its own dot-separated build identifier, so a variant slots straight into the existing <a href="/spec/VERSION.bnf"><code>&lt;build&gt;</code></a> grammar.</li>
+          </ul>
+          <p>Registered vocabularies (extensible; aligned with runtime values like Node's <code>process.platform</code> / <code>process.arch</code>):</p>
+          <div class="table-wrap">
+            <table class="compat">
+              <thead><tr><th>Axis</th><th>Values</th></tr></thead>
+              <tbody>
+                <tr><td><code>os</code></td><td><code>linux</code> · <code>darwin</code> · <code>win32</code> · <code>freebsd</code> · <code>openbsd</code> · <code>android</code> · <code>sunos</code> · <code>aix</code></td></tr>
+                <tr><td><code>arch</code></td><td><code>x64</code> · <code>arm64</code> · <code>arm</code> · <code>ia32</code> · <code>ppc64</code> · <code>s390x</code> · <code>riscv64</code> · <code>loong64</code> · <code>wasm32</code></td></tr>
+                <tr><td><code>abi</code></td><td><code>glibc</code> · <code>musl</code> · <code>msvc</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Consumers <strong>MUST</strong> ignore axis or feature identifiers they don't recognise and <strong>MUST NOT</strong> treat that as a match failure on its own; an unknown coordinate simply doesn't narrow selection.</p>
+
+          <h2 id="f-select">Selection</h2>
+          <p>
+            Selection is just the core <a href="/spec/#build-channels">Build Channels</a> rule applied to
+            coordinates: a <code>+</code>-channel is orthogonal to the numeric comparison and admits only
+            versions whose build coordinates <em>begin with</em> the channel's. Because coordinates are
+            ordered coarse→fine, a shorter channel is a broader subset.
+          </p>
+          <ul>
+            <li><code>^1.0.0+linux</code>: every linux variant in the 1.x line.</li>
+            <li><code>^1.0.0+linux.x64</code>: narrows to linux/x64, both glibc and musl.</li>
+            <li><code>^1.0.0+linux.x64.musl</code>: just the musl build.</li>
+            <li><code>&gt;=1.1.0+darwin.arm64</code>: the Apple-silicon build at or above 1.1.0.</li>
+            <li><code>1.2.0+win32.x64</code>: one exact artifact.</li>
+            <li><code>^1.0.0</code>: no channel, so every variant <em>and</em> the plain release.</li>
+          </ul>
+          <p>Within a subset the fixed axes are equal, so ordering falls back to numeric precedence, and “the latest linux/x64 build of 1.x” is well-defined.</p>
+          <blockquote>
+            Prefix matching means a coarse channel also admits deeper refinements: <code>+linux.x64</code>
+            matches <code>linux.x64.musl</code>. To distinguish siblings that share a prefix, make the
+            distinguishing axis explicit: model libc as <code>linux.x64.glibc</code> vs
+            <code>linux.x64.musl</code> rather than leaving glibc implicit.
+          </blockquote>
+
+          <h2 id="f-relationship">Relationship to other schemes</h2>
+          <ul>
+            <li><strong>npm <code>os</code>/<code>cpu</code>/<code>libc</code> + optional-dependency fanout.</strong> The same target matrix, expressed in one version instead of across many packages, and now rangeable. A resolver can still map a selected variant onto whatever artifact layout a registry uses.</li>
+            <li><strong>OCI / Docker multi-arch manifests.</strong> A manifest list selects by <code>os</code>/<code>architecture</code>/<code>variant</code>; Build Variants lifts that tuple into the version grammar, so the same selection works in a specifier or lockfile, not only at pull time.</li>
+            <li><strong><a href="https://github.com/package-url/purl-spec">Package-URL</a> qualifiers.</strong> PURL carries target facts in <code>?arch=…&amp;os=…</code> qualifiers, outside the version and outside precedence. Build Variants keeps them <em>in</em> the version, where they order and where ranges select them, while staying round-trippable to PURL qualifiers for interchange.</li>
+          </ul>
+
+          <h2 id="f-compose">Composability</h2>
+          <p>
+            Variant coordinates are ordinary build identifiers, so they compose with other build-metadata
+            extensions. A variant can precede an integrity digest
+            (<code>1.0.0+linux.x64.musl.sha512.…</code> pins the exact bytes of one target), and a
+            <a href="/extensions/dependency-locks/">Dependency Lock</a> can pin the resolved variant
+            chosen for each node of a graph. See <a href="/extensions/integrity/">Package Integrity</a>
+            for the digest half.
+          </p>
+
+          <h2 id="f-grammar">Grammar (BNF)</h2>
+          <p>Building on <a href="/spec/VERSION.bnf">VERSION.bnf</a>'s <code>&lt;build&gt;</code>:</p>
+          <div class="grammar-actions">
+            <a class="btn btn-ghost" href="/spec/VARIANTS.bnf" download>Download VARIANTS.bnf</a>
+          </div>
+          <pre class="bnf" data-copy><button class="copy-btn" type="button" aria-label="Copy" style="float:right">Copy</button><code>&lt;variant build&gt; ::= &lt;os&gt; ( "." &lt;arch&gt; ( "." &lt;abi&gt; )? )? ( "." &lt;feature&gt; )*
+&lt;os&gt;            ::= "linux" | "darwin" | "win32" | "freebsd" | "openbsd"
+                  | "android" | "sunos" | "aix"
+&lt;arch&gt;          ::= "x64" | "arm64" | "arm" | "ia32" | "ppc64" | "s390x"
+                  | "riscv64" | "loong64" | "wasm32"
+&lt;abi&gt;           ::= "glibc" | "musl" | "msvc"
+&lt;feature&gt;       ::= &lt;build identifier&gt;</code></pre>
+        </article>
+      </div>
+    </main>
+
+    <div data-footer></div>
+
+    <script type="module" src="/src/shell.js"></script>
+    <script type="module" src="/extensions/variants/variants.js"></script>
+  </body>
+</html>

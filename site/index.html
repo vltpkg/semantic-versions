@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>semver.xyz — Semantic Versions, a modern versioning specification</title>
+    <meta
+      name="description"
+      content="Semantic Versions is a living versioning specification: a spiritual successor to Semantic Versioning 2.0.0-rc.1 that restores build precedence and adds sets, ranges and comparators."
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#fbfbfb" />
+
+    <meta property="og:title" content="semver.xyz — Semantic Versions" />
+    <meta
+      property="og:description"
+      content="A modern versioning spec: restores build precedence and formally defines sets, ranges and comparators. Test the range grammar in your browser."
+    />
+    <meta property="og:type" content="website" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div class="bg-grid" aria-hidden="true"></div>
+    <div class="bg-glow" aria-hidden="true"></div>
+
+    <div data-nav></div>
+
+    <main id="top">
+      <!-- ─────────────────────────── Hero ─────────────────────────── -->
+      <section class="hero">
+        <div class="reveal">
+          <p class="eyebrow">Specification · 1.0.0</p>
+          <h1 class="hero-title">Software versions are a<br /><span class="grad">communication mechanism.</span></h1>
+          <p class="hero-sub">
+            <strong>Semantic Versions</strong> is an open specification for how version
+            numbers are<br><em>assigned, incremented, grouped, compared and matched</em>.<br>A
+            spiritual successor to <a href="https://semver.org/spec/v2.0.0-rc.1.html">Semantic
+            Versioning 2.0.0-rc.1</a>.
+          </p>
+
+          <div class="code-window hero-code" data-copy>
+            <div class="code-bar">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+              <span class="code-title">anatomy of a version</span>
+              <button class="copy-btn" type="button" aria-label="Copy">Copy</button>
+            </div>
+            <pre class="code"><code><span class="t-src">npm:</span><span class="t-name">react</span><span class="t-at">@</span><span class="t-name">1</span><span class="t-at">.</span><span class="t-name">2</span><span class="t-at">.</span><span class="t-name">3</span><span class="t-at">-</span><span class="t-ver">beta.4</span><span class="t-plus">+</span><span class="t-pay">build.7</span>
+<span class="t-cmt"># source:name @ major.minor.patch-prerelease+build</span></code></pre>
+          </div>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="/spec/">Read the spec</a>
+            <a class="btn btn-ghost" href="/selector/">Try the range selector</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ───────────────────────── Manifesto ───────────────────────── -->
+      <section class="wrap why">
+        <div class="section-head left reveal">
+          <p class="eyebrow">Why a new spec</p>
+          <h2 class="section-title big">Versioning should mirror how software actually changes.</h2>
+          <p class="lead">
+            Semantic Versioning 2.0.0 is more than a decade old, has not meaningfully changed in
+            that time, and has no realistic path to a 3.0. The way we ship software has moved on.
+            JavaScript avoided the first circle of dependency hell only because tooling quietly
+            bolted <em>sets, ranges and comparators</em> onto a spec that never defined them. We
+            have since landed in a deeper circle, where package managers read the same version
+            differently and resolve to different graphs.
+          </p>
+          <p class="lead why-crit">
+            A specification is a language, and it is only as good as the definitions it contains.
+            Software changes over time and sometimes breaks; that is natural, and necessary for
+            growth. A versioning spec exists to <strong>codify the signals that communicate
+            change</strong>, so it should codify the ones we actually use.
+          </p>
+        </div>
+      </section>
+
+      <!-- ───────────────────────── What changed ───────────────────── -->
+      <section class="wrap">
+        <div class="section-head left reveal">
+          <p class="eyebrow">What changed</p>
+          <h2 class="section-title big">Corrected definitions, restored meaning, formal grammars.</h2>
+        </div>
+        <div class="grid features">
+          <article class="card reveal">
+            <span class="card-kicker">01</span>
+            <h3>Patch, corrected</h3>
+            <p>A patch is a fix for behaviour that was never intended, not a promise of backward compatibility (which is practically impossible to guarantee). The definition is amended so a fix stays a fix.</p>
+          </article>
+          <article class="card reveal">
+            <span class="card-kicker">02</span>
+            <h3>Builds get their precedence back</h3>
+            <p>2.0.0-rc.2 turned <em>builds</em> into inert "build metadata," making every build of a version equivalent. Two artifacts with different hashes or architectures are distinct software, so builds order again.</p>
+          </article>
+          <article class="card reveal">
+            <span class="card-kicker">03</span>
+            <h3>Sets &amp; subsets</h3>
+            <p>Precedence alone can't describe a collection of versions. This spec defines ordered, unordered, normal, prerelease and build sets: the vocabulary you need to manage more than one version at a time.</p>
+          </article>
+          <article class="card reveal">
+            <span class="card-kicker">04</span>
+            <h3>Ranges &amp; comparators</h3>
+            <p>Comparators (<code>&gt;=1.2.7</code>), comparator sets, hyphen ranges, x-ranges, tilde and caret. The grammar tools already ship, defined so they desugar to primitive comparators in one deterministic way.</p>
+          </article>
+          <article class="card reveal">
+            <span class="card-kicker">05</span>
+            <h3>Approximate ranges (<code>~&gt;</code>)</h3>
+            <p>The pessimistic operator, borrowed from the Ruby world, is defined explicitly rather than left to each tool's imagination.</p>
+          </article>
+          <article class="card reveal">
+            <span class="card-kicker">06</span>
+            <h3>A reference implementation &amp; BNF</h3>
+            <p>Backus–Naur grammars for versions, ranges and comparators, plus a parser you can read, so anyone can build a compliant library.</p>
+          </article>
+        </div>
+      </section>
+
+      <!-- ───────────────────────── Explore cards ──────────────────── -->
+      <section class="wrap">
+        <div class="grid features home-cards">
+          <a class="card reveal" href="/spec/">
+            <span class="card-kicker">SPEC</span>
+            <h3>The specification</h3>
+            <p>The full ruleset: versions, sets, ranges, comparators and precedence.</p>
+            <div class="card-arrow">Read →</div>
+          </a>
+          <a class="card reveal" href="/selector/">
+            <span class="card-kicker">TRY IT</span>
+            <h3>Range selector</h3>
+            <p>Test what matches what against the range grammar, entirely in your browser.</p>
+            <div class="card-arrow">Open →</div>
+          </a>
+          <a class="card reveal" href="/grammar/">
+            <span class="card-kicker">GRAMMAR</span>
+            <h3>BNF grammars</h3>
+            <p>Formal Backus–Naur forms, ready to build a library from.</p>
+            <div class="card-arrow">View →</div>
+          </a>
+          <a class="card reveal" href="/origin/">
+            <span class="card-kicker">HISTORY</span>
+            <h3>History</h3>
+            <p>How builds were introduced, and how a later change made them meaningless.</p>
+            <div class="card-arrow">Trace →</div>
+          </a>
+          <a class="card reveal" href="/extensions/dependency-locks/">
+            <span class="card-kicker">EXTENSION</span>
+            <h3>Dependency Locks</h3>
+            <p>Pinning a resolved subgraph inside a source-qualified version, built on this spec.</p>
+            <div class="card-arrow">Explore →</div>
+          </a>
+          <a class="card reveal" href="/extensions/integrity/">
+            <span class="card-kicker">EXTENSION</span>
+            <h3>Package Integrity</h3>
+            <p>A verifiable content digest carried in the version: <code>npm:react@18.2.0+sha512.…</code></p>
+            <div class="card-arrow">Explore →</div>
+          </a>
+        </div>
+      </section>
+
+      <!-- ─────────────────── Status of this document ─────────────────── -->
+      <section class="wrap">
+        <div class="doc-status reveal">
+          <p class="eyebrow">Status of this document</p>
+          <p>
+            Semantic Versions 1.0.0 is a release candidate. Its definitions are intended to be
+            scrutinized, tested and refined; a reference parser (<code>semantic-versions</code>)
+            tracks the specification, and the work is being stewarded toward an open standards
+            body. Corrections and proposals are welcome
+            <a href="https://github.com/vltpkg/semantic-versions">in the repository</a>.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <div data-footer></div>
+
+    <script type="module" src="/src/shell.js"></script>
+  </body>
+</html>

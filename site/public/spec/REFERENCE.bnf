@@ -1,0 +1,46 @@
+; Backus-Naur Form Grammar for a Semantic Version reference
+; A reference is an optional context and an "@"-separated version or range.
+; https://semver.xyz/grammar/#references
+
+<reference>       ::= <valid semver>
+                   | <context> "@" <valid semver>
+
+<range reference> ::= <range set>
+                    | <context> "@" <range set>
+
+<context>         ::= <name>
+                    | <source> ":" <name>
+
+<source>          ::= <lowercase letter> <source tail>
+
+<source tail>     ::= ""
+                    | <source character> <source tail>
+
+<source character> ::= <lowercase letter>
+                     | <digit>
+                     | "-"
+
+<name>            ::= <name path>
+                    | "@" <name path>            ; scoped, e.g. @scope/pkg
+
+<name path>       ::= <name segment>
+                    | <name segment> "/" <name path>
+
+<name segment>    ::= <name character>
+                    | <name character> <name segment>
+
+<name character>  ::= <letter>
+                    | <digit>
+                    | "-"
+                    | "."
+                    | "_"
+
+; <valid semver> is defined in VERSION.bnf
+; <range set> is defined in RANGE.bnf
+; A version core and a range body never contain "@", and a context never
+; contains whitespace, so the context ends at the last "@" of the first
+; whitespace-delimited token.
+
+<lowercase letter> ::= "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j"
+                     | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t"
+                     | "u" | "v" | "w" | "x" | "y" | "z"

@@ -1,0 +1,65 @@
+name: Release parser
+
+# Publishes the `semantic-versions` reference parser to npm.
+# Trigger by publishing a GitHub Release, or run manually from the Actions tab.
+# Requires a repository secret `NPM_TOKEN` (an npm automation or granular
+# access token with publish rights for the `semantic-versions` package).
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: "Pack and validate without publishing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install vlt
+        run: |
+          curl -fsSL https://install.vlt.sh | bash
+          vlt --version
+
+      - name: Install dependencies
+        run: vlt install
+
+      - name: Run tests
+        run: vlt run test -w packages/parser
+
+      - name: Authenticate vlt to npm
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "$NPM_TOKEN" ]; then
+            echo "::error::NPM_TOKEN secret is not set"
+            exit 1
+          fi
+          # vlt reads bearer tokens per-registry from its keychain. Seed it for
+          # npm in both the XDG data and config locations so the publish step
+          # finds credentials regardless of the runner's path resolution.
+          for dir in "$HOME/.local/share/vlt/auth" "$HOME/.config/vlt/auth"; do
+            mkdir -p "$dir"
+            printf '{"https://registry.npmjs.org":"Bearer %s"}' "$NPM_TOKEN" > "$dir/keychain.json"
+            chmod 600 "$dir/keychain.json"
+          done
+
+      - name: Publish (dry run)
+        if: ${{ inputs.dry-run }}
+        run: vlt publish --dry-run --workspace packages/parser --access public
+
+      - name: Publish to npm
+        if: ${{ !inputs.dry-run }}
+        run: vlt publish --workspace packages/parser --access public

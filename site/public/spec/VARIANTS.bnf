@@ -1,0 +1,30 @@
+; Backus-Naur Form Grammar for the Build Variants extension
+; https://semver.xyz/extensions/variants/
+;
+; A Build Variant is ordinary <build> metadata (see VERSION.bnf) whose
+; identifiers name deployment-target axes, ordered coarse-to-fine so that the
+; core Build Channels rule (a "+ <build>" on a comparator/tilde/caret) selects
+; a coherent subset by prefix:
+;   ^1.0.0+linux        ->  every linux variant in the 1.x line
+;   ^1.0.0+linux.x64    ->  narrows to linux/x64 (any abi)
+;   1.2.0+win32.x64     ->  one exact artifact
+; The fixed axes MUST appear in order (os, then arch, then abi); any fixed axis
+; may be omitted only if every later fixed axis is also omitted, so a variant is
+; always a PREFIX of the axis sequence. Feature tags follow the fixed axes.
+
+<variant build> ::= <os> ( "." <arch> ( "." <abi> )? )? <features>
+
+<features> ::= ""
+             | "." <feature> <features>
+
+<os> ::= "linux" | "darwin" | "win32" | "freebsd" | "openbsd"
+       | "android" | "sunos" | "aix"
+
+<arch> ::= "x64" | "arm64" | "arm" | "ia32" | "ppc64" | "s390x"
+         | "riscv64" | "loong64" | "wasm32"
+
+<abi> ::= "glibc" | "musl" | "msvc"
+
+; A feature tag is any build identifier (see VERSION.bnf). Lowercase is
+; conventional; tags SHOULD be sorted for a canonical form.
+<feature> ::= <build identifier>

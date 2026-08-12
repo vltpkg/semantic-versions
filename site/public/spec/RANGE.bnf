@@ -1,0 +1,67 @@
+; Backus-Naur Form Grammar for a Semantic Version Range
+; https://semver.xyz/grammar/#ranges
+;
+; A range-set is one or more comparator sets joined by "||". A version matches
+; the range-set if it satisfies every comparator in at least one set. The
+; advanced forms (hyphen, x-range, tilde, caret, approximate) desugar to
+; primitive comparators in deterministic ways.
+
+<range set>    ::= <range> ( <logical or> <range> ) *
+
+<logical or>   ::= ( " " ) * "||" ( " " ) *
+
+<range>        ::= <hyphen>
+                 | <simple> ( " " <simple> ) *
+                 | ""
+
+<hyphen>       ::= <partial> " - " <partial>
+
+<simple>       ::= <primitive>
+                 | <partial>
+                 | <tilde>
+                 | <caret>
+                 | <star pre>
+
+<primitive>    ::= <operator> <partial>
+
+<operator>     ::= "<" | ">" | ">=" | "<=" | "="
+
+<tilde>        ::= "~" [ ">" ] <partial>
+
+<caret>        ::= "^" <partial>
+
+; "*-*" is the UNIVERSAL pre-release channel: admit pre-releases on every tuple
+; (the range-driven replacement for an "includePrerelease" flag). "*" alone is
+; still stable-only.
+<star pre>     ::= "*-*"
+
+<partial>      ::= <xr> [ "." <xr> [ "." <xr> <qualifier> ? ] ]
+
+<xr>           ::= "x" | "X" | "*" | <numeric identifier>
+
+<qualifier>    ::= ( "-" <range pre-release> ) ? ( "+" <build> ) ?
+
+; A range pre-release may be the wildcard "*" (any pre-release of this tuple);
+; versions themselves never use it (see VERSION.bnf's stricter <pre-release>).
+<range pre-release> ::= "*" | <pre-release>
+
+; <pre-release>, <build>, <numeric identifier> and <partial>'s leaf tokens
+; are defined by the version grammar (see VERSION.bnf).
+;
+; Build channels: a "+ <build>" on a <primitive>, <tilde> or <caret> is a
+; CHANNEL FILTER, orthogonal to the numeric comparison. The numeric comparison
+; ignores build metadata on both sides; a candidate then satisfies the channel
+; iff its own build identifiers begin with the channel's (prefix match). A
+; <tilde>/<caret> channel applies to every comparator it desugars to; a <hyphen>
+; range spans two endpoints and ignores their build metadata.
+;   ^1.0.0+win  ->  >=1.0.0+win <2.0.0-0+win   (the "win" channel within ^1.0.0)
+;
+; Pre-release channels: a "- <pre-release>" on a <primitive>, <tilde> or <caret>
+; is likewise a CHANNEL FILTER on that comparator's [major, minor, patch] tuple,
+; matched as a PREFIX. Stable versions are unaffected; a pre-release is admitted
+; only if some comparator declares a matching channel on its tuple. Pre-releases
+; are excluded by default because they rank BELOW their release (the mirror of
+; build, which ranks at/above and is therefore included by default).
+;   ^1.0.0-rc   ->  >=1.0.0-rc <2.0.0-0        (the "rc" channel of 1.0.0; not beta)
+;   ^1.0.0-*    ->  >=1.0.0-0 <2.0.0-0         (any pre-release of the 1.0.0 tuple)
+;   *-*                                        (any pre-release, any tuple)

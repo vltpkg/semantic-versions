@@ -1,0 +1,29 @@
+; Backus-Naur Form Grammar for the Package Integrity extension
+; https://semver.xyz/extensions/integrity/
+;
+; A Package Integrity build is one or more algorithm/digest pairs appended as
+; build metadata (see VERSION.bnf's <build>). The digest is a build-metadata-safe
+; transcoding (hex or Base62) of the raw hash bytes.
+
+<integrity build> ::= <integrity> ( "." <integrity> ) *
+
+<integrity>       ::= <algorithm> "." <digest>
+
+<algorithm>       ::= "sha256" | "sha384" | "sha512"
+
+<digest>          ::= <hex digest> | <base62 digest>
+
+<hex digest>      ::= <hex> <hex> +
+
+<base62 digest>   ::= <base62 char> <base62 char> +
+
+<hex>             ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+                    | "a" | "b" | "c" | "d" | "e" | "f"
+
+<base62 char>     ::= "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+                    | "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J"
+                    | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T"
+                    | "U" | "V" | "W" | "X" | "Y" | "Z" | "a" | "b" | "c" | "d"
+                    | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n"
+                    | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x"
+                    | "y" | "z"
