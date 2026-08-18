@@ -14,9 +14,11 @@ communicated with specific increments to your software's "Semantic Version".
 ## Specification
 
 The key words "**MUST**", "**MUST NOT**", "**REQUIRED**", "**SHALL**",
-"**SHALL NOT**", "**SHOULD**", "**SHOULD NOT**", "**RECOMMENDED**", "**MAY**",
-and "**OPTIONAL**" in this document are to be interpreted as described in
-[RFC 2119](https://tools.ietf.org/html/rfc2119).
+"**SHALL NOT**", "**SHOULD**", "**SHOULD NOT**", "**RECOMMENDED**",
+"**NOT RECOMMENDED**", "**MAY**", and "**OPTIONAL**" in this document are to be
+interpreted as described in BCP 14 [RFC 2119](https://tools.ietf.org/html/rfc2119)
+[RFC 8174](https://www.rfc-editor.org/rfc/rfc8174) when, and only when, they
+appear in all capitals, as shown here.
 
 ### Versions
 
@@ -477,6 +479,68 @@ content digests.
 Build channels are a deliberate divergence from Semantic Versioning 2.0.0, which
 discards build metadata during range resolution.
 
+### PEP440 interoperability
+
+Python's [PEP 440](https://peps.python.org/pep-0440/) is the other widely-used
+version grammar, and it *recommends* Semantic Versioning for the public release
+segment. Because Semantic Versions restores the two things Semantic Versioning
+2.0.0 discarded — **build precedence** and **default pre-release exclusion** —
+it lines up with PEP 440's ordering model more closely than 2.0.0 does. This
+section defines the interoperable subset; it adds no grammar or precedence rules.
+
+#### Compatible subset
+
+A version is round-trippable between the two schemes when it stays within this
+subset:
+
+1. The release segment is exactly three components (`MAJOR.MINOR.PATCH`) with no
+   leading zeroes. PEP 440 permits an arbitrary-length release segment, but
+   recommends this form.
+2. Pre-releases use the spellings `-a.N` (alpha), `-b.N` (beta) and `-rc.N`
+   (release candidate). These sort correctly under Semantic Versions precedence
+   (`a < b < rc`, then numerically), and map onto PEP 440's normalized `aN` /
+   `bN` / `rcN` pre-release segments.
+
+#### Ordering alignment
+
+- **Local versions ↔ build metadata.** PEP 440 local versions (`1.0.0+abc`)
+  participate in ordering and rank a labelled artifact above its plain release.
+  Semantic Versions' restored [build precedence](#precedence) does the same
+  (`1.0.0 < 1.0.0+build`) — where Semantic Versioning 2.0.0 discards it.
+- **Default pre-release exclusion.** A range of stable comparators admits no
+  pre-releases unless it opts in (see
+  [Pre-release Channels](#pre-release-channels-100-rc)), mirroring `pip`'s
+  requirement of `--pre`.
+- **Post-releases.** PEP 440 post-releases (`1.0.0.post1`) rank *above* the
+  release, matching the "refinement above the release" shape of build precedence,
+  though the two are not byte-for-byte convertible (see below).
+
+#### Specifier mapping
+
+PEP 440 specifiers translate to Semantic Versions ranges:
+
+| PEP 440 specifier | Semantic Versions range |
+| --- | --- |
+| `~=1.4.2` | `~1.4.2` (`>=1.4.2 <1.5.0-0`) |
+| `~=1.4` | `^1.4` (`>=1.4.0 <2.0.0-0`) |
+| `==1.4.*` | `1.4.x` (`>=1.4.0 <1.5.0-0`) |
+| `>=1.4.2`, `>1.4.2`, `<=1.4.2`, `<1.4.2` | same operator, identical meaning |
+| `==1.4.2` | `1.4.2` |
+
+#### Lossy / out of scope
+
+The following PEP 440 constructs are **not representable** in Semantic Versions
+and are deliberately left unmapped rather than special-cased:
+
+- **Epoch** (`1!1.0`) — there is no Semantic Versions equivalent; an epoch cannot
+  be encoded without breaking Semantic Versioning 2.0.0 compatibility.
+- **Development releases** (`.devN`) — PEP 440 sorts a dev release *below* its own
+  parent pre-release (`1.0.0-a.1.dev.1 < 1.0.0-a.1`), which contradicts the
+  Semantic Versions rule that a larger set of identifiers ranks *higher*.
+- **Exact post-release numerics** (`.postN`) — the "above the release" concept
+  maps onto build precedence, but the precise `.postN` counter semantics do not
+  survive the round trip.
+
 ## FAQ
 
 ### What are the differences between `semver.org`?
@@ -489,6 +553,71 @@ to "build metadata" making those definitions semantically useless. Semantic
 Versions reverts this unfortunate change while also additing new definitions for
 Sets, Ranges & Comparitors. These differences cover essential gaps required to
 meaningfully handle software versions.
+
+### Why **MUST** minor and patch reset to `0`?
+
+Resetting keeps versions a single, well-defined total order and gives every line
+an unambiguous first member: `2.5.0` is the start of the `2.5` series, and
+`2.0.0` is the start of the `2.x` series. Tools that reason about "the first
+release of a minor" or that desugar ranges (`~`, `^`, `~>`) rely on this — a
+carried-forward counter like `2.5.1` with no `2.5.0` breaks that assumption.
+
+The rule constrains *carrying a lower-position counter forward*, not *skipping
+numbers*. You **MAY** skip values: `2.4.10` → `2.6.0` → `4.0.0` is fine, because
+each increment still starts its lower positions at `0`. What the rule forbids is
+`2.4.10` → `2.5.1` — the minor incremented, so patch **MUST** restart at `0`.
+
+This is also why Semantic Versions keeps **MUST** rather than relaxing it to
+**SHOULD** (as proposed in
+[semver/semver#393](https://github.com/semver/semver/pull/393)): a normative
+relaxation would fragment the ordering guarantees that existing Semantic
+Versioning 2.0.0 tooling depends on, for a gain that is expressible by simply
+skipping the numbers you do not want.
+
+### Why keep `MAJOR.MINOR.PATCH` instead of renaming to `BREAKING.FEATURE.FIX`?
+
+Backward compatibility is the whole pitch. Anything valid under Semantic
+Versioning 2.0.0 stays valid here, and `MAJOR.MINOR.PATCH` is the vocabulary the
+ecosystem — parsers, registries, changelog tools, and a decade of habit —
+already speaks. Renaming the positions would fragment all of that for a purely
+cosmetic gain, so we keep the names.
+
+The common confusion the renaming proposals are reacting to is real, though, and
+worth stating plainly: **an increment reflects the *nature* of the change to your
+public API — incompatible, additive, or a fix — not the *amount* of code that
+changed.** A complete internal rewrite that leaves the public API untouched is
+still a patch; a one-character change that removes a parameter is a major bump.
+The number you increment is decided by *what the change does to the contract*,
+never by how much work it was.
+
+To keep that meaning attached to the familiar labels, the summary states the
+intent right next to each name: `MAJOR` = incompatible change, `MINOR` = additive
+change, `PATCH` = a fix. And a patch is exactly that — *a fix*, not a promise of
+backward compatibility (nothing can truly guarantee that); a fix stays a fix.
+
+### What counts as the "public API", and is Semantic Versions for apps and products?
+
+"Public API" is meant **broadly**: it is whatever public interface or contract
+you declare — a library's function signatures, a CLI's flags and output, a GUI's
+documented behaviour, a wire protocol, a file format. The spec does not care
+*which* kind of interface it is; it only requires that you **declare one** and
+increment based on changes to it. If your software's contract is its command-line
+surface, then that surface *is* your public API for versioning purposes.
+
+What a version is *about* is named by its **context**: `source:name@version`
+(for example `npm:react@18.2.0`) identifies a specific artifact in a specific
+ecosystem — the thing whose interface you are versioning. Context is how the spec
+scopes a version to a concrete identity rather than leaving a bare `1.2.3` to mean
+whatever the reader assumes.
+
+Because of that, Semantic Versions targets a **declared interface**, not a
+product's marketing, feature-set, or billing cadence. A "product version" that
+jumps to `2.0.0` for a licensing change, or that must land features on a planned
+`1.5.0`, is following a *different* (marketing) scheme — one where the number
+communicates roadmap or pricing, not interface compatibility. That is a
+legitimate thing to want, but it is not what a semantic version measures. If you
+need both, version the declared interface semantically and let the product carry
+its own separate, contextual label.
 
 ### License
 
