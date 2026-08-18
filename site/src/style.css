@@ -169,6 +169,34 @@ code, pre { font-family: var(--mono); }
   :root:not([data-theme="light"]) .theme-toggle .icon-moon { display: none; }
 }
 
+/* Hamburger toggle — hidden on desktop, revealed at the mobile breakpoint. */
+.nav-toggle {
+  display: none; place-items: center; width: 34px; height: 34px;
+  border: 1px solid var(--border); border-radius: 9px; background: var(--panel);
+  color: var(--muted); cursor: pointer; transition: color 0.15s ease, border-color 0.15s ease;
+}
+.nav-toggle:hover { color: var(--text); border-color: var(--border-2); }
+.nav-toggle svg { width: 18px; height: 18px; }
+.nav-toggle .icon-close { display: none; }
+.nav-toggle[aria-expanded="true"] .icon-menu { display: none; }
+.nav-toggle[aria-expanded="true"] .icon-close { display: block; }
+
+/* Mobile drawer — dropped below the sticky header, only shown on mobile. */
+.mobile-nav {
+  display: none;
+  position: absolute; top: 100%; left: 0; right: 0;
+  flex-direction: column;
+  padding: 6px 24px 14px;
+  background: var(--bg); border-bottom: 1px solid var(--border);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+}
+.mobile-nav a {
+  padding: 13px 4px; font-size: 1rem; color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+.mobile-nav a:last-child { border-bottom: 0; }
+.mobile-nav a:hover, .mobile-nav a.active { color: var(--text); }
+
 /* ============================== Layout ============================== */
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
 section { position: relative; }
@@ -531,10 +559,12 @@ p code, .lead code, .caption code { background: var(--panel); border: 1px solid 
   .pipeline { grid-template-columns: 1fr; }
   .pipe-arrow { transform: rotate(90deg); }
   .nav-links a:not(.nav-cta) { display: none; }
+  .nav-links { gap: 12px; }
+  .nav-toggle { display: inline-grid; }
+  .mobile-nav:not([hidden]) { display: flex; }
 }
 @media (max-width: 560px) {
   .nav { padding: 16px; }
-  .brand-tag { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; transition: none; }

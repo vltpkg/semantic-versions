@@ -440,10 +440,10 @@
           <p class="eyebrow">Support status</p>
           <h2 class="section-title big">Implemented by vlt first. Portable by specification.</h2>
           <p class="lead">
-            Dependency Locks are a new concept. The site should not imply npm, pnpm, yarn,
-            or bun understand or honor the lock. The measured compatibility claim is only
-            about transport: exact SemVer versions can carry build metadata without
-            necessarily breaking existing tools.
+            Dependency Locks are a new idea, and no mainstream package manager honors them yet.
+            npm, pnpm, yarn and bun will not decode or act on the lock. The only compatibility we
+            claim is at the transport layer: an exact SemVer version can carry the lock as build
+            metadata without breaking tools that already parse versions.
           </p>
         </div>
 
@@ -454,7 +454,7 @@
           </div>
           <div class="support-row">
             <span class="support-term">Other package managers</span>
-            <p>May adopt the format. Until they do, they should be described as lock-unaware, not lock-compatible.</p>
+            <p>May adopt the format later. Until one does, it stays lock-unaware, not lock-compatible: it installs the plain version and ignores the lock.</p>
           </div>
           <div class="support-row">
             <span class="support-term">Existing SemVer parsers</span>

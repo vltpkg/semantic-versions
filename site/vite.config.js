@@ -13,6 +13,7 @@ export default defineConfig({
       input: {
         home: entry("index.html"),
         spec: entry("spec/index.html"),
+        proposal: entry("proposal/index.html"),
         selector: entry("selector/index.html"),
         grammar: entry("grammar/index.html"),
         origin: entry("origin/index.html"),

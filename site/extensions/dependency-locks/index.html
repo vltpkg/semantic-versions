@@ -6,7 +6,7 @@
     <title>Dependency Locks: a package format extension · semver.xyz</title>
     <meta
       name="description"
-      content="Dependency Locks is a package format specification for attaching a resolved transitive subgraph to a source-qualified package identity. Implemented by vlt."
+      content="Dependency Locks is a package format specification for attaching a resolved transitive subgraph to a source-qualified package identity. Reference implementation planned in vlt."
     />
     <meta name="color-scheme" content="light" />
     <meta name="theme-color" content="#fbfbfb" />
@@ -15,7 +15,7 @@
     <meta property="og:title" content="Dependency Locks by vlt" />
     <meta
       property="og:description"
-      content="A package format specification for attaching resolved dependency subgraphs to package identities like npm:express@5.2.1. Implemented by vlt."
+      content="A package format specification for attaching resolved dependency subgraphs to package identities like npm:express@5.2.1. Reference implementation planned in vlt."
     />
     <meta property="og:type" content="website" />
 
@@ -58,12 +58,12 @@
 
           <div class="hero-actions">
             <a class="btn btn-primary" href="#format">Read the format</a>
-            <a class="btn btn-ghost" href="#spec">Open the spec</a>
+            <a class="btn btn-ghost" href="https://github.com/vltpkg/semantic-versions/blob/main/extensions/dependency-locks/dependency-locks.md" target="_blank" rel="noopener">Open the spec</a>
           </div>
 
           <p class="hero-note">
-            A specification from vlt, shipping with the vlt client. Not a claim of
-            ecosystem-wide package-manager support.
+            A specification from vlt. Support is planned in the vlt client and hasn't shipped
+            yet, so this is not a claim of package-manager support today.
           </p>
         </div>
       </section>
@@ -208,7 +208,7 @@
               <span class="cascade-n">2</span>
               <div>
                 <strong>Package manager</strong>
-                <span>vlt honors it by default; a lock-unaware tool ignores it and installs the bare version.</span>
+                <span>vlt is where support is planned first. Until it ships, every tool is lock-unaware and installs the bare version.</span>
               </div>
             </li>
             <li>
@@ -424,23 +424,23 @@
       <section id="support" class="wrap">
         <div class="section-head left reveal">
           <p class="eyebrow">Support status</p>
-          <h2 class="section-title big">Implemented by vlt first. Portable by specification.</h2>
+          <h2 class="section-title big">Planned in vlt first. Portable by specification.</h2>
           <p class="lead">
-            Dependency Locks are a new concept. The site should not imply npm, pnpm, yarn,
-            or bun understand or honor the lock. The measured compatibility claim is only
-            about transport: exact SemVer versions can carry build metadata without
-            necessarily breaking existing tools.
+            Dependency Locks are a new idea, and no mainstream package manager honors them yet.
+            npm, pnpm, yarn and bun will not decode or act on the lock. The only compatibility we
+            claim is at the transport layer: an exact SemVer version can carry the lock as build
+            metadata without breaking tools that already parse versions.
           </p>
         </div>
 
         <div class="support-list reveal">
           <div class="support-row">
             <span class="support-term">vlt</span>
-            <p>Target implementation. Can choose to decode, validate, and use the locked subgraph during resolution.</p>
+            <p>Reference implementation, planned. Support hasn't shipped yet; once it lands, vlt will decode, validate, and use the locked subgraph during resolution.</p>
           </div>
           <div class="support-row">
             <span class="support-term">Other package managers</span>
-            <p>May adopt the format. Until they do, they should be described as lock-unaware, not lock-compatible.</p>
+            <p>May adopt the format later. Until one does, it stays lock-unaware, not lock-compatible: it installs the plain version and ignores the lock.</p>
           </div>
           <div class="support-row">
             <span class="support-term">Existing SemVer parsers</span>
@@ -477,22 +477,6 @@
         </div>
       </section>
 
-      <!-- ─────────────────────────── Spec CTA ────────────────────── -->
-      <section id="spec" class="wrap cta">
-        <div class="cta-card reveal">
-          <p class="eyebrow">The specification</p>
-          <h2 class="section-title big">Read the spec, then argue with the details.</h2>
-          <p class="lead center">
-            The full specification covers source-qualified identifiers, ABNF grammar, binary
-            layout, resolution semantics, consumer policy, publishing behavior, security
-            analysis, and transport compatibility tests.
-          </p>
-          <div class="hero-actions center">
-            <a class="btn btn-primary" href="https://github.com/vltpkg/semantic-versions/blob/main/extensions/dependency-locks/dependency-locks.md">Read the spec</a>
-            <a class="btn btn-ghost" href="https://github.com/vltpkg/semantic-versions/blob/main/extensions/dependency-locks/dependency-locks-spec.md">Full internals</a>
-          </div>
-        </div>
-      </section>
     </main>
 
     <div data-footer></div>
