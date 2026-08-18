@@ -321,8 +321,110 @@ section { position: relative; }
 
 .decoded-head { margin-top: 60px; }
 
-.why { margin-top: 52px; }
+.why { margin-top: 52px; margin-bottom: 52px; }
 .why-crit { margin-top: 16px; }
+
+/* ============================== Why: precedence stream ==============================
+   Two-column manifesto: copy on the left, an interactive canvas of cascading
+   version tokens on the right. The panel stays dark in both themes (like the
+   code windows) so the monochrome stream always reads. */
+.why-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: 52px; align-items: center;
+}
+.why-grid .section-head { margin: 0; max-width: 560px; }
+
+.why-viz {
+  position: relative; margin: 0; aspect-ratio: 4 / 3;
+  border-radius: 14px; overflow: hidden;
+  background: linear-gradient(#191919, #101010);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.20);
+}
+/* soften only the very top/bottom edges so rows fade in/out of the panel
+   without ever clipping the first or last version */
+.why-viz::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgba(16, 16, 16, 0.5) 0%, transparent 8% 88%, rgba(16, 16, 16, 0.55) 100%
+  );
+}
+
+/* ---- the sorted list ----
+   Rows are absolutely positioned, so their containing block is this element's
+   padding box and any padding here would be ignored for placement. Inset the
+   whole layer instead (leaving extra room at the bottom for the tag), so the
+   rows sit in a balanced band rather than jammed to the top-left. */
+.why-sort {
+  position: absolute; inset: 18px 18px 40px;
+  overflow: hidden; font-family: var(--mono);
+}
+/* low -> high axis cue, aligned with the first / last row on the right edge */
+.why-sort::before,
+.why-sort::after {
+  position: absolute; right: 4px; z-index: 2;
+  font: 700 0.56rem/1 var(--mono); letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.26);
+}
+.why-sort::before { content: "lower"; top: 8px; }
+.why-sort::after { content: "higher"; bottom: 8px; }
+
+.why-row {
+  position: absolute; left: 0; right: 0; top: 0;
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 11px; border-radius: 8px;
+  font-size: clamp(0.8rem, 2.1vw, 0.92rem); color: rgba(235, 235, 235, 0.9);
+  will-change: transform;
+}
+/* transitions enabled only after the first placement (JS adds .live) */
+.why-sort.live .why-row {
+  transition: transform 0.55s cubic-bezier(0.2, 0.7, 0.2, 1),
+    background-color 0.2s ease, color 0.2s ease;
+}
+.v-rank {
+  flex: 0 0 auto; width: 20px; text-align: right;
+  font-size: 0.76em; color: rgba(255, 255, 255, 0.3);
+  font-variant-numeric: tabular-nums;
+}
+.v-str { flex: 1; white-space: nowrap; letter-spacing: 0.01em; }
+.v-core { color: rgba(246, 246, 246, 0.96); font-weight: 600; }
+.v-pre { color: rgba(255, 255, 255, 0.5); }
+.v-build { color: rgba(255, 255, 255, 0.34); }
+.v-lt {
+  flex: 0 0 auto; margin-left: auto; padding-left: 10px;
+  color: rgba(255, 255, 255, 0.6); font-weight: 700;
+  opacity: 0; transition: opacity 0.2s ease;
+}
+
+.why-row.hot { background: rgba(255, 255, 255, 0.08); }
+.why-row.hot .v-core { color: #ffffff; }
+.why-row.hot .v-rank { color: rgba(255, 255, 255, 0.65); }
+.why-row.hot .v-lt { opacity: 1; }
+.why-row.hot-next { background: rgba(255, 255, 255, 0.035); }
+.why-row.hot-next .v-core { color: rgba(255, 255, 255, 0.9); }
+.why-viz-tag {
+  position: absolute; left: 15px; bottom: 13px; z-index: 2;
+  display: inline-flex; align-items: center; gap: 9px;
+  font: 600 0.66rem/1 var(--mono); letter-spacing: 0.16em; text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+.why-viz-tag::before {
+  content: ""; width: 7px; height: 7px; border-radius: 50%;
+  background: #eaeaea; box-shadow: 0 0 9px rgba(255, 255, 255, 0.7);
+  animation: whyPulse 2.4s ease-in-out infinite;
+}
+@keyframes whyPulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+@media (max-width: 880px) {
+  .why-grid { grid-template-columns: 1fr; gap: 32px; }
+  .why-grid .section-head { max-width: none; }
+  .why-viz { aspect-ratio: 16 / 9; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .why-viz-tag::before { animation: none; opacity: 0.7; }
+}
 
 /* Live lock generator */
 .gen-form { display: flex; gap: 10px; max-width: 600px; margin-bottom: 18px; }
@@ -500,7 +602,7 @@ section { position: relative; }
   box-shadow: 0 24px 60px rgba(0,0,0,0.07);
 }
 /* Understated standards-style colophon (replaces the marketing CTA) */
-.doc-status { padding-top: 34px; border-top: 1px solid var(--border); }
+.doc-status { margin-top: 44px; padding-top: 34px; border-top: 1px solid var(--border); }
 .doc-status .eyebrow { margin-bottom: 12px; }
 .doc-status p:not(.eyebrow) { color: var(--muted); font-size: 0.98rem; line-height: 1.75; max-width: 720px; margin: 0; }
 .doc-status code { background: var(--panel); border: 1px solid var(--border); padding: 1px 6px; border-radius: 6px; font-size: 0.86em; color: var(--accent); }
@@ -586,7 +688,7 @@ p code, .lead code, .caption code { background: var(--panel); border: 1px solid 
 .brand-tag.xyz { color: var(--text); border-color: var(--border-2); }
 
 /* Compact page hero (interior pages) */
-.page-hero { max-width: var(--maxw); margin: 0 auto; padding: 60px 24px 20px; }
+.page-hero { max-width: var(--maxw); margin: 0 auto; padding: 60px 24px 40px; }
 .page-hero .eyebrow { margin-bottom: 14px; }
 .page-hero h1 {
   font-size: clamp(2rem, 4.6vw, 3.1rem); line-height: 1.05;
@@ -874,7 +976,7 @@ p code, .lead code, .caption code { background: var(--panel); border: 1px solid 
 .bnf .tok-ref { color: #e6e6e6; }
 .bnf .op { color: #6f6f6f; }
 .bnf .lit { color: #a6a6a6; }
-.grammar-actions { display: flex; gap: 12px; flex-wrap: wrap; margin: 14px 0 4px; }
+.grammar-actions { display: flex; gap: 12px; flex-wrap: wrap; margin: 18px 0 16px; }
 
 /* Feature link cards on home */
 .home-cards { grid-template-columns: repeat(3, 1fr); margin-top: 20px; }

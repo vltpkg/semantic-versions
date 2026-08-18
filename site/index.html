@@ -59,23 +59,29 @@
 
       <!-- ───────────────────────── Manifesto ───────────────────────── -->
       <section class="wrap why">
-        <div class="section-head left reveal">
-          <p class="eyebrow">Why a new spec</p>
-          <h2 class="section-title big">Versioning should mirror how software actually changes.</h2>
-          <p class="lead">
-            Semantic Versioning 2.0.0 is more than a decade old, has not meaningfully changed in
-            that time, and has no realistic path to a 3.0. The way we ship software has moved on.
-            JavaScript avoided the first circle of dependency hell only because tooling quietly
-            bolted <em>sets, ranges and comparators</em> onto a spec that never defined them. We
-            have since landed in a deeper circle, where package managers read the same version
-            differently and resolve to different graphs.
-          </p>
-          <p class="lead why-crit">
-            A specification is a language, and it is only as good as the definitions it contains.
-            Software changes over time and sometimes breaks; that is natural, and necessary for
-            growth. A versioning spec exists to <strong>codify the signals that communicate
-            change</strong>, so it should codify the ones we actually use.
-          </p>
+        <div class="why-grid">
+          <div class="section-head left reveal">
+            <p class="eyebrow">Why a new spec</p>
+            <h2 class="section-title big">Versioning should mirror how software actually changes.</h2>
+            <p class="lead">
+              Semantic Versioning 2.0.0 is more than a decade old, has not meaningfully changed in
+              that time, and has no realistic path to a 3.0. The way we ship software has moved on.
+              JavaScript avoided the first circle of dependency hell only because tooling quietly
+              bolted <em>sets, ranges and comparators</em> onto a spec that never defined them. We
+              have since landed in a deeper circle, where package managers read the same version
+              differently and resolve to different graphs.
+            </p>
+            <p class="lead why-crit">
+              A specification is a language, and it is only as good as the definitions it contains.
+              Software changes over time and sometimes breaks; that is natural, and necessary for
+              growth. A versioning spec exists to <strong>codify the signals that communicate
+              change</strong>, so it should codify the ones we actually use.
+            </p>
+          </div>
+          <figure class="why-viz reveal" aria-hidden="true">
+            <div class="why-sort" data-version-sort></div>
+            <figcaption class="why-viz-tag" data-sort-tag>precedence · live</figcaption>
+          </figure>
         </div>
       </section>
 
@@ -186,5 +192,6 @@
     <div data-footer></div>
 
     <script type="module" src="/src/shell.js"></script>
+    <script type="module" src="/src/version-stream.js"></script>
   </body>
 </html>
