@@ -6,7 +6,7 @@
 const SPEC_VERSION = "1.0.0";
 
 const NAV = [
-  { href: "/spec/", label: "Spec" },
+  { href: "/spec/", label: "Spec", badge: SPEC_VERSION },
   { href: "/extensions/", label: "Extensions" },
   { href: "/grammar/", label: "Grammar" },
   { href: "/selector/", label: "Try" },
@@ -50,14 +50,15 @@ function isActive(href) {
 function renderNav() {
   const links = NAV.map(
     (n) =>
-      `<a href="${n.href}"${isActive(n.href) ? ' class="active"' : ""}>${n.label}</a>`,
+      `<a href="${n.href}"${isActive(n.href) ? ' class="active"' : ""}>${n.label}${
+        n.badge ? ` <span class="nav-ver" aria-label="version ${n.badge}">${n.badge}</span>` : ""
+      }</a>`,
   ).join("");
 
   return `
     <header class="nav">
       <a class="brand" href="/" aria-label="semver.xyz home">
         <span class="brand-word"><span class="brand-name">semver</span><span class="brand-tld">.xyz</span></span>
-        <span class="brand-ver">${SPEC_VERSION}</span>
       </a>
       <nav class="nav-links">
         ${links}
