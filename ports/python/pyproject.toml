@@ -8,7 +8,7 @@ version = "1.0.0"
 description = "Parse, compare and match versions per the Semantic Versions specification (semver.xyz)"
 readme = "README.md"
 license = "Apache-2.0"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 keywords = ["semver", "semantic versioning", "version", "range", "npm"]
 classifiers = [
   "Programming Language :: Python :: 3",

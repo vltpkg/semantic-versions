@@ -1,6 +1,6 @@
 {
   "name": "semantic-versions",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The reference parser for Semantic Versions (semver.xyz): parse, validate, compare and range-match versions, with build metadata that participates in precedence.",
   "keywords": [
     "semver",

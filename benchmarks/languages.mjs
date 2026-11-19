@@ -39,7 +39,7 @@ export const LANGUAGES = [
     source: 'ports/python',
     readme: 'ports/python/README.md',
     links: [['PyPI', 'https://pypi.org/project/semantic-versions/']],
-    tagline: 'Pure Python 3.9+, typed, no dependencies. Versions order by a precomputed tuple, so sorting runs at C speed.',
+    tagline: 'Pure Python 3.10+, typed, no dependencies. Versions order by a precomputed tuple, so sorting runs at C speed.',
     method: `Timed against ${a('https://pypi.org/project/node-semver/', 'node-semver')} (npm's rules, ported to Python) and ${a('https://pypi.org/project/semver/', 'python-semver')}, parsing once and comparing parsed values.`,
   },
   {

@@ -10,7 +10,7 @@
   },
   "libraries": {
     "semantic-versions": {
-      "version": "1.0.0"
+      "version": "1.0.1"
     },
     "semver": {
       "version": "7.8.6"
@@ -81,7 +81,7 @@
     {
       "id": "satisfies",
       "label": "satisfies(version, range)",
-      "description": "15,604 version × range checks",
+      "description": "15,604 version \u00d7 range checks",
       "results": {
         "semantic-versions": {
           "nsPerOp": 414.2,

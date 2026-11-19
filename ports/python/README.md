@@ -9,7 +9,7 @@ It is a port of the JavaScript reference implementation
 and behaves identically: both pass the same
 [conformance suite](https://github.com/vltpkg/semantic-versions/tree/main/conformance),
 and they agree on every version, range and resolution in the benchmark corpus.
-Pure Python 3.9+, typed, no dependencies.
+Pure Python 3.10+, typed, no dependencies.
 
 ## Install
 

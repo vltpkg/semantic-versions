@@ -103,7 +103,7 @@ Also on [semver.xyz/libraries](https://semver.xyz/libraries/).
 
 ### Speed
 
-| Operation | `semantic-versions@1.0.0` | `semver@7.8.6` | semantic-versions vs semver |
+| Operation | `semantic-versions@1.0.1` | `semver@7.8.6` | semantic-versions vs semver |
 | --- | ---: | ---: | --- |
 | Parse a version | **78.3 ns** | 231 ns | **3.0× faster** |
 | Sort versions | **350 ns** | 3.58 µs | **10× faster** |
