@@ -34,7 +34,7 @@ window.result = { main, worker }
 const server = createServer(async (req, res) => {
   const path = decodeURIComponent(new URL(req.url, 'http://x').pathname)
   if (path === '/') return res.writeHead(200, { 'content-type': 'text/html' }).end(PAGE)
-  if (!/^\/(packages\/parser\/(index\.js|lib\/|runtimes\/)|conformance\/)/.test(path)) return res.writeHead(404).end()
+  if (!/^\/(libraries\/javascript\/(index\.js|lib\/|runtimes\/)|conformance\/)/.test(path)) return res.writeHead(404).end()
   try {
     res.writeHead(200, { 'content-type': TYPES[extname(path)] || 'text/plain' }).end(await readFile(root + path.slice(1)))
   } catch {
