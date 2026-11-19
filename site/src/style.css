@@ -1047,13 +1047,22 @@ p code, .lead code, .caption code { background: var(--panel-2); padding: 1px 5px
 .range-echo b { color: var(--text); font-weight: 600; }
 .range-echo.invalid b { color: var(--danger); }
 
+.sel-summary-row {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 8px 18px; margin-bottom: 14px;
+}
 .sel-summary {
   display: flex; flex-wrap: wrap; gap: 8px 18px;
-  font-family: var(--mono); font-size: 0.8rem; color: var(--muted); margin-bottom: 14px;
+  font-family: var(--mono); font-size: 0.8rem; color: var(--muted);
 }
 .sel-summary b { color: var(--text); }
 
-.vlist { display: flex; flex-direction: column; gap: 6px; max-height: 520px; overflow: auto; padding-right: 4px; }
+/* The list grows with the page; long lists are truncated in selector.js with a
+   "Show all" control rather than scrolled inside a fixed-height box. */
+.vlist { display: flex; flex-direction: column; gap: 6px; }
+.vlist-more:not(:empty) { margin-top: 12px; }
+.vlist-more .btn { width: 100%; justify-content: center; gap: 10px; }
+.vlist-more-n { font-family: var(--mono); font-size: 0.75rem; color: var(--faint); }
 .vrow {
   display: flex; align-items: center; gap: 10px;
   padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);

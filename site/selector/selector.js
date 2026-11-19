@@ -110,6 +110,8 @@ const echoEl = $("echo");
 const desugarEl = $("desugar");
 const summaryEl = $("summary");
 const resultsEl = $("results");
+const moreEl = $("results-more");
+const matchesOnlyInput = $("matches-only");
 const examplesEl = $("examples");
 const samplesEl = $("samples");
 const sampleNoteEl = $("sample-note");
@@ -142,9 +144,31 @@ function renderSet(comps) {
     .join(" ");
 }
 
+// A registry lookup can return thousands of versions. Rather than scrolling
+// inside a fixed-height box, the list grows with the page: long lists show the
+// first PREVIEW_ROWS rows and a "Show all" control, and "Matches only" hides
+// the misses.
+const PREVIEW_ROWS = 50;
+const VERSIONS_MAX_PX = 560;
+let showAll = false;
+let lastVersionsText = null;
+
+const count = (n) => n.toLocaleString("en");
+
+// Size the versions textarea to its content, up to a cap; past that it scrolls.
+function fitVersions() {
+  versionsInput.style.height = "auto";
+  versionsInput.style.height = `${Math.min(versionsInput.scrollHeight + 2, VERSIONS_MAX_PX)}px`;
+}
+
 function render() {
   const rangeStr = rangeInput.value.trim();
   const versions = parseVersionList(versionsInput.value);
+  if (versionsInput.value !== lastVersionsText) {
+    lastVersionsText = versionsInput.value;
+    showAll = false;
+    fitVersions();
+  }
 
   let range = null;
   let invalidRange = false;
@@ -185,7 +209,7 @@ function render() {
     try {
       version = new Version(raw);
     } catch {
-      return `<div class="vrow invalid"><span class="vmark">?</span><span class="vver">${esc(raw)}</span><span class="vnote">invalid version</span></div>`;
+      return { ok: false, html: `<div class="vrow invalid"><span class="vmark">?</span><span class="vver">${esc(raw)}</span><span class="vnote">invalid version</span></div>` };
     }
     valid++;
     const { context, rest } = splitReference(raw);
@@ -198,19 +222,36 @@ function render() {
     // its number — shown distinctly from an ordinary numeric miss.
     if (rangeContext && version.context !== rangeContext) {
       contextMiss++;
-      return `<div class="vrow context-miss"><span class="vmark">≠</span>${label}<span class="vnote">other context</span></div>`;
+      return { ok: false, html: `<div class="vrow context-miss"><span class="vmark">≠</span>${label}<span class="vnote">other context</span></div>` };
     }
 
     const ok = !invalidRange && range.test(version);
     if (ok) matched++;
     const cls = ok ? "match" : "nomatch";
     const mark = ok ? "✓" : "";
-    return `<div class="vrow ${cls}"><span class="vmark">${mark}</span>${label}</div>`;
+    return { ok, html: `<div class="vrow ${cls}"><span class="vmark">${mark}</span>${label}</div>` };
   });
 
-  resultsEl.innerHTML =
-    rows.join("") ||
-    '<div class="vrow invalid"><span class="vmark">?</span><span class="vver">Add some versions on the left.</span></div>';
+  const matchesOnly = matchesOnlyInput.checked;
+  const shown = matchesOnly ? rows.filter((r) => r.ok) : rows;
+  const limit = showAll ? shown.length : Math.min(shown.length, PREVIEW_ROWS);
+  const noun = matchesOnly ? "matches" : "versions";
+  if (!rows.length) {
+    resultsEl.innerHTML =
+      '<div class="vrow invalid"><span class="vmark">?</span><span class="vver">Add some versions on the left.</span></div>';
+  } else if (!shown.length) {
+    resultsEl.innerHTML =
+      '<div class="vrow nomatch"><span class="vmark"></span><span class="vver">No versions match this range.</span></div>';
+  } else {
+    resultsEl.innerHTML = shown.slice(0, limit).map((r) => r.html).join("");
+  }
+  if (limit < shown.length) {
+    moreEl.innerHTML = `<button class="btn btn-ghost" type="button" data-more="all">Show all ${count(shown.length)} ${noun} <span class="vlist-more-n">${count(shown.length - limit)} more</span></button>`;
+  } else if (showAll && shown.length > PREVIEW_ROWS) {
+    moreEl.innerHTML = `<button class="btn btn-ghost" type="button" data-more="less">Show the first ${PREVIEW_ROWS}</button>`;
+  } else {
+    moreEl.innerHTML = "";
+  }
 
   // Whether the range itself admits any pre-release, and how: a declared channel
   // (a comparator carrying a pre-release, or an `X.Y.Z-*` tuple wildcard) or the
@@ -227,7 +268,7 @@ function render() {
     );
 
   summaryEl.innerHTML = [
-    `<span><b>${matched}</b> of <b>${valid}</b> match</span>`,
+    `<span><b>${count(matched)}</b> of <b>${count(valid)}</b> match</span>`,
     contextMiss > 0
       ? `<span><b>${contextMiss}</b> other context</span>`
       : "",
@@ -365,6 +406,15 @@ function init() {
   }
 
   rangeInput.addEventListener("input", render);
+  matchesOnlyInput.addEventListener("change", render);
+  moreEl.addEventListener("click", (ev) => {
+    const btn = ev.target.closest("[data-more]");
+    if (!btn) return;
+    showAll = btn.dataset.more === "all";
+    render();
+    // Collapsing shortens the page; bring the list back into view.
+    if (!showAll) summaryEl.scrollIntoView({ block: "nearest" });
+  });
   versionsInput.addEventListener("input", () => {
     // Manual edits detach from any preset sample.
     samplesEl.querySelectorAll(".chip.active").forEach((el) => el.classList.remove("active"));
