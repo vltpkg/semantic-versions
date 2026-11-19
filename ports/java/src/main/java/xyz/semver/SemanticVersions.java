@@ -1,4 +1,4 @@
-package io.vlt.semanticversions;
+package xyz.semver;
 
 import java.util.ArrayList;
 import java.util.Collection;

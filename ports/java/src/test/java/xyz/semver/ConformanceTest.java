@@ -1,4 +1,4 @@
-package io.vlt.semanticversions;
+package xyz.semver;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,7 +11,7 @@ import java.util.Objects;
  * Runs the shared conformance suite (../../conformance) against this library. Dependency-free:
  * exits non-zero on failure.
  *
- * <pre>javac -d build $(find src -name '*.java') && java -cp build io.vlt.semanticversions.ConformanceTest</pre>
+ * <pre>javac -d build $(find src -name '*.java') && java -cp build xyz.semver.ConformanceTest</pre>
  */
 public final class ConformanceTest {
     private static final List<String> failures = new ArrayList<>();

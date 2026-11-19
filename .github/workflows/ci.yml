@@ -147,7 +147,7 @@ jobs:
           distribution: temurin
           java-version: "17"
       - run: javac -Xlint:all -Werror -d build $(find src -name '*.java')
-      - run: java -cp build io.vlt.semanticversions.ConformanceTest
+      - run: java -cp build xyz.semver.ConformanceTest
       - run: mvn -B -q package
 
   dotnet:

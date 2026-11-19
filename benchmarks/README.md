@@ -13,7 +13,7 @@ libraries people use today, in each language:
 | [Python](../ports/python) | `semantic-versions` (PyPI) | 447/447 | `node-semver` 360/447 | 1.6–15× |
 | [Go](../ports/go) | `github.com/vltpkg/semantic-versions/ports/go` (pkg.go.dev) | 447/447 | `Masterminds/semver` 342/413 | 2.5–24× |
 | [Ruby](../ports/ruby) | `semantic-versions` (RubyGems) | 447/447 | `semantic_range` 360/447 | 1.6–20× |
-| [Java](../ports/java) | `io.vlt:semantic-versions` (Maven Central) | 447/447 | `semver4j` 350/413 | 9.3–25× |
+| [Java](../ports/java) | `xyz.semver:semantic-versions` (Maven Central) | 447/447 | `semver4j` 350/413 | 9.3–25× |
 | [.NET](../ports/dotnet) | `SemanticVersions` (NuGet) | 447/447 | `Semver` 359/413 | 1.3–9.7× |
 | [PHP](../ports/php) | `vltpkg/semantic-versions` (Packagist) | 447/447 | `composer/semver` 273/413 | 1.1–3.8× |
 

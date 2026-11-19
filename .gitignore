@@ -34,3 +34,7 @@ ports/php/vendor/
 ports/php/composer.lock
 ports/ruby/Gemfile.lock
 ports/ruby/*.gem
+
+# Private signing keys: never commit
+*-signing.asc
+secring.*

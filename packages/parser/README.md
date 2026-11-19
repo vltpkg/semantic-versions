@@ -193,7 +193,7 @@ this package on every version and range in the benchmark corpus:
 | Python | [`semantic-versions`](https://pypi.org/project/semantic-versions/) on PyPI |
 | Go | [`github.com/vltpkg/semantic-versions/ports/go`](https://pkg.go.dev/github.com/vltpkg/semantic-versions/ports/go) |
 | Ruby | [`semantic-versions`](https://rubygems.org/gems/semantic-versions) on RubyGems |
-| Java | [`io.vlt:semantic-versions`](https://central.sonatype.com/artifact/io.vlt/semantic-versions) on Maven Central |
+| Java | [`xyz.semver:semantic-versions`](https://central.sonatype.com/artifact/xyz.semver/semantic-versions) on Maven Central |
 | .NET | [`SemanticVersions`](https://www.nuget.org/packages/SemanticVersions) on NuGet |
 | PHP | [`vltpkg/semantic-versions`](https://packagist.org/packages/vltpkg/semantic-versions) on Packagist |
 

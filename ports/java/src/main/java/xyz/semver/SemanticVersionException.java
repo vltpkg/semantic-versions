@@ -1,4 +1,4 @@
-package io.vlt.semanticversions;
+package xyz.semver;
 
 /** Thrown for input that is not a version or not a range. */
 public class SemanticVersionException extends IllegalArgumentException {

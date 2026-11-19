@@ -1,4 +1,4 @@
-package io.vlt.semanticversions;
+package xyz.semver;
 
 import java.util.Objects;
 

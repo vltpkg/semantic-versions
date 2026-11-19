@@ -1,4 +1,4 @@
-package io.vlt.semanticversions;
+package xyz.semver;
 
 /** Scanning and comparison of dot-separated identifiers, without allocation. */
 final class Identifiers {

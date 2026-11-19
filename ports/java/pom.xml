@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>io.vlt</groupId>
+  <groupId>xyz.semver</groupId>
   <artifactId>semantic-versions</artifactId>
   <version>1.0.0</version>
   <packaging>jar</packaging>
@@ -17,18 +17,26 @@
     <license>
       <name>Apache-2.0</name>
       <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+      <distribution>repo</distribution>
     </license>
   </licenses>
   <developers>
     <developer>
+      <name>vlt technology inc.</name>
       <organization>vlt technology inc.</organization>
       <organizationUrl>https://vlt.sh</organizationUrl>
     </developer>
   </developers>
   <scm>
-    <url>https://github.com/vltpkg/semantic-versions</url>
+    <url>https://github.com/vltpkg/semantic-versions/tree/main/ports/java</url>
     <connection>scm:git:https://github.com/vltpkg/semantic-versions.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/vltpkg/semantic-versions.git</developerConnection>
+    <tag>ports/java/v${project.version}</tag>
   </scm>
+  <issueManagement>
+    <system>GitHub</system>
+    <url>https://github.com/vltpkg/semantic-versions/issues</url>
+  </issueManagement>
 
   <properties>
     <maven.compiler.release>17</maven.compiler.release>
@@ -48,7 +56,7 @@
             <phase>test</phase>
             <goals><goal>java</goal></goals>
             <configuration>
-              <mainClass>io.vlt.semanticversions.ConformanceTest</mainClass>
+              <mainClass>xyz.semver.ConformanceTest</mainClass>
               <classpathScope>test</classpathScope>
               <arguments><argument>${project.basedir}/../../conformance</argument></arguments>
             </configuration>
@@ -73,4 +81,44 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <!--
+      Publishing to Maven Central (namespace xyz.semver):
+        mvn -P release deploy
+      Signs every artifact with your default GPG key and uploads the bundle with
+      the Central Portal token stored as <server id="central"> in ~/.m2/settings.xml.
+      The deployment is validated, then waits in the Portal until you click Publish.
+    -->
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>3.2.8</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals><goal>sign</goal></goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.sonatype.central</groupId>
+            <artifactId>central-publishing-maven-plugin</artifactId>
+            <version>0.12.0</version>
+            <extensions>true</extensions>
+            <configuration>
+              <publishingServerId>central</publishingServerId>
+              <autoPublish>false</autoPublish>
+              <waitUntil>validated</waitUntil>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

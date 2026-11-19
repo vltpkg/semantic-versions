@@ -15,20 +15,20 @@ Java 17+, no dependencies; usable from Kotlin, Scala and any other JVM language.
 
 ```xml
 <dependency>
-  <groupId>io.vlt</groupId>
+  <groupId>xyz.semver</groupId>
   <artifactId>semantic-versions</artifactId>
   <version>1.0.0</version>
 </dependency>
 ```
 
-Gradle: `implementation("io.vlt:semantic-versions:1.0.0")`
+Gradle: `implementation("xyz.semver:semantic-versions:1.0.0")`
 
 ## Usage
 
 ```java
-import io.vlt.semanticversions.Range;
-import io.vlt.semanticversions.SemanticVersions;
-import io.vlt.semanticversions.Version;
+import xyz.semver.Range;
+import xyz.semver.SemanticVersions;
+import xyz.semver.Version;
 import java.util.List;
 
 Version v = Version.parse("1.2.3-beta.4+build.7");
@@ -113,10 +113,14 @@ The library and its tests have no dependencies, so the JDK is all you need:
 
 ```sh
 javac -d build $(find src -name '*.java')
-java -cp build io.vlt.semanticversions.ConformanceTest   # conformance suite
-bench/run.sh                                             # benchmarks
-mvn package                                              # the published jar
+java -cp build xyz.semver.ConformanceTest   # conformance suite
+bench/run.sh                                # benchmarks
+mvn package                                 # the jar, sources and javadoc
 ```
+
+Releases go to Maven Central under the `xyz.semver` namespace with
+`mvn -P release deploy`, which GPG-signs the artifacts and uploads them with the
+Central Portal token in `~/.m2/settings.xml` (server id `central`).
 
 ## License
 

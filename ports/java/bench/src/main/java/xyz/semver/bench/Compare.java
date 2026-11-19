@@ -1,10 +1,10 @@
-package io.vlt.semanticversions.bench;
+package xyz.semver.bench;
 
 import com.github.zafarkhaja.semver.expr.ExpressionParser;
-import io.vlt.semanticversions.Json;
-import io.vlt.semanticversions.Range;
-import io.vlt.semanticversions.SemanticVersions;
-import io.vlt.semanticversions.Version;
+import xyz.semver.Json;
+import xyz.semver.Range;
+import xyz.semver.SemanticVersions;
+import xyz.semver.Version;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;

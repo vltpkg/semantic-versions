@@ -16,5 +16,5 @@ fetch org.semver4j semver4j "$SEMVER4J"
 fetch com.github.zafarkhaja java-semver "$JSEMVER"
 fetch org.jspecify jspecify "$JSPECIFY"
 CP="lib/semver4j-$SEMVER4J.jar:lib/java-semver-$JSEMVER.jar:lib/jspecify-$JSPECIFY.jar"
-javac -nowarn -cp "$CP" -d build $(find ../src/main ../src/test/java/io/vlt/semanticversions/Json.java src -name '*.java')
-java -Dsemver4j.version="$SEMVER4J" -Djsemver.version="$JSEMVER" -cp "build:$CP" io.vlt.semanticversions.bench.Compare "$@"
+javac -nowarn -cp "$CP" -d build $(find ../src/main ../src/test/java/xyz/semver/Json.java src -name '*.java')
+java -Dsemver4j.version="$SEMVER4J" -Djsemver.version="$JSEMVER" -cp "build:$CP" xyz.semver.bench.Compare "$@"
