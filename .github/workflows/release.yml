@@ -37,7 +37,7 @@ jobs:
         run: vlt install --frozen-lockfile
 
       - name: Run tests
-        run: vlt run test -w packages/parser
+        run: vlt run test -w libraries/javascript
 
       - name: Authenticate vlt to npm
         env:
@@ -58,8 +58,8 @@ jobs:
 
       - name: Publish (dry run)
         if: ${{ inputs.dry-run }}
-        run: vlt publish --dry-run --workspace packages/parser --access public
+        run: vlt publish --dry-run --workspace libraries/javascript --access public
 
       - name: Publish to npm
         if: ${{ !inputs.dry-run }}
-        run: vlt publish --workspace packages/parser --access public
+        run: vlt publish --workspace libraries/javascript --access public

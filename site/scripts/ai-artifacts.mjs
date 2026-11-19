@@ -68,7 +68,7 @@ const DOCS = [
     full: true,
   },
   {
-    src: "packages/parser/README.md",
+    src: "libraries/javascript/README.md",
     url: "/parser.md",
     section: "Libraries",
     title: "semantic-versions (npm)",

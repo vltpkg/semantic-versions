@@ -33,14 +33,14 @@ Every implementation passes the same [conformance suite](conformance) and is
 
 | Language | Package | Conformance | Compared with | Speed vs. it |
 | --- | --- | :---: | --- | ---: |
-| [JavaScript](packages/parser) | `semantic-versions` (npm) | 447/447 | `semver` 390/447 | 1.3–10× |
-| [Rust](crates/semantic-versions) | `semantic-versions` (crates.io) | 447/447 | `nodejs-semver` 357/447 | 0.9–1.6× |
-| [Python](ports/python) | `semantic-versions` (PyPI) | 447/447 | `node-semver` 360/447 | 1.6–15× |
-| [Go](ports/go) | `github.com/vltpkg/semantic-versions/ports/go` (pkg.go.dev) | 447/447 | `Masterminds/semver` 342/413 | 2.5–24× |
-| [Ruby](ports/ruby) | `semantic-versions` (RubyGems) | 447/447 | `semantic_range` 360/447 | 1.6–20× |
-| [Java](ports/java) | `xyz.semver:semantic-versions` (Maven Central) | 447/447 | `semver4j` 350/413 | 9.3–25× |
-| [.NET](ports/dotnet) | `SemanticVersions` (NuGet) | 447/447 | `Semver` 359/413 | 1.3–9.7× |
-| [PHP](ports/php) | `vltpkg/semantic-versions` (Packagist) | 447/447 | `composer/semver` 273/413 | 1.1–3.8× |
+| [JavaScript](libraries/javascript) | `semantic-versions` (npm) | 447/447 | `semver` 390/447 | 1.3–10× |
+| [Rust](libraries/rust) | `semantic-versions` (crates.io) | 447/447 | `nodejs-semver` 357/447 | 0.9–1.6× |
+| [Python](libraries/python) | `semantic-versions` (PyPI) | 447/447 | `node-semver` 360/447 | 1.6–15× |
+| [Go](libraries/go) | `semver.xyz/go` (pkg.go.dev) | 447/447 | `Masterminds/semver` 342/413 | 2.5–24× |
+| [Ruby](libraries/ruby) | `semantic-versions` (RubyGems) | 447/447 | `semantic_range` 360/447 | 1.6–20× |
+| [Java](libraries/java) | `xyz.semver:semantic-versions` (Maven Central) | 447/447 | `semver4j` 350/413 | 9.3–25× |
+| [.NET](libraries/dotnet) | `SemanticVersions` (NuGet) | 447/447 | `Semver` 359/413 | 1.3–9.7× |
+| [PHP](libraries/php) | `vltpkg/semantic-versions` (Packagist) | 447/447 | `composer/semver` 273/413 | 1.1–3.8× |
 
 <!-- languages:end -->
 
@@ -79,18 +79,17 @@ This repository is a [vlt](https://www.vlt.io) workspace (`vlt.json`):
 │   ├── variants/             # 1. Build Variants: which artifact
 │   ├── integrity/            # 2. Package Integrity: which bytes
 │   └── dependency-locks/     # 3. Dependency Locks: which graph (builds on 1 and 2)
-├── packages/
-│   └── parser/               # `semantic-versions` on npm, the JavaScript reference implementation
-├── crates/
-│   └── semantic-versions/    # `semantic-versions` on crates.io, the Rust implementation
-├── ports/                    # The other implementations, one directory per language:
+├── libraries/                # One directory per language, all passing conformance/:
+│   ├── javascript/           #   npm `semantic-versions` (the reference implementation)
+│   ├── rust/                 #   crates.io `semantic-versions`
 │   ├── python/               #   PyPI `semantic-versions`
-│   ├── go/                   #   module github.com/vltpkg/semantic-versions/ports/go
+│   ├── go/                   #   module `semver.xyz/go`
 │   ├── ruby/                 #   RubyGems `semantic-versions`
 │   ├── java/                 #   Maven Central `xyz.semver:semantic-versions`
 │   ├── dotnet/               #   NuGet `SemanticVersions`
 │   └── php/                  #   Packagist `vltpkg/semantic-versions`
 ├── benchmarks/               # Real-world corpus, results, and the shared table renderer
+├── assets/                   # README banner (and the script that draws it)
 └── site/                     # The semver.xyz static site (Vite, vanilla HTML/CSS/JS)
     ├── index.html            # Home
     ├── spec/                 # Template; content rendered from spec/SPEC.md
@@ -116,24 +115,24 @@ Node 22.22 or newer), then:
 
 ```sh
 vlt install
-vlt run dev -w site               # start the site (Vite) at http://localhost:5173
-vlt run build -w site             # build the static site into site/dist
-vlt run preview -w site           # preview the production build
-vlt run test -w packages/parser   # run the parser test suite (tap), incl. conformance
-vlt run bench -w packages/parser  # benchmark against node-semver, refresh the tables
+vlt run dev -w site                    # start the site (Vite) at http://localhost:5173
+vlt run build -w site                  # build the static site into site/dist
+vlt run preview -w site                # preview the production build
+vlt run test -w libraries/javascript   # run the parser test suite (tap), incl. conformance
+vlt run bench -w libraries/javascript  # benchmark against node-semver, refresh the tables
 ```
 
 The other implementations live outside the vlt workspace and use their own
 toolchains; each README has the details:
 
 ```sh
-cd crates/semantic-versions && cargo test && cargo bench --bench compare
-cd ports/python && python -m unittest discover -s tests && python bench/compare.py
-cd ports/go && go test ./... && (cd bench && go run .)
-cd ports/ruby && bundle exec rake test && bundle exec rake bench
-cd ports/java && javac -d build $(find src -name '*.java') && java -cp build xyz.semver.ConformanceTest && bench/run.sh
-cd ports/dotnet && dotnet run --project tests/SemanticVersions.Conformance && dotnet run -c Release --project bench
-cd ports/php && composer install && composer test && composer bench
+cd libraries/rust && cargo test && cargo bench --bench compare
+cd libraries/python && python -m unittest discover -s tests && python bench/compare.py
+cd libraries/go && go test ./... && (cd bench && go run .)
+cd libraries/ruby && bundle exec rake test && bundle exec rake bench
+cd libraries/java && javac -d build $(find src -name '*.java') && java -cp build xyz.semver.ConformanceTest && bench/run.sh
+cd libraries/dotnet && dotnet run --project tests/SemanticVersions.Conformance && dotnet run -c Release --project bench
+cd libraries/php && composer install && composer test && composer bench
 ```
 
 Each benchmark writes `benchmarks/results/<language>.json`. Afterwards,
@@ -188,6 +187,9 @@ user-level vlt config points at.
 
 ## License
 
-The specification text is licensed under
-[CC BY 3.0](https://creativecommons.org/licenses/by/3.0/); the reference parser
-(`packages/parser`) under the Apache License 2.0.
+The specification and extension texts are licensed under
+[CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). The code (every library
+under `libraries/`, the benchmarks and the site) is licensed under the
+[Apache License 2.0](LICENSE).
+
+Releasing a library: see [`.github/RELEASING.md`](.github/RELEASING.md).

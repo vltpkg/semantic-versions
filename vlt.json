@@ -1,5 +1,5 @@
 {
-  "workspaces": ["packages/*", "site"],
+  "workspaces": ["libraries/javascript", "site"],
   "config": {
     "registries": {
       "npm": "https://registry.npmjs.org/"

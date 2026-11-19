@@ -8,14 +8,14 @@ libraries people use today, in each language:
 
 | Language | Package | Conformance | Compared with | Speed vs. it |
 | --- | --- | :---: | --- | ---: |
-| [JavaScript](../packages/parser) | `semantic-versions` (npm) | 447/447 | `semver` 390/447 | 1.3–10× |
-| [Rust](../crates/semantic-versions) | `semantic-versions` (crates.io) | 447/447 | `nodejs-semver` 357/447 | 0.9–1.6× |
-| [Python](../ports/python) | `semantic-versions` (PyPI) | 447/447 | `node-semver` 360/447 | 1.6–15× |
-| [Go](../ports/go) | `github.com/vltpkg/semantic-versions/ports/go` (pkg.go.dev) | 447/447 | `Masterminds/semver` 342/413 | 2.5–24× |
-| [Ruby](../ports/ruby) | `semantic-versions` (RubyGems) | 447/447 | `semantic_range` 360/447 | 1.6–20× |
-| [Java](../ports/java) | `xyz.semver:semantic-versions` (Maven Central) | 447/447 | `semver4j` 350/413 | 9.3–25× |
-| [.NET](../ports/dotnet) | `SemanticVersions` (NuGet) | 447/447 | `Semver` 359/413 | 1.3–9.7× |
-| [PHP](../ports/php) | `vltpkg/semantic-versions` (Packagist) | 447/447 | `composer/semver` 273/413 | 1.1–3.8× |
+| [JavaScript](../libraries/javascript) | `semantic-versions` (npm) | 447/447 | `semver` 390/447 | 1.3–10× |
+| [Rust](../libraries/rust) | `semantic-versions` (crates.io) | 447/447 | `nodejs-semver` 357/447 | 0.9–1.6× |
+| [Python](../libraries/python) | `semantic-versions` (PyPI) | 447/447 | `node-semver` 360/447 | 1.6–15× |
+| [Go](../libraries/go) | `semver.xyz/go` (pkg.go.dev) | 447/447 | `Masterminds/semver` 342/413 | 2.5–24× |
+| [Ruby](../libraries/ruby) | `semantic-versions` (RubyGems) | 447/447 | `semantic_range` 360/447 | 1.6–20× |
+| [Java](../libraries/java) | `xyz.semver:semantic-versions` (Maven Central) | 447/447 | `semver4j` 350/413 | 9.3–25× |
+| [.NET](../libraries/dotnet) | `SemanticVersions` (NuGet) | 447/447 | `Semver` 359/413 | 1.3–9.7× |
+| [PHP](../libraries/php) | `vltpkg/semantic-versions` (Packagist) | 447/447 | `composer/semver` 273/413 | 1.1–3.8× |
 
 <!-- languages:end -->
 
@@ -55,14 +55,14 @@ and in each package's README.
 
 | Language | From | Command |
 | --- | --- | --- |
-| JavaScript | repository root | `vlt run bench -w packages/parser` |
-| Rust | `crates/semantic-versions` | `cargo bench --bench compare` |
-| Python | `ports/python` | `pip install node-semver semver && python bench/compare.py` |
-| Go | `ports/go/bench` | `go run .` |
-| Ruby | `ports/ruby` | `bundle install && bundle exec rake bench` |
-| Java | `ports/java` | `bench/run.sh` |
-| .NET | `ports/dotnet` | `dotnet run -c Release --project bench` |
-| PHP | `ports/php` | `composer install && composer bench` |
+| JavaScript | repository root | `vlt run bench -w libraries/javascript` |
+| Rust | `libraries/rust` | `cargo bench --bench compare` |
+| Python | `libraries/python` | `pip install node-semver semver && python bench/compare.py` |
+| Go | `libraries/go/bench` | `go run .` |
+| Ruby | `libraries/ruby` | `bundle install && bundle exec rake bench` |
+| Java | `libraries/java` | `bench/run.sh` |
+| .NET | `libraries/dotnet` | `dotnet run -c Release --project bench` |
+| PHP | `libraries/php` | `composer install && composer bench` |
 
 Each runner writes `results/<language>.json`; `--quick` (`-quick` for Go and
 .NET) does a fast run that does not write results. Then refresh the README

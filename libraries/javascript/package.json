@@ -1,0 +1,67 @@
+{
+  "name": "semantic-versions",
+  "version": "1.0.1",
+  "description": "The reference parser for Semantic Versions (semver.xyz): parse, validate, compare and range-match versions, with build metadata that participates in precedence.",
+  "keywords": [
+    "semver",
+    "semantic-versions",
+    "semantic-versioning",
+    "version",
+    "versions",
+    "range",
+    "ranges",
+    "comparator",
+    "precedence",
+    "build-metadata",
+    "parser",
+    "vlt",
+    "isomorphic",
+    "browser",
+    "deno",
+    "bun",
+    "esm"
+  ],
+  "homepage": "https://semver.xyz",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vltpkg/semantic-versions.git",
+    "directory": "libraries/javascript"
+  },
+  "license": "Apache-2.0",
+  "author": "vlt (https://www.vlt.io)",
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "lib/",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "test": "tap",
+    "test:coverage": "tap --coverage",
+    "bench": "node benchmarks/run.js && node ../../benchmarks/report.mjs",
+    "bench:quick": "node benchmarks/run.js --quick",
+    "prepublishOnly": "tap"
+  },
+  "devDependencies": {
+    "semver": "^7.6.0",
+    "tap": "^16.0.0"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "test"
+  }
+}

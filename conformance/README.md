@@ -20,8 +20,8 @@ example, a redundant `>=0.0.0` lower bound may be omitted).
 
 Where to find the runners:
 
-- JavaScript: [`packages/parser/test/conformance.js`](../packages/parser/test/conformance.js)
-- Rust: [`crates/semantic-versions/tests/conformance.rs`](../crates/semantic-versions/tests/conformance.rs)
+- JavaScript: [`libraries/javascript/test/conformance.js`](../libraries/javascript/test/conformance.js)
+- Rust: [`libraries/rust/tests/conformance.rs`](../libraries/rust/tests/conformance.rs)
 - Scoring other libraries: [`../benchmarks`](../benchmarks)
 
 Building an implementation in another language? Run these files against it; a
