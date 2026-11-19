@@ -40,7 +40,7 @@ const DOCS = [
     url: "/spec/SPEC.md",
     section: "Specification",
     title: "Semantic Versions 1.0.0",
-    note: "The core specification: versions, precedence, sets, ranges, comparators and operators. Working draft — some definitions are still placeholders; https://semver.xyz/spec/ is more current for the numbered rules.",
+    note: "The core specification: versions, precedence, sets, ranges, comparators, operators, channels and PEP 440 interoperability. Normative; https://semver.xyz/spec/ is rendered from this file.",
     full: true,
   },
   {
@@ -101,6 +101,7 @@ const PAGES = [
   ["/grammar/", "BNF grammars"],
   ["/selector/", "Range selector (interactive)"],
   ["/origin/", "History: how build metadata lost its meaning"],
+  ["/faq/", "FAQ"],
   ["/extensions/", "Extensions index"],
   ["/extensions/variants/", "Build Variants"],
   ["/extensions/integrity/", "Package Integrity"],
@@ -175,7 +176,7 @@ const lines = [
   "",
   "A version here is source-qualified and its build metadata is meaningful, not inert: `npm:sharp@0.33.0+linux.x64.musl.sha512.a91c…` names a registry, a package, a SemVer core, a target platform and the exact bytes.",
   "",
-  "The HTML pages at the corresponding topic URLs are separately authored presentations, not Markdown renderings of these files, so the two can differ. For the three extensions, the Markdown linked below is the normative document and governs. The core specification is still a working draft in which several definitions are unfilled placeholders; where it and https://semver.xyz/spec/ disagree, prefer the site.",
+  "The Markdown linked below is normative. https://semver.xyz/spec/ is rendered directly from the core specification, so the two never differ. The extension pages are separately authored presentations of their Markdown; where an extension page and its Markdown disagree, the Markdown governs.",
   "",
 ];
 for (const section of sections) {

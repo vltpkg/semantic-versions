@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FAQ — Semantic Versions · semver.xyz</title>
+    <meta
+      name="description"
+      content="Frequently asked questions about Semantic Versions: how it differs from semver.org, why minor and patch reset to 0, what counts as a public API, deprecation, Package-URL and more."
+    />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <meta property="og:title" content="FAQ — Semantic Versions" />
+    <meta
+      property="og:description"
+      content="How Semantic Versions differs from semver.org, why it keeps MAJOR.MINOR.PATCH, what counts as a public API, and other common questions."
+    />
+    <meta property="og:type" content="website" />
+
+    <link rel="describedby" type="text/markdown" href="/llms.txt" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div data-nav></div>
+
+    <main>
+      <section class="page-hero reveal">
+        <p class="eyebrow">FAQ</p>
+        <h1>Common questions, <span class="grad">answered.</span></h1>
+        <p class="lead">
+          The reasoning behind the rules: why some things changed from Semantic Versioning
+          2.0.0, why others deliberately didn't, and how the spec fits alongside the rest of the
+          ecosystem. The normative text is the <a href="/spec/">specification</a>.
+        </p>
+      </section>
+
+      <div class="doc-layout">
+        <aside class="toc reveal" aria-label="Questions">
+          <div class="toc-title">The specification</div>
+          <a href="#semver-org">Differences from semver.org</a>
+          <a href="#reset-to-zero">Resetting to <code>0</code></a>
+          <a href="#position-names">Why <code>MAJOR.MINOR.PATCH</code></a>
+          <a href="#public-api">Public API &amp; products</a>
+          <a href="#deprecated">Deprecation</a>
+          <div class="toc-title">Ecosystem</div>
+          <a href="#purl">Package-URL (purl)</a>
+          <div class="toc-title">The project</div>
+          <a href="#grammar">Grammar</a>
+          <a href="#contributing">Contributing</a>
+          <a href="#license">License</a>
+        </aside>
+
+        <article class="doc reveal">
+          <h2 id="the-specification">The specification</h2>
+
+          <h3 id="semver-org">How does this differ from <code>semver.org</code>?</h3>
+          <p>
+            Semantic Versions is a spiritual successor to
+            <a href="https://semver.org/spec/v2.0.0-rc.1.html">Semantic Versioning 2.0.0-rc.1</a>,
+            the draft that introduced optional pre-release and build versions. The next draft,
+            <code>2.0.0-rc.2</code>, turned builds into inert &ldquo;build metadata,&rdquo; which made
+            them semantically useless. Semantic Versions reverts that change, so
+            <strong>builds participate in precedence</strong> again, and adds the definitions tools
+            were already relying on without a spec: <strong>sets, ranges, operators and
+            comparators</strong>.
+          </p>
+          <p>
+            Anything valid under Semantic Versioning 2.0.0 is valid here and parses identically. The
+            topic-by-topic comparison is on the <a href="/proposal/#compare">proposal page</a>, and
+            the <a href="/origin/">history</a> traces how builds lost their meaning.
+          </p>
+
+          <h3 id="reset-to-zero">Why <strong>MUST</strong> minor and patch reset to <code>0</code>?</h3>
+          <p>
+            Resetting keeps versions a single, well-defined total order and gives every line an
+            unambiguous first member: <code>2.5.0</code> is the start of the <code>2.5</code> series,
+            and <code>2.0.0</code> is the start of the <code>2.x</code> series. Tools that reason
+            about &ldquo;the first release of a minor&rdquo; or that desugar ranges
+            (<code>~</code>, <code>^</code>, <code>~&gt;</code>) rely on this. A carried-forward
+            counter like <code>2.5.1</code> with no <code>2.5.0</code> breaks that assumption.
+          </p>
+          <p>
+            The rule constrains <em>carrying a lower-position counter forward</em>, not
+            <em>skipping numbers</em>. You <strong>MAY</strong> skip values:
+            <code>2.4.10</code> &rarr; <code>2.6.0</code> &rarr; <code>4.0.0</code> is fine, because
+            each increment still starts its lower positions at <code>0</code>. What the rule forbids
+            is <code>2.4.10</code> &rarr; <code>2.5.1</code>: the minor incremented, so patch
+            <strong>MUST</strong> restart at <code>0</code>.
+          </p>
+          <p>
+            This is also why Semantic Versions keeps <strong>MUST</strong> rather than relaxing it to
+            <strong>SHOULD</strong> (as proposed in
+            <a href="https://github.com/semver/semver/pull/393" target="_blank" rel="noopener">semver/semver#393</a>).
+            A normative relaxation would fragment the ordering guarantees that existing Semantic
+            Versioning 2.0.0 tooling depends on, for a gain you can already have by skipping the
+            numbers you don't want.
+          </p>
+
+          <h3 id="position-names">Why keep <code>MAJOR.MINOR.PATCH</code> instead of renaming to <code>BREAKING.FEATURE.FIX</code>?</h3>
+          <p>
+            Backward compatibility is the whole pitch. Anything valid under Semantic Versioning
+            2.0.0 stays valid here, and <code>MAJOR.MINOR.PATCH</code> is the vocabulary the
+            ecosystem already speaks: parsers, registries, changelog tools and a decade of habit.
+            Renaming the positions would fragment all of that for a purely cosmetic gain, so the
+            names stay.
+          </p>
+          <p>
+            The confusion the renaming proposals react to is real, though, and worth stating
+            plainly: <strong>an increment reflects the <em>nature</em> of the change to your public
+            API (incompatible, additive, or a fix), not the <em>amount</em> of code that
+            changed.</strong> A complete internal rewrite that leaves the public API untouched is
+            still a patch; a one-character change that removes a parameter is a major bump. The
+            number you increment is decided by what the change does to the contract, never by how
+            much work it was.
+          </p>
+          <p>
+            To keep that meaning attached to the familiar labels, the spec states the intent next
+            to each name: <code>MAJOR</code> is an incompatible change, <code>MINOR</code> an
+            additive change, <code>PATCH</code> a fix. And a patch is exactly that, <em>a fix</em>,
+            not a promise of backward compatibility (nothing can truly guarantee that).
+          </p>
+
+          <h3 id="public-api">What counts as the &ldquo;public API&rdquo;, and is Semantic Versions for apps and products?</h3>
+          <p>
+            &ldquo;Public API&rdquo; is meant <strong>broadly</strong>: it is whatever public
+            interface or contract you declare. That might be a library's function signatures, a
+            CLI's flags and output, a GUI's documented behaviour, a wire protocol or a file format.
+            The spec does not care which kind of interface it is; it only requires that you
+            <strong>declare one</strong> and increment based on changes to it. If your software's
+            contract is its command-line surface, that surface <em>is</em> your public API for
+            versioning purposes.
+          </p>
+          <p>
+            What a version is <em>about</em> is named by its <a href="/spec/#context">context</a>:
+            <code>source:name@version</code> (for example <code>npm:react@18.2.0</code>) identifies
+            a specific artifact in a specific ecosystem, the thing whose interface you are
+            versioning, rather than leaving a bare <code>1.2.3</code> to mean whatever the reader
+            assumes.
+          </p>
+          <p>
+            Because of that, Semantic Versions targets a <strong>declared interface</strong>, not a
+            product's marketing, feature set or billing cadence. A &ldquo;product version&rdquo; that
+            jumps to <code>2.0.0</code> for a licensing change, or that must land features on a
+            planned <code>1.5.0</code>, follows a different scheme, one where the number communicates
+            roadmap or pricing rather than interface compatibility. That is a legitimate thing to
+            want, but it is not what a semantic version measures. If you need both, version the
+            declared interface semantically and give the product its own separate label.
+          </p>
+
+          <h3 id="deprecated">What does the spec mean by &ldquo;deprecated&rdquo;?</h3>
+          <p>
+            Deprecation is a <strong>documentation and registry concern, not version syntax</strong>.
+            The spec references it once (a minor <strong>MUST</strong> be incremented when public API
+            functionality is marked as deprecated) and deliberately defines no notation for it.
+            None is planned.
+          </p>
+          <p>
+            The reason is that deprecation is <em>retroactive</em> while a version string is not.
+            You deprecate <code>1.2.3</code> after publishing it, often long after, and registries
+            model this as mutable metadata attached to an already-published version. But the
+            contents of a released version <strong>MUST NOT</strong> be modified, and its version
+            string is fixed at publish time. There is no moment at which the string could be
+            rewritten to record a decision made later.
+          </p>
+          <p>
+            Encoding it anyway would break precedence in both available slots. A pre-release lowers
+            precedence and announces instability, which is not what a deprecation says: a deprecated
+            release is usually stable, just unwanted. A build is worse. Because a build
+            <a href="/spec/#precedence">participates in precedence</a> here,
+            <code>1.2.3+deprecated</code> would sort <em>above</em> <code>1.2.3</code> and be
+            preferred by every range that matched it. The deprecated release would win, which is
+            precisely backwards.
+          </p>
+          <p>
+            So mark deprecations in your documentation and in your registry's metadata, and ship the
+            announcement in a minor release. A version number records what changed in the declared
+            interface; it does not carry advice about whether to use a release. That advice is real
+            and worth publishing; it simply belongs somewhere mutable.
+          </p>
+
+          <h2 id="ecosystem">Ecosystem</h2>
+
+          <h3 id="purl">How does this relate to Package-URL (<code>purl</code>)?</h3>
+          <p>
+            They solve different problems and compose cleanly.
+            <a href="https://github.com/package-url/purl-spec" target="_blank" rel="noopener">Package-URL</a>
+            (ECMA-427) is an <em>identifier</em>: <code>pkg:npm/react@18.2.0</code> standardises how
+            to name and locate a package across ecosystems, and is what SBOMs (CycloneDX, SPDX) and
+            vulnerability databases (OSV, CVE) reference. It deliberately says nothing about version
+            <em>semantics</em> (precedence, ordering or matching) and defers ranges to its separate
+            <a href="https://github.com/package-url/purl-spec/blob/main/VERSION-RANGE-SPEC.rst" target="_blank" rel="noopener"><code>vers</code></a>
+            constraint syntax.
+          </p>
+          <p>
+            Semantic Versions is the complementary layer: it defines what a version <em>means</em>,
+            covering precedence (including build), sets, ranges and comparators. A <code>purl</code>
+            says <em>which</em> package; Semantic Versions says how its versions <em>order and
+            match</em>. The source-qualified identity used here maps onto a <code>purl</code>
+            one-to-one across every ecosystem (see the <a href="/spec/#context">mapping table</a>
+            under Context), so a tool can carry both. The one thing neither <code>purl</code>
+            qualifiers nor <code>vers</code> model is a <strong>precedence-bearing build</strong>,
+            which is precisely the slot the <a href="/extensions/">extensions</a> occupy.
+          </p>
+
+          <h2 id="the-project">The project</h2>
+
+          <h3 id="grammar">Where is the grammar?</h3>
+          <p>
+            Backus–Naur forms for <a href="/grammar/#versions">versions</a>,
+            <a href="/grammar/#ranges">ranges</a> and
+            <a href="/grammar/#comparators">comparators</a> are published on the
+            <a href="/grammar/">grammar page</a>, alongside the reference parser,
+            <a href="https://github.com/vltpkg/semantic-versions/tree/main/packages/parser" target="_blank" rel="noopener"><code>semantic-versions</code></a>.
+            You can also <a href="/selector/">try ranges</a> against it in your browser.
+          </p>
+
+          <h3 id="contributing">Can I contribute, or propose an extension?</h3>
+          <p>
+            Yes. The specification, reference parser and extensions are developed in the open at
+            <a href="https://github.com/vltpkg/semantic-versions" target="_blank" rel="noopener">vltpkg/semantic-versions</a>.
+            Open an issue or discussion to propose a change, report a defect, or float a new
+            extension. Anything that rides on a source-qualified version and restored build
+            precedence is in scope.
+          </p>
+
+          <h3 id="license">How is it licensed?</h3>
+          <p>
+            The specification text is licensed under
+            <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener">CC BY 3.0</a>,
+            the reference parser under Apache 2.0. See the <a href="/license/">license page</a> for
+            details and attribution.
+          </p>
+        </article>
+      </div>
+    </main>
+
+    <div data-footer></div>
+
+    <script type="module" src="/src/shell.js"></script>
+  </body>
+</html>

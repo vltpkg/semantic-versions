@@ -46,7 +46,7 @@
           <div class="grammar-actions">
             <a class="btn btn-ghost" href="/spec/VERSION.bnf" download>Download VERSION.bnf</a>
           </div>
-          <pre class="bnf" data-copy><button class="copy-btn" type="button" aria-label="Copy" style="float:right">Copy</button><code>&lt;valid semver&gt; ::= &lt;version core&gt;
+          <pre class="bnf" data-copy><button class="copy-btn" type="button" aria-label="Copy">Copy</button><code>&lt;valid semver&gt; ::= &lt;version core&gt;
                  | &lt;version core&gt; "-" &lt;pre-release&gt;
                  | &lt;version core&gt; "+" &lt;build&gt;
                  | &lt;version core&gt; "-" &lt;pre-release&gt; "+" &lt;build&gt;
@@ -78,7 +78,7 @@
                        | &lt;positive digit&gt; &lt;digits&gt;
 
 &lt;positive digit&gt; ::= "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"</code></pre>
-          <p class="caption" style="text-align:left">The full leaf definitions (identifier characters, letters, digits) are in the downloadable file.</p>
+          <p class="caption left">The full leaf definitions (identifier characters, letters, digits) are in the downloadable file.</p>
 
           <h2 id="references">References &amp; context</h2>
           <p>
@@ -95,7 +95,7 @@
           <div class="grammar-actions">
             <a class="btn btn-ghost" href="/spec/REFERENCE.bnf" download>Download REFERENCE.bnf</a>
           </div>
-          <pre class="bnf" data-copy><button class="copy-btn" type="button" aria-label="Copy" style="float:right">Copy</button><code>&lt;reference&gt;       ::= &lt;valid semver&gt;
+          <pre class="bnf" data-copy><button class="copy-btn" type="button" aria-label="Copy">Copy</button><code>&lt;reference&gt;       ::= &lt;valid semver&gt;
                   | &lt;context&gt; "@" &lt;valid semver&gt;
 
 &lt;range reference&gt; ::= &lt;range set&gt;
@@ -114,14 +114,14 @@
 &lt;name segment&gt;    ::= &lt;name character&gt; +
 
 &lt;name character&gt;  ::= &lt;letter&gt; | &lt;digit&gt; | "-" | "." | "_"</code></pre>
-          <p class="caption" style="text-align:left">Context is identity, not precedence: it never changes how versions order. It scopes a range to a <a href="/spec/#contextual-sets">Contextual Set</a>, so <code>npm:react@^1.2.3</code> admits only versions of <code>npm:react</code>.</p>
+          <p class="caption left">Context is identity, not precedence: it never changes how versions order. It scopes a range to a <a href="/spec/#contextual-sets">Contextual Set</a>, so <code>npm:react@^1.2.3</code> admits only versions of <code>npm:react</code>.</p>
 
           <h2 id="ranges">Ranges</h2>
           <p>A range-set is one or more comparator sets joined by <code>||</code>. Hyphen, x-range, tilde, caret and approximate forms desugar to primitive comparators.</p>
           <div class="grammar-actions">
             <a class="btn btn-ghost" href="/spec/RANGE.bnf" download>Download RANGE.bnf</a>
           </div>
-          <pre class="bnf" data-copy><button class="copy-btn" type="button" aria-label="Copy" style="float:right">Copy</button><code>&lt;range set&gt;    ::= &lt;range&gt; ( &lt;logical or&gt; &lt;range&gt; ) *
+          <pre class="bnf" data-copy><button class="copy-btn" type="button" aria-label="Copy">Copy</button><code>&lt;range set&gt;    ::= &lt;range&gt; ( &lt;logical or&gt; &lt;range&gt; ) *
 
 &lt;logical or&gt;   ::= ( " " ) * "||" ( " " ) *
 
@@ -155,7 +155,7 @@
           <div class="grammar-actions">
             <a class="btn btn-ghost" href="/spec/COMPARATOR.bnf" download>Download COMPARATOR.bnf</a>
           </div>
-          <pre class="bnf" data-copy><button class="copy-btn" type="button" aria-label="Copy" style="float:right">Copy</button><code>&lt;comparator set&gt; ::= &lt;comparator&gt; ( &lt;whitespace&gt; &lt;comparator&gt; ) *
+          <pre class="bnf" data-copy><button class="copy-btn" type="button" aria-label="Copy">Copy</button><code>&lt;comparator set&gt; ::= &lt;comparator&gt; ( &lt;whitespace&gt; &lt;comparator&gt; ) *
 
 &lt;comparator&gt;     ::= &lt;operator&gt; &lt;partial&gt;
                    | &lt;partial&gt;

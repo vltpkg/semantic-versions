@@ -77,14 +77,13 @@
           </p>
         </div>
 
-        <div class="sel-toolbar reveal" style="margin-top:20px">
+        <div class="sel-toolbar sel-toolbar-spaced reveal">
           <input id="registry" type="text" spellcheck="false" autocomplete="off"
             aria-label="Registry origin"
-            placeholder="https://registry.npmjs.org" value="https://registry.npmjs.org"
-            style="flex:1;min-width:220px;max-width:300px" />
+            placeholder="https://registry.npmjs.org" value="https://registry.npmjs.org" />
           <input id="pkg" type="text" spellcheck="false" autocomplete="off"
             aria-label="Package identity"
-            placeholder="react   ·   react@18.2.0   ·   @scope/name@1.0.0" style="flex:1;min-width:200px;max-width:260px" />
+            placeholder="react   ·   react@18.2.0   ·   @scope/name@1.0.0" />
           <button class="btn btn-primary" id="compute-btn" type="button">Compute integrity</button>
         </div>
         <p class="range-echo reveal" id="echo"></p>
@@ -102,7 +101,7 @@
             <button class="btn btn-ghost" id="verify-btn" type="button">Verify by downloading the tarball</button>
             <span class="hint" id="tarball-note"></span>
           </div>
-          <div class="vlist reveal" id="verify-out" style="margin-top:4px"></div>
+          <div class="vlist reveal" id="verify-out"></div>
         </div>
       </section>
 
@@ -166,7 +165,7 @@
           <div class="grammar-actions">
             <a class="btn btn-ghost" href="/spec/INTEGRITY.bnf" download>Download INTEGRITY.bnf</a>
           </div>
-          <pre class="bnf" data-copy><button class="copy-btn" type="button" aria-label="Copy" style="float:right">Copy</button><code>&lt;integrity build&gt; ::= &lt;integrity&gt; ( "." &lt;integrity&gt; )*
+          <pre class="bnf" data-copy><button class="copy-btn" type="button" aria-label="Copy">Copy</button><code>&lt;integrity build&gt; ::= &lt;integrity&gt; ( "." &lt;integrity&gt; )*
 &lt;integrity&gt;       ::= &lt;algorithm&gt; "." &lt;digest&gt;
 &lt;algorithm&gt;       ::= "sha256" | "sha384" | "sha512"
 &lt;digest&gt;          ::= &lt;hex digest&gt; | &lt;base62 digest&gt;

@@ -7,11 +7,12 @@ const SPEC_VERSION = "1.0.0";
 
 const NAV = [
   { href: "/spec/", label: "Spec" },
-  { href: "/proposal/", label: "Proposal" },
-  { href: "/selector/", label: "Try" },
-  { href: "/grammar/", label: "Grammar" },
-  { href: "/origin/", label: "History" },
   { href: "/extensions/", label: "Extensions" },
+  { href: "/grammar/", label: "Grammar" },
+  { href: "/selector/", label: "Try" },
+  { href: "/proposal/", label: "Proposal" },
+  { href: "/origin/", label: "History" },
+  { href: "/faq/", label: "FAQ" },
 ];
 
 // Apply a previously chosen theme as early as possible (visitors without an

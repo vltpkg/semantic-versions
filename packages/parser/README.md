@@ -63,7 +63,7 @@ The behaviour follows [semver.xyz](https://semver.xyz) rather than semver.org:
   comparator acts as a [channel filter](https://semver.xyz/spec/#build-channels)
   (`^1.0.0+win`).
 - **Pre-releases are range-driven.** A pre-release on a comparator is a
-  [prefix channel](https://semver.xyz/spec/#prerelease-channels) scoped to its tuple
+  [prefix channel](https://semver.xyz/spec/#pre-release-channels) scoped to its tuple
   (`^1.0.0-rc` admits `rc.*`, never `beta`). There is no `includePrerelease` option;
   wildcards `-*` and `*-*` opt in explicitly.
 - **No coercion.** `v1.2.3` fails to parse; `1.2.3` is fine. Coerce before parsing if

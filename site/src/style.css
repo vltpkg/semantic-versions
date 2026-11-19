@@ -226,6 +226,9 @@ code, pre { font-family: var(--mono); }
 /* ============================== Layout ============================== */
 .wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
 section { position: relative; }
+/* Vertical rhythm between top-level page sections. */
+main > .wrap + .wrap { margin-top: 112px; }
+.page-hero + .wrap { margin-top: 24px; }
 .band {
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
@@ -247,6 +250,7 @@ section { position: relative; }
 .lead.center { margin-left: auto; margin-right: auto; }
 .caption { color: var(--muted); font-size: 0.875rem; max-width: 760px; margin: 22px auto 0; text-align: center; }
 .muted { color: var(--faint); }
+.caption.left { text-align: left; margin-left: 0; }
 
 /* Status pill (hero), after vlt.io's "All Systems Operational" chip. */
 .status-pill {
@@ -789,6 +793,19 @@ p code, .lead code, .caption code { background: var(--panel-2); padding: 1px 5px
 .doc ul, .doc ol { color: var(--muted); margin: 12px 0; padding-left: 22px; display: grid; gap: 7px; }
 .doc li { line-height: 1.55; }
 .doc li::marker { color: var(--faint); }
+/* Markdown "loose" lists wrap each item in <p>: keep items tight. */
+.doc li > p { margin: 0; }
+.doc li > p + p, .doc li > p + ul, .doc li > p + ol { margin-top: 8px; }
+.doc li > ul, .doc li > ol { margin: 8px 0 0; }
+.doc blockquote p { margin: 0; color: inherit; }
+.doc blockquote p + p { margin-top: 8px; }
+.doc blockquote strong { color: var(--text); }
+
+/* Source line under the rendered spec's title. */
+.spec-source { margin-top: 18px; font: 400 0.8125rem/1.6 var(--mono); color: var(--faint); }
+.spec-source a { color: var(--muted); text-decoration: underline; text-decoration-color: var(--border-2); text-underline-offset: 2px; }
+.spec-source a:hover { color: var(--text); text-decoration-color: var(--text); }
+.spec-source code { background: none; padding: 0; font-size: 1em; color: inherit; }
 .doc strong { color: var(--text); font-weight: 600; }
 .doc a { color: var(--text); text-decoration: underline; text-underline-offset: 2px; text-decoration-color: var(--border-2); }
 .doc a:hover { text-decoration-color: var(--text); }
@@ -805,6 +822,8 @@ p code, .lead code, .caption code { background: var(--panel-2); padding: 1px 5px
   border-radius: var(--radius); background: var(--bg-2);
 }
 .doc-example code { background: var(--bg); box-shadow: inset 0 0 0 1px var(--border); }
+.doc-example > :first-child { margin-top: 0; }
+.doc-example > :last-child { margin-bottom: 0; }
 
 /* Inline example used inside list items: a real block box so its border/background
    never overlaps the lines above or below, and long chains wrap gracefully. */
@@ -829,7 +848,11 @@ p code, .lead code, .caption code { background: var(--panel-2); padding: 1px 5px
 .doc-table tbody tr:last-child td { border-bottom: 0; }
 .doc-table td:first-child { font-weight: 500; white-space: nowrap; color: var(--text); }
 .doc-table td { color: var(--muted); }
-.doc-table code { background: var(--panel-2); }
+.doc-table code { background: var(--panel-2); padding: 1px 5px; border-radius: 5px; font-size: 0.88em; color: var(--text); }
+.doc-table a, .compare-note a { color: var(--text); text-decoration: underline; text-decoration-color: var(--border-2); text-underline-offset: 2px; }
+.doc-table a:hover, .compare-note a:hover { text-decoration-color: var(--text); }
+.compare-note { max-width: 760px; margin-top: 22px; color: var(--muted); font-size: 0.9375rem; line-height: 1.65; }
+.compare-note strong, .doc-table strong { color: var(--text); font-weight: 600; }
 
 /* Linkable heading anchors */
 .has-anchor { scroll-margin-top: 90px; }
@@ -871,6 +894,8 @@ p code, .lead code, .caption code { background: var(--panel-2); padding: 1px 5px
 .toc a:hover { color: var(--text); }
 .toc a.active { color: var(--text); border-left-color: var(--text); }
 .doc-layout .doc { max-width: none; padding: 0; margin: 0; min-width: 0; }
+.toc a + .toc-title { margin-top: 20px; }
+.toc code { font-size: 0.9em; }
 @media (max-width: 880px) {
   .doc-layout { grid-template-columns: minmax(0, 1fr); }
   .toc { display: none; }
@@ -899,6 +924,12 @@ p code, .lead code, .caption code { background: var(--panel-2); padding: 1px 5px
 /* Example-range chips belong to the range input above, but need clear air
    above the fetch toolbar below them. */
 #examples { margin: 4px 0 26px; }
+.fetch-note { margin: -6px 0 14px; }
+.field-spaced { margin-top: 20px; }
+.field-spaced .chips { margin-top: 12px; }
+.sel-toolbar-spaced { margin-top: 20px; }
+.sel-toolbar-spaced #registry { flex: 1 1 220px; max-width: 300px; }
+.sel-toolbar-spaced #pkg { flex: 1 1 200px; max-width: 260px; }
 .sel-toolbar .btn { height: 38px; padding: 0 16px; white-space: nowrap; }
 /* Text inputs in a toolbar (registry origin, package name) match the field inputs */
 .sel-toolbar input[type="text"] {
@@ -1054,7 +1085,7 @@ p code, .lead code, .caption code { background: var(--panel-2); padding: 1px 5px
 .bnf .tok-ref { color: var(--text); }
 .bnf .op { color: var(--faint); }
 .bnf .lit { color: var(--tok-str); }
-.bnf .copy-btn { margin: -8px -10px 0 12px; }
+.bnf .copy-btn { float: right; margin: -8px -10px 0 12px; }
 .grammar-actions { display: flex; gap: 12px; flex-wrap: wrap; margin: 18px 0 16px; }
 
 /* Feature link cards on home */

@@ -81,12 +81,12 @@
           </p>
         </div>
 
-        <div class="field reveal" style="margin-top:20px">
+        <div class="field field-spaced reveal">
           <label for="channel">Build channel</label>
           <input id="channel" type="text" spellcheck="false" autocomplete="off"
             placeholder="^1.0.0+linux.x64   ·   >=1.1.0+darwin.arm64   ·   1.2.0+win32.x64"
             value="^1.0.0+linux.x64" />
-          <div class="chips" id="channel-examples" aria-label="Example channels" style="margin-top:12px"></div>
+          <div class="chips" id="channel-examples" aria-label="Example channels"></div>
         </div>
 
         <p class="range-echo reveal" id="echo"></p>
@@ -177,7 +177,7 @@
           <div class="grammar-actions">
             <a class="btn btn-ghost" href="/spec/VARIANTS.bnf" download>Download VARIANTS.bnf</a>
           </div>
-          <pre class="bnf" data-copy><button class="copy-btn" type="button" aria-label="Copy" style="float:right">Copy</button><code>&lt;variant build&gt; ::= &lt;os&gt; ( "." &lt;arch&gt; ( "." &lt;abi&gt; )? )? ( "." &lt;feature&gt; )*
+          <pre class="bnf" data-copy><button class="copy-btn" type="button" aria-label="Copy">Copy</button><code>&lt;variant build&gt; ::= &lt;os&gt; ( "." &lt;arch&gt; ( "." &lt;abi&gt; )? )? ( "." &lt;feature&gt; )*
 &lt;os&gt;            ::= "linux" | "darwin" | "win32" | "freebsd" | "openbsd"
                   | "android" | "sunos" | "aix"
 &lt;arch&gt;          ::= "x64" | "arm64" | "arm" | "ia32" | "ppc64" | "s390x"

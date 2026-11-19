@@ -39,7 +39,7 @@
         <div class="hero-actions">
           <!-- TODO: swap in the real semver.org PR URL once the pull request is opened. -->
           <a class="btn btn-primary" href="https://github.com/semver/semver" target="_blank" rel="noopener">View the proposal on GitHub</a>
-          <a class="btn btn-ghost" href="/spec/#relationship">See what changes vs 2.0.0</a>
+          <a class="btn btn-ghost" href="#compare">See what changes vs 2.0.0</a>
         </div>
       </section>
 
@@ -71,9 +71,79 @@
             <p>Comparators, comparator sets, hyphen ranges, x-ranges, tilde, caret and the approximate operator (<code>~&gt;</code>) all get defined, so two tools stop reading the same range two different ways.</p>
           </article>
         </div>
-        <div class="hero-actions" style="justify-content:flex-start;margin-top:28px">
-          <a class="btn btn-ghost" href="/spec/#relationship">Read the full comparison table</a>
+      </section>
+
+      <section class="wrap" id="compare">
+        <div class="section-head left reveal">
+          <p class="eyebrow">Compared with 2.0.0</p>
+          <h2 class="section-title big">What changes, topic by topic.</h2>
+          <p class="lead">
+            A version that is valid under Semantic Versioning 2.0.0 is valid here and parses
+            identically. Every difference is either <strong>additive</strong> or concerns the
+            treatment of builds.
+          </p>
         </div>
+        <div class="reveal">
+          <div class="doc-table-wrap">
+            <table class="doc-table">
+              <thead>
+                <tr><th>Topic</th><th>Semantic Versioning 2.0.0</th><th>Semantic Versions 1.0.0</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Build precedence</td>
+                  <td>Ignored: two versions differing only in build are equal</td>
+                  <td><strong>Participates</strong> in precedence, ranking <em>above</em> the plain release; a build is the antithesis of a pre-release</td>
+                </tr>
+                <tr>
+                  <td>Build channels</td>
+                  <td>Build discarded during range resolution</td>
+                  <td>Build on a comparator/tilde/caret is a <strong>channel filter</strong> (<code>^1.0.0+win</code>)</td>
+                </tr>
+                <tr>
+                  <td>Pre-release ranges</td>
+                  <td>Any pre-release on a comparator's tuple is admitted; opt in via a separate flag</td>
+                  <td>A pre-release is a <strong>prefix channel</strong> (<code>^1.0.0-rc</code>); wildcards <code>-*</code> / <code>*-*</code> replace the flag</td>
+                </tr>
+                <tr>
+                  <td>Sets</td>
+                  <td>Undefined</td>
+                  <td>Defined: ordered, unordered, normal, pre-release and build sets</td>
+                </tr>
+                <tr>
+                  <td>Ranges &amp; comparators</td>
+                  <td>Out of scope</td>
+                  <td>Defined: comparators, comparator sets, and <code>||</code> unions</td>
+                </tr>
+                <tr>
+                  <td>Operators</td>
+                  <td>None</td>
+                  <td><code>&lt;</code> <code>&gt;</code> <code>=</code> <code>&lt;=</code> <code>&gt;=</code>, plus advanced tilde/caret/hyphen/x-ranges</td>
+                </tr>
+                <tr>
+                  <td>Approximate operator</td>
+                  <td>None</td>
+                  <td>Pessimistic <code>~&gt;</code></td>
+                </tr>
+                <tr>
+                  <td>Grammar</td>
+                  <td>Prose + a single regex</td>
+                  <td>Published <a href="/grammar/">BNF</a> for versions, ranges and comparators</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <p class="compare-note reveal">
+          The one behavioural divergence to be aware of is <strong>build precedence</strong>:
+          tooling that assumes builds are ignored will order build-bearing versions differently.
+          This is deliberate. It is what lets extensions like
+          <a href="/extensions/variants/">Build Variants</a>,
+          <a href="/extensions/integrity/">Package Integrity</a> and
+          <a href="/extensions/dependency-locks/">Dependency Locks</a> carry meaning in the build.
+          The <a href="/origin/">history</a> has the full story, and the
+          <a href="/faq/">FAQ</a> covers the changes we deliberately <em>didn't</em> make.
+        </p>
       </section>
 
       <section class="wrap">

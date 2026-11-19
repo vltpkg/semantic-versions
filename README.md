@@ -2,9 +2,36 @@
 
 # semver.xyz
 
-The **Semantic Versions** specification site and its reference parser — a modern,
-`semver.org`-style home for a spec that restores build precedence and formally
-defines sets, ranges and comparators.
+**Semantic Versions** is an open specification for how version numbers are
+assigned, incremented, grouped, compared and matched: a spiritual successor to
+[Semantic Versioning 2.0.0-rc.1](https://semver.org/spec/v2.0.0-rc.1.html) that
+restores build precedence and formally defines sets, ranges, comparators and
+channels. This repository holds the specification, its extensions, the
+reference parser and the [semver.xyz](https://semver.xyz) site.
+
+- **Read the spec:** [`spec/SPEC.md`](spec/SPEC.md) (also at [semver.xyz/spec](https://semver.xyz/spec/))
+- **Questions:** [semver.xyz/faq](https://semver.xyz/faq/)
+- **Try ranges in the browser:** [semver.xyz/selector](https://semver.xyz/selector/)
+- **Reference parser:** [`semantic-versions`](packages/parser) on npm
+
+## Where things live
+
+Each document has exactly one source; the site renders or links to it rather
+than keeping a second copy.
+
+| What | Source of truth | On the site |
+| --- | --- | --- |
+| The specification | [`spec/SPEC.md`](spec/SPEC.md) | [`/spec/`](https://semver.xyz/spec/), rendered from the Markdown at build time |
+| Extensions | [`extensions/*/*.md`](extensions) | [`/extensions/`](https://semver.xyz/extensions/), one presentation page each |
+| FAQ | [`site/faq/index.html`](site/faq/index.html) | [`/faq/`](https://semver.xyz/faq/) |
+| Comparison with SemVer 2.0.0 | [`site/proposal/index.html`](site/proposal/index.html) | [`/proposal/#compare`](https://semver.xyz/proposal/#compare) |
+| BNF grammars | [`site/public/spec/*.bnf`](site/public/spec) | [`/grammar/`](https://semver.xyz/grammar/) |
+
+To change the specification, edit `spec/SPEC.md` and nothing else: it reads
+correctly on GitHub, and `vlt run dev -w site` live-reloads `/spec/` as you
+save. Keep headings plain where other pages link to them (`#context`,
+`#precedence`, `#pre-release-channels`, `#build-channels`), since heading ids
+follow GitHub's slug rules on both GitHub and the site.
 
 ## Layout
 
@@ -12,41 +39,50 @@ This repository is a [vlt](https://www.vlt.io) workspace (`vlt.json`):
 
 ```
 .
-├── site/                     # The semver.xyz static site (Vite, vanilla HTML/CSS/JS)
-│   ├── index.html            # Home / manifesto
-│   ├── spec/                 # The specification
-│   ├── selector/             # Client-side range selector (uses the parser)
-│   ├── grammar/              # BNF grammars + downloads
-│   ├── origin/               # History of build metadata
-│   ├── extensions/           # One page per extension, in layering order
-│   │   ├── variants/         # Build Variants
-│   │   ├── integrity/        # Package Integrity
-│   │   └── dependency-locks/ # Dependency Locks + live generator
-│   ├── public/               # CNAME, favicon, downloadable *.bnf grammars
-│   └── src/                  # Shared design system (style.css) + shell (nav/footer)
-├── packages/
-│   └── parser/               # `semantic-versions` — the reference implementation
+├── spec/
+│   └── SPEC.md               # The specification (canonical)
 ├── extensions/               # Extension specifications (markdown + source)
-│   ├── variants/             # 1. Build Variants — which artifact
-│   ├── integrity/            # 2. Package Integrity — which bytes
-│   └── dependency-locks/     # 3. Dependency Locks — which graph (builds on 1 and 2)
-└── spec/                     # Specification source notes
+│   ├── variants/             # 1. Build Variants: which artifact
+│   ├── integrity/            # 2. Package Integrity: which bytes
+│   └── dependency-locks/     # 3. Dependency Locks: which graph (builds on 1 and 2)
+├── packages/
+│   └── parser/               # `semantic-versions`, the reference implementation
+└── site/                     # The semver.xyz static site (Vite, vanilla HTML/CSS/JS)
+    ├── index.html            # Home
+    ├── spec/                 # Template; content rendered from spec/SPEC.md
+    ├── extensions/           # One page per extension, in layering order
+    ├── grammar/              # BNF grammars + downloads
+    ├── selector/             # Client-side range selector (uses the parser)
+    ├── proposal/             # Semantic Versioning 3.0.0 proposal + 2.0.0 comparison
+    ├── origin/               # History of build metadata
+    ├── faq/                  # Frequently asked questions
+    ├── license/
+    ├── scripts/
+    │   ├── render-spec.mjs   # Markdown → /spec/ (used by vite.config.js)
+    │   └── ai-artifacts.mjs  # llms.txt, sitemap.xml, robots.txt, Markdown mirrors
+    ├── public/               # favicon, fonts, downloadable *.bnf grammars
+    └── src/                  # Shared design system (style.css) + shell (nav/footer)
 ```
 
 ## Develop
 
-Install [vlt](https://www.vlt.io) (`curl -fsSL https://install.vlt.sh | bash`),
-then:
+Install [vlt](https://www.vlt.io) (`curl -fsSL https://install.vlt.sh | bash`,
+Node 22.22 or newer), then:
 
 ```sh
 vlt install
-vlt run dev -w site      # start the site (Vite) at http://localhost:5173
-vlt run build -w site    # build the static site into site/dist
-vlt run preview -w site  # preview the production build
+vlt run dev -w site               # start the site (Vite) at http://localhost:5173
+vlt run build -w site             # build the static site into site/dist
+vlt run preview -w site           # preview the production build
 vlt run test -w packages/parser   # run the parser test suite (tap)
 ```
 
 The root `package.json` also exposes convenience wrappers, e.g. `vlt run build`.
+
+`dev` and `build` first run `site/scripts/ai-artifacts.mjs`, which writes the
+machine-readable files served from the site root (`/llms.txt`, `/llms-full.txt`,
+`/sitemap.xml`, `/robots.txt` and Markdown mirrors of the spec and extensions).
+They are gitignored; never edit the copies under `site/public/`.
 
 The [range selector](https://semver.xyz/selector/) imports the `semantic-versions`
 parser directly, so the site and the reference implementation never drift.
