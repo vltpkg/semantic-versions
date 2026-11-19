@@ -2,6 +2,9 @@
 // scroll-reveal animation, and copy buttons. Content lives in each page's HTML;
 // only the surrounding chrome is rendered here so it stays consistent.
 
+// Current published version of the specification, shown in the nav and footer.
+const SPEC_VERSION = "1.0.0";
+
 const NAV = [
   { href: "/spec/", label: "Spec" },
   { href: "/proposal/", label: "Proposal" },
@@ -51,9 +54,9 @@ function renderNav() {
 
   return `
     <header class="nav">
-      <a class="brand" href="/">
-        <span class="brand-name">semver</span>
-        <span class="brand-tag xyz">.xyz</span>
+      <a class="brand" href="/" aria-label="semver.xyz home">
+        <span class="brand-word"><span class="brand-name">semver</span><span class="brand-tld">.xyz</span></span>
+        <span class="brand-ver">${SPEC_VERSION}</span>
       </a>
       <nav class="nav-links">
         ${links}
@@ -76,7 +79,7 @@ function renderFooter() {
           <span>A specification stewarded by vlt</span>
         </a>
         <span class="footer-meta">
-          <span class="footer-ver">Semantic Versions 1.0.0</span>
+          <span class="footer-ver">Semantic Versions ${SPEC_VERSION}</span>
           <a class="footer-link" href="/license/">License: CC BY 3.0</a>
           <a class="footer-link" href="https://github.com/vltpkg/semantic-versions" target="_blank" rel="noopener">GitHub</a>
         </span>
