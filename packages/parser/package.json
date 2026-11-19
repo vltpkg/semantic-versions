@@ -14,25 +14,21 @@
     "precedence",
     "build-metadata",
     "parser",
-    "vlt"
+    "vlt",
+    "isomorphic",
+    "browser",
+    "deno",
+    "bun",
+    "esm"
   ],
   "homepage": "https://semver.xyz",
-  "bugs": [
-    {
-      "type": "link",
-      "url": "https://github.com/vltpkg/semantic-versions/issues"
-    }
-  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/vltpkg/semantic-versions.git",
     "directory": "packages/parser"
   },
   "license": "Apache-2.0",
-  "author": {
-    "name": "vlt",
-    "url": "https://www.vlt.io"
-  },
+  "author": "vlt (https://www.vlt.io)",
   "type": "module",
   "main": "index.js",
   "exports": {
@@ -56,12 +52,16 @@
   "scripts": {
     "test": "tap",
     "test:coverage": "tap --coverage",
-    "bench:bun": "hyperfine --warmup 3 'bun ./benchmarks/bun.js' 'bun ./benchmarks/npm.js' 'bun ./benchmarks/this.js'",
-    "bench:node": "hyperfine --warmup 3 'node ./benchmarks/npm.js' 'node ./benchmarks/this.js'",
+    "bench": "node benchmarks/run.js && node ../../benchmarks/report.mjs",
+    "bench:quick": "node benchmarks/run.js --quick",
     "prepublishOnly": "tap"
   },
   "devDependencies": {
     "semver": "^7.6.0",
     "tap": "^16.0.0"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "test"
   }
 }

@@ -1,0 +1,270 @@
+{
+  "language": ".NET",
+  "subject": "semantic-versions",
+  "baseline": "Semver",
+  "environment": {
+    "runtime": ".NET 10.0.15",
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "platform": "linux x64",
+    "date": "2026-11-19"
+  },
+  "libraries": {
+    "semantic-versions": {
+      "version": "1.0.0"
+    },
+    "Semver": {
+      "version": "3.0.0"
+    },
+    "SemanticVersioning": {
+      "version": "3.0.0"
+    }
+  },
+  "corpus": {
+    "versions": 5398,
+    "ranges": 2000,
+    "comparableRanges": 1996,
+    "fetched": "2026-11-19"
+  },
+  "coverage": {
+    "semantic-versions": {
+      "versions": 5398,
+      "ranges": 1996
+    },
+    "Semver": {
+      "versions": 5398,
+      "ranges": 1996
+    },
+    "SemanticVersioning": {
+      "versions": 5398,
+      "ranges": 1996
+    }
+  },
+  "tasks": [
+    {
+      "id": "parse",
+      "label": "Parse a version",
+      "description": "5398 published versions",
+      "results": {
+        "semantic-versions": {
+          "nsPerOp": 31.9,
+          "opsPerSec": 31354777
+        },
+        "Semver": {
+          "nsPerOp": 310.7,
+          "opsPerSec": 3218409
+        },
+        "SemanticVersioning": {
+          "nsPerOp": 520.8,
+          "opsPerSec": 1920100
+        }
+      }
+    },
+    {
+      "id": "sort",
+      "label": "Sort versions",
+      "description": "5398 parsed versions by precedence (per version)",
+      "results": {
+        "semantic-versions": {
+          "nsPerOp": 89.4,
+          "opsPerSec": 11180211
+        },
+        "Semver": {
+          "nsPerOp": 135.2,
+          "opsPerSec": 7393903
+        },
+        "SemanticVersioning": {
+          "nsPerOp": 694.5,
+          "opsPerSec": 1439787
+        }
+      }
+    },
+    {
+      "id": "range",
+      "label": "Parse a range",
+      "description": "1996 real dependency ranges",
+      "results": {
+        "semantic-versions": {
+          "nsPerOp": 334.7,
+          "opsPerSec": 2987316
+        },
+        "Semver": {
+          "nsPerOp": 646.2,
+          "opsPerSec": 1547404
+        },
+        "SemanticVersioning": {
+          "nsPerOp": 19097.7,
+          "opsPerSec": 52362
+        }
+      }
+    },
+    {
+      "id": "satisfies",
+      "label": "range.Test(version)",
+      "description": "15604 version \u00D7 range checks",
+      "results": {
+        "semantic-versions": {
+          "nsPerOp": 6,
+          "opsPerSec": 167477851
+        },
+        "Semver": {
+          "nsPerOp": 7.8,
+          "opsPerSec": 127648502
+        },
+        "SemanticVersioning": {
+          "nsPerOp": 68.6,
+          "opsPerSec": 14569427
+        }
+      }
+    },
+    {
+      "id": "resolve",
+      "label": "Resolve a range",
+      "description": "116 max-satisfying lookups against a package\u0027s versions",
+      "results": {
+        "semantic-versions": {
+          "nsPerOp": 1208.9,
+          "opsPerSec": 827222
+        },
+        "Semver": {
+          "nsPerOp": 1639.1,
+          "opsPerSec": 610095
+        },
+        "SemanticVersioning": {
+          "nsPerOp": 27109.9,
+          "opsPerSec": 36887
+        }
+      }
+    }
+  ],
+  "conformance": {
+    "semantic-versions": {
+      "approximate": {
+        "passed": 17,
+        "total": 17
+      },
+      "build-channels": {
+        "passed": 24,
+        "total": 24
+      },
+      "build-precedence": {
+        "passed": 10,
+        "total": 10
+      },
+      "context": {
+        "passed": 15,
+        "total": 15
+      },
+      "parse": {
+        "passed": 81,
+        "total": 81
+      },
+      "precedence": {
+        "passed": 32,
+        "total": 32
+      },
+      "prerelease-channels": {
+        "passed": 44,
+        "total": 44
+      },
+      "prerelease-wildcards": {
+        "passed": 14,
+        "total": 14
+      },
+      "ranges": {
+        "passed": 199,
+        "total": 199
+      },
+      "strict": {
+        "passed": 11,
+        "total": 11
+      }
+    },
+    "Semver": {
+      "approximate": {
+        "passed": 13,
+        "total": 13
+      },
+      "build-channels": {
+        "passed": 12,
+        "total": 22
+      },
+      "build-precedence": {
+        "passed": 1,
+        "total": 10
+      },
+      "context": {
+        "passed": 3,
+        "total": 15
+      },
+      "parse": {
+        "passed": 80,
+        "total": 81
+      },
+      "precedence": {
+        "passed": 32,
+        "total": 32
+      },
+      "prerelease-channels": {
+        "passed": 33,
+        "total": 44
+      },
+      "prerelease-wildcards": {
+        "passed": 2,
+        "total": 13
+      },
+      "ranges": {
+        "passed": 172,
+        "total": 172
+      },
+      "strict": {
+        "passed": 11,
+        "total": 11
+      }
+    },
+    "SemanticVersioning": {
+      "approximate": {
+        "passed": 7,
+        "total": 13
+      },
+      "build-channels": {
+        "passed": 12,
+        "total": 22
+      },
+      "build-precedence": {
+        "passed": 1,
+        "total": 10
+      },
+      "context": {
+        "passed": 3,
+        "total": 15
+      },
+      "parse": {
+        "passed": 57,
+        "total": 81
+      },
+      "precedence": {
+        "passed": 32,
+        "total": 32
+      },
+      "prerelease-channels": {
+        "passed": 33,
+        "total": 44
+      },
+      "prerelease-wildcards": {
+        "passed": 2,
+        "total": 13
+      },
+      "ranges": {
+        "passed": 172,
+        "total": 172
+      },
+      "strict": {
+        "passed": 7,
+        "total": 11
+      }
+    }
+  },
+  "notes": {
+    "Semver": "Compared by precedence (ComparePrecedence), which ignores builds as SemVer 2.0.0 specifies."
+  }
+}

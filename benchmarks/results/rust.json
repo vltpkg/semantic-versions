@@ -1,0 +1,258 @@
+{
+  "baseline": "nodejs-semver",
+  "conformance": {
+    "nodejs-semver": {
+      "approximate": {
+        "passed": 17,
+        "total": 17
+      },
+      "build-channels": {
+        "passed": 12,
+        "total": 24
+      },
+      "build-precedence": {
+        "passed": 1,
+        "total": 10
+      },
+      "context": {
+        "passed": 3,
+        "total": 15
+      },
+      "parse": {
+        "passed": 59,
+        "total": 81
+      },
+      "precedence": {
+        "passed": 32,
+        "total": 32
+      },
+      "prerelease-channels": {
+        "passed": 33,
+        "total": 44
+      },
+      "prerelease-wildcards": {
+        "passed": 2,
+        "total": 14
+      },
+      "ranges": {
+        "passed": 195,
+        "total": 199
+      },
+      "strict": {
+        "passed": 3,
+        "total": 11
+      }
+    },
+    "semantic-versions": {
+      "approximate": {
+        "passed": 17,
+        "total": 17
+      },
+      "build-channels": {
+        "passed": 24,
+        "total": 24
+      },
+      "build-precedence": {
+        "passed": 10,
+        "total": 10
+      },
+      "context": {
+        "passed": 15,
+        "total": 15
+      },
+      "parse": {
+        "passed": 81,
+        "total": 81
+      },
+      "precedence": {
+        "passed": 32,
+        "total": 32
+      },
+      "prerelease-channels": {
+        "passed": 44,
+        "total": 44
+      },
+      "prerelease-wildcards": {
+        "passed": 14,
+        "total": 14
+      },
+      "ranges": {
+        "passed": 199,
+        "total": 199
+      },
+      "strict": {
+        "passed": 11,
+        "total": 11
+      }
+    },
+    "semver": {
+      "approximate": {
+        "passed": 7,
+        "total": 13
+      },
+      "build-channels": {
+        "passed": 12,
+        "total": 22
+      },
+      "build-precedence": {
+        "passed": 10,
+        "total": 10
+      },
+      "context": {
+        "passed": 3,
+        "total": 15
+      },
+      "parse": {
+        "passed": 81,
+        "total": 81
+      },
+      "precedence": {
+        "passed": 32,
+        "total": 32
+      },
+      "prerelease-channels": {
+        "passed": 34,
+        "total": 44
+      },
+      "prerelease-wildcards": {
+        "passed": 2,
+        "total": 13
+      },
+      "ranges": {
+        "passed": 134,
+        "total": 172
+      },
+      "strict": {
+        "passed": 11,
+        "total": 11
+      }
+    }
+  },
+  "corpus": {
+    "comparableRanges": 1996,
+    "fetched": "2026-11-19",
+    "ranges": 2000,
+    "versions": 5398
+  },
+  "coverage": {
+    "nodejs-semver": {
+      "ranges": 1996,
+      "versions": 5398
+    },
+    "semantic-versions": {
+      "ranges": 1996,
+      "versions": 5398
+    },
+    "semver": {
+      "ranges": 1987,
+      "versions": 5398
+    }
+  },
+  "environment": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "date": "2026-11-19",
+    "platform": "linux x86_64",
+    "runtime": "rustc 1.97.0"
+  },
+  "language": "Rust",
+  "libraries": {
+    "nodejs-semver": {
+      "version": "7.0.0"
+    },
+    "semantic-versions": {
+      "version": "1.0.0"
+    },
+    "semver": {
+      "version": "1.0.28"
+    }
+  },
+  "notes": {
+    "semver": "Cargo's requirement syntax (bare versions mean ^, comparators are comma-separated, no || or hyphen ranges), so it is compared on versions only."
+  },
+  "subject": "semantic-versions",
+  "tasks": [
+    {
+      "description": "5398 published versions",
+      "id": "parse",
+      "label": "Parse a version",
+      "results": {
+        "nodejs-semver": {
+          "nsPerOp": 26.3,
+          "opsPerSec": 38086735.0
+        },
+        "semantic-versions": {
+          "nsPerOp": 21.7,
+          "opsPerSec": 46154291.0
+        },
+        "semver": {
+          "nsPerOp": 21.4,
+          "opsPerSec": 46733234.0
+        }
+      }
+    },
+    {
+      "description": "5398 parsed versions by precedence (per version)",
+      "id": "sort",
+      "label": "Sort versions",
+      "results": {
+        "nodejs-semver": {
+          "nsPerOp": 101.6,
+          "opsPerSec": 9839834.0
+        },
+        "semantic-versions": {
+          "nsPerOp": 116.6,
+          "opsPerSec": 8574413.0
+        },
+        "semver": {
+          "nsPerOp": 117.0,
+          "opsPerSec": 8545475.0
+        }
+      }
+    },
+    {
+      "description": "1996 real dependency ranges",
+      "id": "range",
+      "label": "Parse a range",
+      "results": {
+        "nodejs-semver": {
+          "nsPerOp": 269.9,
+          "opsPerSec": 3705119.0
+        },
+        "semantic-versions": {
+          "nsPerOp": 207.9,
+          "opsPerSec": 4809928.0
+        }
+      }
+    },
+    {
+      "description": "15604 version × range checks",
+      "id": "satisfies",
+      "label": "Range::test(version)",
+      "results": {
+        "nodejs-semver": {
+          "nsPerOp": 8.7,
+          "opsPerSec": 114591574.0
+        },
+        "semantic-versions": {
+          "nsPerOp": 5.5,
+          "opsPerSec": 180183990.0
+        }
+      }
+    },
+    {
+      "description": "116 max-satisfying lookups against a package's versions",
+      "id": "resolve",
+      "label": "Resolve a range",
+      "results": {
+        "nodejs-semver": {
+          "nsPerOp": 1325.0,
+          "opsPerSec": 754696.0
+        },
+        "semantic-versions": {
+          "nsPerOp": 1032.5,
+          "opsPerSec": 968560.0
+        }
+      }
+    }
+  ]
+}

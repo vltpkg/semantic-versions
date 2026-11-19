@@ -43,6 +43,23 @@
 
         <div class="tl-item reveal">
           <span class="tl-dot"></span>
+          <div class="tl-date">Feb 2011 · node-semver · @isaacs</div>
+          <h3>npm writes down how to match versions</h3>
+          <p>
+            Isaac Z. Schlueter publishes the <code>semver</code> package for npm. Over the following
+            years it defines what the spec never did: comparators, x-ranges, tilde, caret and hyphen
+            ranges, <code>||</code>, a rule for when pre-releases match, and a published Backus–Naur
+            grammar for ranges. Every <code>^1.2.3</code> in a <code>package.json</code> is written in
+            its language, and much of the range grammar in <strong>Semantic Versions</strong>
+            descends from it.
+          </p>
+          <p>
+            <a href="https://github.com/npm/node-semver" target="_blank" rel="noopener">npm/node-semver</a>
+          </p>
+        </div>
+
+        <div class="tl-item reveal">
+          <span class="tl-dot"></span>
           <div class="tl-date">Nov 2011 · @mojombo</div>
           <h3>Builds are introduced</h3>
           <p>
@@ -106,12 +123,30 @@
 
         <div class="tl-item reveal">
           <span class="tl-dot"></span>
+          <div class="tl-date">Jun 2020 · semver/semver#584 · @isaacs</div>
+          <h3>Ranges are proposed upstream, and stall</h3>
+          <p>
+            Isaac proposes a specification for ranges to Semantic Versioning itself: a draft of about
+            380 lines covering comparators, caret, tilde, x-ranges, hyphen ranges, <code>||</code>
+            and node-semver&rsquo;s pre-release rule. Maintainers from Cargo, Composer, RubyGems,
+            Bundler and CocoaPods point out where their tools behave differently, and that aligning
+            them would break constraints already in the wild. After 79 comments the pull request is
+            still open, and the spec still has no ranges.
+          </p>
+          <p>
+            <a href="https://github.com/semver/semver/pull/584" target="_blank" rel="noopener">semver/semver#584</a>
+          </p>
+        </div>
+
+        <div class="tl-item reveal">
+          <span class="tl-dot"></span>
           <div class="tl-date">Today · 1.0.0</div>
           <h3>Semantic Versions</h3>
           <p>
             <a href="/spec/">Semantic Versions</a> reverts the build change, restores build
             precedence, corrects the definition of a patch, and finally writes down the sets,
-            ranges and comparators the ecosystem already relies on. If we want to avoid becoming
+            ranges and comparators the ecosystem already relies on, building on node-semver&rsquo;s
+            grammar and extending it with channels, wildcards and contexts. If we want to avoid becoming
             heretics in the sixth circle, we have to codify what we actually do. It is also
             <a href="/proposal/">offered as a proposal for Semantic Versioning 3.0.0</a>, the
             successor <code>2.0.0</code> never got.

@@ -1,0 +1,10 @@
+# frozen_string_literal: true
+
+require "rake/testtask"
+
+Rake::TestTask.new(:test) { |t| t.pattern = "test/**/*_test.rb" }
+
+desc "Benchmark against semantic_range and Gem::Version"
+task(:bench) { ruby "bench/compare.rb" }
+
+task default: :test

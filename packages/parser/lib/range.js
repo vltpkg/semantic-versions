@@ -1,5 +1,26 @@
 import { Comparator } from './compare.js'
 import { Version, splitReference } from './version.js'
+
+// Parsed ranges are immutable, so cache them by their source string, as
+// node-semver does: `satisfies(v, r)` is usually called with the same handful
+// of ranges many times over.
+const CACHE_MAX = 1000
+const cache = new Map()
+const cached = (raw) => {
+  const hit = cache.get(raw)
+  if (hit !== undefined) {
+    // refresh recency
+    cache.delete(raw)
+    cache.set(raw, hit)
+  }
+  return hit
+}
+const remember = (raw, range) => {
+  cache.set(raw, range)
+  if (cache.size > CACHE_MAX) {
+    cache.delete(cache.keys().next().value)
+  }
+}
 import {
   MAX_LENGTH,
   HYPHENRANGE,
@@ -175,10 +196,10 @@ const hyphenReplace = (
 }
 
 const parseComparator = (comp) => {
-  comp = replaceCarets(comp)
-  comp = replaceTildes(comp)
+  if (comp.indexOf('^') !== -1) comp = replaceCarets(comp)
+  if (comp.indexOf('~') !== -1) comp = replaceTildes(comp)
   comp = replaceXRanges(comp)
-  comp = replaceStars(comp)
+  if (comp.indexOf('*') !== -1) comp = replaceStars(comp)
   return comp
 }
 
@@ -188,7 +209,11 @@ const parseComparator = (comp) => {
 // resulting comparator set. `*-*` becomes an all-versions lower bound flagged
 // universal; `X.Y.Z-*` (optionally after `^`/`~`) becomes a numeric `-0` bound
 // whose tuple is recorded as an empty-prefix ("any pre-release") channel.
+const NO_PRE_WILDCARDS = { universalPre: false, anyPreTuples: new Set() }
 const extractPreWildcards = (range) => {
+  if (range.indexOf('*') === -1) {
+    return { range, ...NO_PRE_WILDCARDS, anyPreTuples: new Set() }
+  }
   let universalPre = false
   const anyPreTuples = new Set()
   const rewritten = range
@@ -249,6 +274,14 @@ class Range {
       throw new TypeError(`Invalid Version Range: ${range}`)
     }
 
+    const useCache = Object.keys(options).length === 0
+    if (useCache) {
+      const hit = cached(range)
+      if (hit) {
+        return hit
+      }
+    }
+
     if (range.length > MAX_LENGTH) {
       throw new TypeError(`Range exceeds ${MAX_LENGTH} characters: ${range.length}`)
     }
@@ -292,6 +325,9 @@ class Range {
     }
 
     this.format()
+    if (useCache) {
+      remember(this.raw, this)
+    }
   }
 
   format () {
@@ -314,12 +350,16 @@ class Range {
     const { range: rewritten, universalPre, anyPreTuples } = extractPreWildcards(range)
     range = rewritten
 
-    // Desugar the advanced grammars into primitive comparators.
-    range = range.replace(HYPHENRANGE, hyphenReplace)
-    range = range.replace(COMPARATORTRIM_G, '$1$2$3')
-    range = range.replace(TILDETRIM_G, '$1~')
-    range = range.replace(CARETTRIM_G, '$1^')
-    range = range.split(/\s+/).join(' ')
+    // Desugar the advanced grammars into primitive comparators. The hyphen form
+    // and the operator/whitespace normalisation only apply when the set has
+    // whitespace in it, which most real ranges (`^1.2.3`) do not.
+    if (/\s/.test(range)) {
+      range = range.replace(HYPHENRANGE, hyphenReplace)
+      range = range.replace(COMPARATORTRIM_G, '$1$2$3')
+      range = range.replace(TILDETRIM_G, '$1~')
+      range = range.replace(CARETTRIM_G, '$1^')
+      range = range.split(/\s+/).join(' ')
+    }
 
     const rangeList = range
       .split(' ')
@@ -466,45 +506,35 @@ const testSet = (set, version) => {
   return false
 }
 
-const maxSatisfying = (versions, range, options) => {
-  let max = null
-  let maxSV = null
+// Parse each candidate once and reuse it for both the range test and the
+// comparison against the best match so far.
+const pick = (versions, range, options, better) => {
+  let best = null
+  let bestSV = null
   let rangeObj = null
   try {
     rangeObj = new Range(range, options)
   } catch (er) {
     return null
   }
-  versions.forEach((v) => {
-    if (rangeObj.test(v)) {
-      if (!max || maxSV.compare(v) === -1) {
-        max = v
-        maxSV = new Version(max)
-      }
+  for (const v of versions) {
+    let sv
+    try {
+      sv = v instanceof Version ? v : new Version(v)
+    } catch (er) {
+      continue
     }
-  })
-  return max
+    if (rangeObj.test(sv) && (bestSV === null || better(sv.compare(bestSV)))) {
+      best = v
+      bestSV = sv
+    }
+  }
+  return best
 }
 
-const minSatisfying = (versions, range, options) => {
-  let min = null
-  let minSV = null
-  let rangeObj = null
-  try {
-    rangeObj = new Range(range, options)
-  } catch (er) {
-    return null
-  }
-  versions.forEach((v) => {
-    if (rangeObj.test(v)) {
-      if (!min || minSV.compare(v) === 1) {
-        min = v
-        minSV = new Version(min)
-      }
-    }
-  })
-  return min
-}
+const maxSatisfying = (versions, range, options) => pick(versions, range, options, (c) => c > 0)
+
+const minSatisfying = (versions, range, options) => pick(versions, range, options, (c) => c < 0)
 
 export {
   Range,

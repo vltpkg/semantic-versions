@@ -1,0 +1,25 @@
+[package]
+name = "semantic-versions"
+version = "1.0.0"
+edition = "2021"
+rust-version = "1.70"
+description = "Reference implementation of Semantic Versions (semver.xyz): parse, compare and range-match versions, with builds that participate in precedence, pre-release and build channels, and contexts."
+license = "Apache-2.0"
+repository = "https://github.com/vltpkg/semantic-versions"
+homepage = "https://semver.xyz/libraries/"
+documentation = "https://docs.rs/semantic-versions"
+readme = "README.md"
+keywords = ["semver", "version", "range", "semantic-versions", "parser"]
+categories = ["parser-implementations", "development-tools"]
+include = ["src/**/*", "README.md", "LICENSE"]
+
+[dependencies]
+
+[dev-dependencies]
+serde_json = "1"
+semver = "1"
+nodejs-semver = "7"
+
+[[bench]]
+name = "compare"
+harness = false

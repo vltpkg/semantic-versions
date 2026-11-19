@@ -35,3 +35,148 @@ jobs:
 
       - name: Build site
         run: vlt run build -w site
+
+  # The JavaScript package runs unchanged on servers and in browsers; run the
+  # conformance suite in each runtime (packages/parser/runtimes).
+  javascript-runtimes:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/parser/runtimes
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - uses: oven-sh/setup-bun@v2
+      - run: npm install --no-package-lock
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - name: Node.js 18, 20 and 22
+        run: |
+          npx -y node@18 server.js
+          npx -y node@20 server.js
+          node server.js
+      - run: npm run deno
+      - run: npm run bun
+      - run: npm run workerd
+      - run: npm run browsers
+
+  rust:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: crates/semantic-versions
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Format
+        run: cargo fmt --check
+
+      - name: Lint
+        run: cargo clippy --all-targets -- -D warnings
+
+      # Includes the shared conformance suite (tests/conformance.rs) and the
+      # README example (a doctest).
+      - name: Test
+        run: cargo test
+
+  # The ports: each runs the shared conformance suite (../../conformance).
+  python:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.13"]
+    defaults:
+      run:
+        working-directory: ports/python
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m unittest discover -s tests -v
+      - run: pip wheel --no-deps -w dist .
+
+  go:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ports/go
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-go@v6
+        with:
+          go-version: stable
+      - run: test -z "$(gofmt -l .)"
+      - run: go vet ./...
+      - run: go test ./...
+      - run: cd bench && go vet .
+
+  ruby:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ports/ruby
+    steps:
+      - uses: actions/checkout@v5
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+          working-directory: ports/ruby
+      - run: bundle exec rake test
+      - run: gem build semantic-versions.gemspec
+
+  java:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ports/java
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+      - run: javac -Xlint:all -Werror -d build $(find src -name '*.java')
+      - run: java -cp build io.vlt.semanticversions.ConformanceTest
+      - run: mvn -B -q package
+
+  dotnet:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ports/dotnet
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+      - run: dotnet build src/SemanticVersions -c Release
+      - run: dotnet run --project tests/SemanticVersions.Conformance
+      - run: dotnet pack src/SemanticVersions -c Release -o dist
+
+  php:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ["8.1", "8.4"]
+    defaults:
+      run:
+        working-directory: ports/php
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+      - run: php tests/conformance.php
+      - run: composer validate --strict

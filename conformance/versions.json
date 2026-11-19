@@ -1,0 +1,533 @@
+{
+  "description": "Version strings. `valid` says whether the input is a version; `version` is its normalized form and `context` its context, when present.",
+  "cases": [
+    {
+      "category": "parse",
+      "input": "0.0.4",
+      "valid": true,
+      "version": "0.0.4"
+    },
+    {
+      "category": "parse",
+      "input": "1.2.3",
+      "valid": true,
+      "version": "1.2.3"
+    },
+    {
+      "category": "parse",
+      "input": "10.20.30",
+      "valid": true,
+      "version": "10.20.30"
+    },
+    {
+      "category": "parse",
+      "input": "1.1.2-prerelease+meta",
+      "valid": true,
+      "version": "1.1.2-prerelease+meta"
+    },
+    {
+      "category": "parse",
+      "input": "1.1.2+meta",
+      "valid": true,
+      "version": "1.1.2+meta"
+    },
+    {
+      "category": "parse",
+      "input": "1.1.2+meta-valid",
+      "valid": true,
+      "version": "1.1.2+meta-valid"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-alpha",
+      "valid": true,
+      "version": "1.0.0-alpha"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-beta",
+      "valid": true,
+      "version": "1.0.0-beta"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-alpha.beta",
+      "valid": true,
+      "version": "1.0.0-alpha.beta"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-alpha.beta.1",
+      "valid": true,
+      "version": "1.0.0-alpha.beta.1"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-alpha.1",
+      "valid": true,
+      "version": "1.0.0-alpha.1"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-alpha0.valid",
+      "valid": true,
+      "version": "1.0.0-alpha0.valid"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-alpha.0valid",
+      "valid": true,
+      "version": "1.0.0-alpha.0valid"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay",
+      "valid": true,
+      "version": "1.0.0-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-rc.1+build.1",
+      "valid": true,
+      "version": "1.0.0-rc.1+build.1"
+    },
+    {
+      "category": "parse",
+      "input": "2.0.0-rc.1+build.123",
+      "valid": true,
+      "version": "2.0.0-rc.1+build.123"
+    },
+    {
+      "category": "parse",
+      "input": "1.2.3-beta",
+      "valid": true,
+      "version": "1.2.3-beta"
+    },
+    {
+      "category": "parse",
+      "input": "10.2.3-DEV-SNAPSHOT",
+      "valid": true,
+      "version": "10.2.3-DEV-SNAPSHOT"
+    },
+    {
+      "category": "parse",
+      "input": "1.2.3-SNAPSHOT-123",
+      "valid": true,
+      "version": "1.2.3-SNAPSHOT-123"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0",
+      "valid": true,
+      "version": "1.0.0"
+    },
+    {
+      "category": "parse",
+      "input": "2.0.0",
+      "valid": true,
+      "version": "2.0.0"
+    },
+    {
+      "category": "parse",
+      "input": "1.1.7",
+      "valid": true,
+      "version": "1.1.7"
+    },
+    {
+      "category": "parse",
+      "input": "2.0.0+build.1848",
+      "valid": true,
+      "version": "2.0.0+build.1848"
+    },
+    {
+      "category": "parse",
+      "input": "2.0.1-alpha.1227",
+      "valid": true,
+      "version": "2.0.1-alpha.1227"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-alpha+beta",
+      "valid": true,
+      "version": "1.0.0-alpha+beta"
+    },
+    {
+      "category": "parse",
+      "input": "1.2.3----RC-SNAPSHOT.12.9.1--.12+788",
+      "valid": true,
+      "version": "1.2.3----RC-SNAPSHOT.12.9.1--.12+788"
+    },
+    {
+      "category": "parse",
+      "input": "1.2.3----R-S.12.9.1--.12+meta",
+      "valid": true,
+      "version": "1.2.3----R-S.12.9.1--.12+meta"
+    },
+    {
+      "category": "parse",
+      "input": "1.2.3----RC-SNAPSHOT.12.9.1--.12",
+      "valid": true,
+      "version": "1.2.3----RC-SNAPSHOT.12.9.1--.12"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0+0.build.1-rc.10000aaa-kk-0.1",
+      "valid": true,
+      "version": "1.0.0+0.build.1-rc.10000aaa-kk-0.1"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-0A.is.legal",
+      "valid": true,
+      "version": "1.0.0-0A.is.legal"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-0.3.7",
+      "valid": true,
+      "version": "1.0.0-0.3.7"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-x.7.z.92",
+      "valid": true,
+      "version": "1.0.0-x.7.z.92"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-x-y-z.--",
+      "valid": true,
+      "version": "1.0.0-x-y-z.--"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-alpha+001",
+      "valid": true,
+      "version": "1.0.0-alpha+001"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0+20130313144700",
+      "valid": true,
+      "version": "1.0.0+20130313144700"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-beta+exp.sha.5114f85",
+      "valid": true,
+      "version": "1.0.0-beta+exp.sha.5114f85"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0+21AF26D3----117B344092BD",
+      "valid": true,
+      "version": "1.0.0+21AF26D3----117B344092BD"
+    },
+    {
+      "category": "parse",
+      "input": "1",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.2",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.2.3-0123",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.2.3-0123.0123",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.1.2+.123",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "+invalid",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "-invalid",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "-invalid+invalid",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "-invalid.01",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "alpha",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "alpha.beta",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "alpha.beta.1",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "alpha.1",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "alpha+beta",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "alpha_beta",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "alpha.",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "alpha..",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "beta",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-alpha_beta",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "-alpha.",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-alpha..",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-alpha..1",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-alpha...1",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-alpha....1",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-alpha.....1",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-alpha......1",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0-alpha.......1",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "01.1.1",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.01.1",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.1.01",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.2.3.DEV",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.2-SNAPSHOT",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.2.31.2.3----RC-SNAPSHOT.12.09.1--..12+788",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.2-RC-SNAPSHOT",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "-1.0.3-gamma+b7718",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "+justmeta",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "9.8.7+meta+meta",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "9.8.7-whatever+meta+meta",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "99999999999999999999999.999999999999999999.99999999999999999",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "hello, world",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.2.3-",
+      "valid": false
+    },
+    {
+      "category": "parse",
+      "input": "1.2.3+",
+      "valid": false
+    },
+    {
+      "category": "strict",
+      "input": "v1.2.3",
+      "valid": false,
+      "note": "no coercion or loose forms"
+    },
+    {
+      "category": "strict",
+      "input": "=1.2.3",
+      "valid": false,
+      "note": "no coercion or loose forms"
+    },
+    {
+      "category": "strict",
+      "input": "V1.2.3",
+      "valid": false,
+      "note": "no coercion or loose forms"
+    },
+    {
+      "category": "strict",
+      "input": "1.2.3pre",
+      "valid": false,
+      "note": "no coercion or loose forms"
+    },
+    {
+      "category": "strict",
+      "input": "1.0.3alpha",
+      "valid": false,
+      "note": "no coercion or loose forms"
+    },
+    {
+      "category": "strict",
+      "input": ">=1.2.3",
+      "valid": false,
+      "note": "no coercion or loose forms"
+    },
+    {
+      "category": "strict",
+      "input": "~1.2.3",
+      "valid": false,
+      "note": "no coercion or loose forms"
+    },
+    {
+      "category": "parse",
+      "input": "1.0.0+001",
+      "valid": true,
+      "version": "1.0.0+001",
+      "note": "build identifiers may have leading zeroes"
+    },
+    {
+      "category": "context",
+      "input": "npm:react@18.2.0",
+      "valid": true,
+      "context": "npm:react",
+      "version": "18.2.0"
+    },
+    {
+      "category": "context",
+      "input": "react@1.2.3",
+      "valid": true,
+      "context": "react",
+      "version": "1.2.3"
+    },
+    {
+      "category": "context",
+      "input": "npm:@babel/core@7.24.0",
+      "valid": true,
+      "context": "npm:@babel/core",
+      "version": "7.24.0"
+    },
+    {
+      "category": "context",
+      "input": "go:golang.org/x/text@0.14.0",
+      "valid": true,
+      "context": "go:golang.org/x/text",
+      "version": "0.14.0"
+    },
+    {
+      "category": "context",
+      "input": "napi:sharp@0.33.0+linux.x64.musl",
+      "valid": true,
+      "context": "napi:sharp",
+      "version": "0.33.0+linux.x64.musl"
+    },
+    {
+      "category": "context",
+      "input": "app@1.2.3-canary.1+sha.1a8c",
+      "valid": true,
+      "context": "app",
+      "version": "1.2.3-canary.1+sha.1a8c"
+    }
+  ]
+}

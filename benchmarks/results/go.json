@@ -1,0 +1,259 @@
+{
+  "baseline": "Masterminds/semver",
+  "conformance": {
+    "Masterminds/semver": {
+      "approximate": {
+        "passed": 13,
+        "total": 13
+      },
+      "build-channels": {
+        "passed": 12,
+        "total": 22
+      },
+      "build-precedence": {
+        "passed": 1,
+        "total": 10
+      },
+      "context": {
+        "passed": 3,
+        "total": 15
+      },
+      "parse": {
+        "passed": 74,
+        "total": 81
+      },
+      "precedence": {
+        "passed": 32,
+        "total": 32
+      },
+      "prerelease-channels": {
+        "passed": 28,
+        "total": 44
+      },
+      "prerelease-wildcards": {
+        "passed": 2,
+        "total": 13
+      },
+      "ranges": {
+        "passed": 167,
+        "total": 172
+      },
+      "strict": {
+        "passed": 10,
+        "total": 11
+      }
+    },
+    "blang/semver": {
+      "approximate": {
+        "passed": 7,
+        "total": 13
+      },
+      "build-channels": {
+        "passed": 14,
+        "total": 22
+      },
+      "build-precedence": {
+        "passed": 1,
+        "total": 10
+      },
+      "context": {
+        "passed": 3,
+        "total": 15
+      },
+      "parse": {
+        "passed": 81,
+        "total": 81
+      },
+      "precedence": {
+        "passed": 32,
+        "total": 32
+      },
+      "prerelease-channels": {
+        "passed": 29,
+        "total": 44
+      },
+      "prerelease-wildcards": {
+        "passed": 2,
+        "total": 13
+      },
+      "ranges": {
+        "passed": 114,
+        "total": 172
+      },
+      "strict": {
+        "passed": 11,
+        "total": 11
+      }
+    },
+    "semantic-versions": {
+      "approximate": {
+        "passed": 17,
+        "total": 17
+      },
+      "build-channels": {
+        "passed": 24,
+        "total": 24
+      },
+      "build-precedence": {
+        "passed": 10,
+        "total": 10
+      },
+      "context": {
+        "passed": 15,
+        "total": 15
+      },
+      "parse": {
+        "passed": 81,
+        "total": 81
+      },
+      "precedence": {
+        "passed": 32,
+        "total": 32
+      },
+      "prerelease-channels": {
+        "passed": 44,
+        "total": 44
+      },
+      "prerelease-wildcards": {
+        "passed": 14,
+        "total": 14
+      },
+      "ranges": {
+        "passed": 199,
+        "total": 199
+      },
+      "strict": {
+        "passed": 11,
+        "total": 11
+      }
+    }
+  },
+  "corpus": {
+    "comparableRanges": 1996,
+    "fetched": "2026-11-19",
+    "ranges": 2000,
+    "versions": 5398
+  },
+  "coverage": {
+    "Masterminds/semver": {
+      "ranges": 1996,
+      "versions": 5398
+    },
+    "blang/semver": {
+      "ranges": 1342,
+      "versions": 5398
+    },
+    "semantic-versions": {
+      "ranges": 1996,
+      "versions": 5398
+    }
+  },
+  "environment": {
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "date": "2026-11-19",
+    "platform": "linux amd64",
+    "runtime": "go1.24.7"
+  },
+  "language": "Go",
+  "libraries": {
+    "Masterminds/semver": {
+      "version": "3.5.0"
+    },
+    "blang/semver": {
+      "version": "4.0.0"
+    },
+    "semantic-versions": {
+      "version": "1.0.0"
+    }
+  },
+  "notes": {
+    "Masterminds/semver": "NewVersion is lenient by design (it accepts v1.2 and coerces it), which is why it fails the strict-parsing cases.",
+    "blang/semver": "Its range syntax has no ^, ~ or x-ranges, so it is compared on versions only."
+  },
+  "subject": "semantic-versions",
+  "tasks": [
+    {
+      "id": "parse",
+      "label": "Parse a version",
+      "description": "5398 published versions",
+      "results": {
+        "Masterminds/semver": {
+          "nsPerOp": 528.8,
+          "opsPerSec": 1891227
+        },
+        "blang/semver": {
+          "nsPerOp": 151,
+          "opsPerSec": 6621999
+        },
+        "semantic-versions": {
+          "nsPerOp": 28,
+          "opsPerSec": 35777894
+        }
+      }
+    },
+    {
+      "id": "sort",
+      "label": "Sort versions",
+      "description": "5398 parsed versions by precedence (per version)",
+      "results": {
+        "Masterminds/semver": {
+          "nsPerOp": 443.9,
+          "opsPerSec": 2252865
+        },
+        "blang/semver": {
+          "nsPerOp": 233.2,
+          "opsPerSec": 4288858
+        },
+        "semantic-versions": {
+          "nsPerOp": 174.7,
+          "opsPerSec": 5725316
+        }
+      }
+    },
+    {
+      "id": "range",
+      "label": "Parse a range",
+      "description": "1996 real dependency ranges",
+      "results": {
+        "Masterminds/semver": {
+          "nsPerOp": 5487.2,
+          "opsPerSec": 182241
+        },
+        "semantic-versions": {
+          "nsPerOp": 356.5,
+          "opsPerSec": 2804993
+        }
+      }
+    },
+    {
+      "id": "satisfies",
+      "label": "Range.Test(version)",
+      "description": "15604 version × range checks",
+      "results": {
+        "Masterminds/semver": {
+          "nsPerOp": 578.7,
+          "opsPerSec": 1727931
+        },
+        "semantic-versions": {
+          "nsPerOp": 23.7,
+          "opsPerSec": 42139144
+        }
+      }
+    },
+    {
+      "id": "resolve",
+      "label": "Resolve a range",
+      "description": "116 max-satisfying lookups against a package's versions",
+      "results": {
+        "Masterminds/semver": {
+          "nsPerOp": 76046.5,
+          "opsPerSec": 13150
+        },
+        "semantic-versions": {
+          "nsPerOp": 3672,
+          "opsPerSec": 272329
+        }
+      }
+    }
+  ]
+}

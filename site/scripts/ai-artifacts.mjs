@@ -40,7 +40,7 @@ const DOCS = [
     url: "/spec/SPEC.md",
     section: "Specification",
     title: "Semantic Versions 1.0.0",
-    note: "The core specification: versions, precedence, sets, ranges, comparators, operators, channels and PEP 440 interoperability. Normative; https://semver.xyz/spec/ is rendered from this file.",
+    note: "The core specification: versions, precedence, sets, ranges, comparators, operators and channels. Normative; https://semver.xyz/spec/ is rendered from this file.",
     full: true,
   },
   {
@@ -70,7 +70,7 @@ const DOCS = [
   {
     src: "packages/parser/README.md",
     url: "/parser.md",
-    section: "Reference implementation",
+    section: "Libraries",
     title: "semantic-versions (npm)",
     note: "The reference parser: parse, validate, compare and range-match, with build metadata participating in precedence.",
     full: false,
@@ -102,6 +102,7 @@ const PAGES = [
   ["/selector/", "Range selector (interactive)"],
   ["/origin/", "History: how build metadata lost its meaning"],
   ["/faq/", "FAQ"],
+  ["/libraries/", "Libraries: implementations for JavaScript, Rust, Python, Go, Ruby, Java, .NET and PHP, with benchmarks"],
   ["/extensions/", "Extensions index"],
   ["/extensions/variants/", "Build Variants"],
   ["/extensions/integrity/", "Package Integrity"],
@@ -168,7 +169,7 @@ for (const doc of DOCS) {
 }
 
 // ── llms.txt ───────────────────────────────────────────────────────────────
-const sections = ["Specification", "Extensions", "Reference implementation", "Optional"];
+const sections = ["Specification", "Extensions", "Libraries", "Optional"];
 const lines = [
   "# Semantic Versions",
   "",
@@ -185,6 +186,10 @@ for (const section of sections) {
   if (section === "Specification")
     extras.push(
       ...GRAMMARS.map(([f, note]) => `- [${f}](${SITE}/spec/${f}): ${note}`),
+    );
+  if (section === "Libraries")
+    extras.push(
+      `- [All libraries](${SITE}/libraries/): Implementations for JavaScript, Rust, Python, Go, Ruby, Java, .NET and PHP that pass the same conformance suite, with install commands and benchmarks against each language's existing libraries.`,
     );
   if (section === "Optional")
     extras.push(

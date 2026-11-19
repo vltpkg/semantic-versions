@@ -1,0 +1,270 @@
+{
+    "language": "PHP",
+    "subject": "semantic-versions",
+    "baseline": "composer/semver",
+    "environment": {
+        "runtime": "PHP 8.3.6",
+        "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+        "platform": "linux x86_64",
+        "date": "2026-11-19"
+    },
+    "libraries": {
+        "semantic-versions": {
+            "version": "1.0.0"
+        },
+        "composer/semver": {
+            "version": "3.6.0"
+        },
+        "z4kn4fein/php-semver": {
+            "version": "3.0.0"
+        }
+    },
+    "corpus": {
+        "versions": 5398,
+        "ranges": 2000,
+        "comparableRanges": 797,
+        "fetched": "2026-11-19"
+    },
+    "coverage": {
+        "semantic-versions": {
+            "versions": 5398,
+            "ranges": 1996
+        },
+        "composer/semver": {
+            "versions": 4425,
+            "ranges": 797
+        },
+        "z4kn4fein/php-semver": {
+            "versions": 5398,
+            "ranges": 1996
+        }
+    },
+    "tasks": [
+        {
+            "id": "parse",
+            "label": "Parse a version",
+            "description": "5398 published versions",
+            "results": {
+                "semantic-versions": {
+                    "nsPerOp": 353.8,
+                    "opsPerSec": 2826448
+                },
+                "composer/semver": {
+                    "nsPerOp": 818.5,
+                    "opsPerSec": 1221781
+                },
+                "z4kn4fein/php-semver": {
+                    "nsPerOp": 664.3,
+                    "opsPerSec": 1505343
+                }
+            }
+        },
+        {
+            "id": "sort",
+            "label": "Sort versions",
+            "description": "5398 parsed versions by precedence (per version)",
+            "results": {
+                "semantic-versions": {
+                    "nsPerOp": 1549.1,
+                    "opsPerSec": 645529
+                },
+                "composer/semver": {
+                    "nsPerOp": 1629.8,
+                    "opsPerSec": 613561
+                },
+                "z4kn4fein/php-semver": {
+                    "nsPerOp": 2161.8,
+                    "opsPerSec": 462580
+                }
+            }
+        },
+        {
+            "id": "range",
+            "label": "Parse a range",
+            "description": "797 real dependency ranges",
+            "results": {
+                "semantic-versions": {
+                    "nsPerOp": 2234.2,
+                    "opsPerSec": 447584
+                },
+                "composer/semver": {
+                    "nsPerOp": 2403.3,
+                    "opsPerSec": 416086
+                },
+                "z4kn4fein/php-semver": {
+                    "nsPerOp": 3654.1,
+                    "opsPerSec": 273667
+                }
+            }
+        },
+        {
+            "id": "satisfies",
+            "label": "range->test(version)",
+            "description": "13654 version × range checks",
+            "results": {
+                "semantic-versions": {
+                    "nsPerOp": 168.8,
+                    "opsPerSec": 5925273
+                },
+                "composer/semver": {
+                    "nsPerOp": 621.3,
+                    "opsPerSec": 1609436
+                },
+                "z4kn4fein/php-semver": {
+                    "nsPerOp": 474.1,
+                    "opsPerSec": 2109435
+                }
+            }
+        },
+        {
+            "id": "resolve",
+            "label": "Resolve a range",
+            "description": "103 max-satisfying lookups against a package's versions",
+            "results": {
+                "semantic-versions": {
+                    "nsPerOp": 26678.3,
+                    "opsPerSec": 37484
+                },
+                "composer/semver": {
+                    "nsPerOp": 101884.7,
+                    "opsPerSec": 9815
+                },
+                "z4kn4fein/php-semver": {
+                    "nsPerOp": 71039.6,
+                    "opsPerSec": 14077
+                }
+            }
+        }
+    ],
+    "conformance": {
+        "semantic-versions": {
+            "approximate": {
+                "passed": 17,
+                "total": 17
+            },
+            "build-channels": {
+                "passed": 24,
+                "total": 24
+            },
+            "build-precedence": {
+                "passed": 10,
+                "total": 10
+            },
+            "context": {
+                "passed": 15,
+                "total": 15
+            },
+            "parse": {
+                "passed": 81,
+                "total": 81
+            },
+            "precedence": {
+                "passed": 32,
+                "total": 32
+            },
+            "prerelease-channels": {
+                "passed": 44,
+                "total": 44
+            },
+            "prerelease-wildcards": {
+                "passed": 14,
+                "total": 14
+            },
+            "ranges": {
+                "passed": 199,
+                "total": 199
+            },
+            "strict": {
+                "passed": 11,
+                "total": 11
+            }
+        },
+        "composer/semver": {
+            "approximate": {
+                "passed": 7,
+                "total": 13
+            },
+            "build-channels": {
+                "passed": 12,
+                "total": 22
+            },
+            "build-precedence": {
+                "passed": 1,
+                "total": 10
+            },
+            "context": {
+                "passed": 3,
+                "total": 15
+            },
+            "parse": {
+                "passed": 57,
+                "total": 81
+            },
+            "precedence": {
+                "passed": 18,
+                "total": 32
+            },
+            "prerelease-channels": {
+                "passed": 26,
+                "total": 44
+            },
+            "prerelease-wildcards": {
+                "passed": 2,
+                "total": 13
+            },
+            "ranges": {
+                "passed": 139,
+                "total": 172
+            },
+            "strict": {
+                "passed": 8,
+                "total": 11
+            }
+        },
+        "z4kn4fein/php-semver": {
+            "approximate": {
+                "passed": 13,
+                "total": 13
+            },
+            "build-channels": {
+                "passed": 12,
+                "total": 22
+            },
+            "build-precedence": {
+                "passed": 1,
+                "total": 10
+            },
+            "context": {
+                "passed": 3,
+                "total": 15
+            },
+            "parse": {
+                "passed": 80,
+                "total": 81
+            },
+            "precedence": {
+                "passed": 32,
+                "total": 32
+            },
+            "prerelease-channels": {
+                "passed": 19,
+                "total": 44
+            },
+            "prerelease-wildcards": {
+                "passed": 2,
+                "total": 13
+            },
+            "ranges": {
+                "passed": 164,
+                "total": 172
+            },
+            "strict": {
+                "passed": 11,
+                "total": 11
+            }
+        }
+    },
+    "notes": {
+        "composer/semver": "Composer's model differs by design: versions normalize to four parts with stability flags (1.0.0-rc.1 becomes 1.0.0.0-RC1), builds are dropped, and pre-release names outside alpha, beta, RC and patch are rejected. Versions are scored on parsing to the same value."
+    }
+}

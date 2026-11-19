@@ -118,6 +118,15 @@
 
           <h2 id="ranges">Ranges</h2>
           <p>A range-set is one or more comparator sets joined by <code>||</code>. Hyphen, x-range, tilde, caret and approximate forms desugar to primitive comparators.</p>
+          <p>
+            This grammar descends from the range grammar Isaac Z. Schlueter published with
+            <a href="https://github.com/npm/node-semver#range-grammar" target="_blank" rel="noopener">node-semver</a>
+            for npm, and which he proposed adding to Semantic Versioning in
+            <a href="https://github.com/semver/semver/pull/584" target="_blank" rel="noopener">semver/semver#584</a>.
+            Semantic Versions makes it normative and extends it with the approximate operator
+            <code>~&gt;</code>, pre-release wildcards (<code>X.Y.Z-*</code>, <code>*-*</code>), build
+            channels and contexts.
+          </p>
           <div class="grammar-actions">
             <a class="btn btn-ghost" href="/spec/RANGE.bnf" download>Download RANGE.bnf</a>
           </div>

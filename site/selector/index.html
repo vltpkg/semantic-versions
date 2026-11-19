@@ -44,7 +44,7 @@
           <div class="sel-origin">
             <input id="registry" type="text" spellcheck="false" autocomplete="off"
               aria-label="Registry origin"
-              placeholder="https://registry.npmjs.org" value="https://registry.npmjs.org" />
+              placeholder="https://registry.vlt.io/upstream/npm" value="https://registry.vlt.io/upstream/npm" />
             <input id="pkg" type="text" spellcheck="false" autocomplete="off"
               aria-label="Package name"
               placeholder="package (e.g. debug or @scope/name)" />
@@ -55,8 +55,10 @@
           </div>
         </div>
         <p class="hint fetch-note reveal">
-          Fetches the package document directly from any npm-compatible registry origin
-          (npm, Verdaccio, GitHub Packages, a private mirror, and so on), entirely client-side.
+          Fetches the package document directly from any npm-compatible registry origin,
+          entirely client-side. The default is <a href="https://vlt.sh" target="_blank" rel="noopener">vlt</a>'s
+          mirror of the public npm registry; npm itself (<code>https://registry.npmjs.org</code>),
+          Verdaccio, GitHub Packages or a private mirror work too.
           Note that public registries don't publish <strong>build metadata</strong> and rarely
           carry long pre-release trains, so the <em>Build variants</em> and
           <em>Release train</em> sample sets above are the best way to explore those parts

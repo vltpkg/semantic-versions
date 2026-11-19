@@ -1,0 +1,238 @@
+{
+  "language": "Python",
+  "subject": "semantic-versions",
+  "baseline": "node-semver",
+  "environment": {
+    "runtime": "CPython 3.13.18",
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "platform": "linux x86_64",
+    "date": "2026-11-19"
+  },
+  "libraries": {
+    "semantic-versions": {
+      "version": "1.0.0"
+    },
+    "node-semver": {
+      "version": "0.9.1"
+    },
+    "semver": {
+      "version": "3.1.2"
+    }
+  },
+  "corpus": {
+    "versions": 5398,
+    "ranges": 2000,
+    "comparableRanges": 1996,
+    "fetched": "2026-11-19"
+  },
+  "coverage": {
+    "semantic-versions": {
+      "versions": 5398,
+      "ranges": 1996
+    },
+    "node-semver": {
+      "versions": 5398,
+      "ranges": 1996
+    },
+    "semver": {
+      "versions": 5398,
+      "ranges": 0
+    }
+  },
+  "tasks": [
+    {
+      "id": "parse",
+      "label": "Parse a version",
+      "description": "5398 published versions",
+      "results": {
+        "semantic-versions": {
+          "nsPerOp": 919.7,
+          "opsPerSec": 1087365
+        },
+        "node-semver": {
+          "nsPerOp": 1438.7,
+          "opsPerSec": 695050
+        },
+        "semver": {
+          "nsPerOp": 1379.4,
+          "opsPerSec": 724939
+        }
+      }
+    },
+    {
+      "id": "sort",
+      "label": "Sort versions",
+      "description": "5398 parsed versions by precedence (per version)",
+      "results": {
+        "semantic-versions": {
+          "nsPerOp": 657.2,
+          "opsPerSec": 1521549
+        },
+        "node-semver": {
+          "nsPerOp": 9900.7,
+          "opsPerSec": 101003
+        },
+        "semver": {
+          "nsPerOp": 5887.9,
+          "opsPerSec": 169839
+        }
+      }
+    },
+    {
+      "id": "range",
+      "label": "Parse a range",
+      "description": "1996 real dependency ranges",
+      "results": {
+        "semantic-versions": {
+          "nsPerOp": 4300.4,
+          "opsPerSec": 232537
+        },
+        "node-semver": {
+          "nsPerOp": 16019.6,
+          "opsPerSec": 62424
+        }
+      }
+    },
+    {
+      "id": "satisfies",
+      "label": "range.test(version)",
+      "description": "15604 version \u00d7 range checks",
+      "results": {
+        "semantic-versions": {
+          "nsPerOp": 247.1,
+          "opsPerSec": 4047372
+        },
+        "node-semver": {
+          "nsPerOp": 1761.0,
+          "opsPerSec": 567851
+        }
+      }
+    },
+    {
+      "id": "resolve",
+      "label": "Resolve a range",
+      "description": "116 max-satisfying lookups against a package's versions",
+      "results": {
+        "semantic-versions": {
+          "nsPerOp": 39878.7,
+          "opsPerSec": 25076
+        },
+        "node-semver": {
+          "nsPerOp": 267297.8,
+          "opsPerSec": 3741
+        }
+      }
+    }
+  ],
+  "conformance": {
+    "semantic-versions": {
+      "approximate": {
+        "passed": 17,
+        "total": 17
+      },
+      "build-channels": {
+        "passed": 24,
+        "total": 24
+      },
+      "build-precedence": {
+        "passed": 10,
+        "total": 10
+      },
+      "context": {
+        "passed": 15,
+        "total": 15
+      },
+      "parse": {
+        "passed": 81,
+        "total": 81
+      },
+      "precedence": {
+        "passed": 32,
+        "total": 32
+      },
+      "prerelease-channels": {
+        "passed": 44,
+        "total": 44
+      },
+      "prerelease-wildcards": {
+        "passed": 14,
+        "total": 14
+      },
+      "ranges": {
+        "passed": 199,
+        "total": 199
+      },
+      "strict": {
+        "passed": 11,
+        "total": 11
+      }
+    },
+    "node-semver": {
+      "approximate": {
+        "passed": 13,
+        "total": 17
+      },
+      "build-channels": {
+        "passed": 12,
+        "total": 24
+      },
+      "build-precedence": {
+        "passed": 1,
+        "total": 10
+      },
+      "context": {
+        "passed": 3,
+        "total": 15
+      },
+      "parse": {
+        "passed": 80,
+        "total": 81
+      },
+      "precedence": {
+        "passed": 32,
+        "total": 32
+      },
+      "prerelease-channels": {
+        "passed": 33,
+        "total": 44
+      },
+      "prerelease-wildcards": {
+        "passed": 2,
+        "total": 14
+      },
+      "ranges": {
+        "passed": 174,
+        "total": 199
+      },
+      "strict": {
+        "passed": 10,
+        "total": 11
+      }
+    },
+    "semver": {
+      "build-precedence": {
+        "passed": 1,
+        "total": 10
+      },
+      "context": {
+        "passed": 0,
+        "total": 8
+      },
+      "parse": {
+        "passed": 80,
+        "total": 81
+      },
+      "precedence": {
+        "passed": 32,
+        "total": 32
+      },
+      "strict": {
+        "passed": 7,
+        "total": 7
+      }
+    }
+  },
+  "notes": {
+    "semver": "python-semver has no npm-style ranges (only single comparisons such as >=1.2.3), so it is compared on versions only."
+  }
+}

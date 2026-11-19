@@ -1,6 +1,6 @@
 /* eslint-disable no-unreachable-loop */
 import { COMPARATOR } from './regex.js'
-import { Version } from './version.js'
+import { Version, compareWithoutBuild } from './version.js'
 import { Range } from './range.js'
 
 // A copy of `version` with its build metadata removed, used so range
@@ -94,8 +94,17 @@ class Comparator {
       return true
     }
     // Numeric comparison ignores build metadata on both sides.
-    const core = version.build.length ? stripBuild(version) : version
-    if (!cmp(core, this.operator, this.core)) {
+    const c = compareWithoutBuild(version, this.semver)
+    let inBounds
+    switch (this.operator) {
+      case '': inBounds = c === 0; break
+      case '>': inBounds = c > 0; break
+      case '>=': inBounds = c >= 0; break
+      case '<': inBounds = c < 0; break
+      case '<=': inBounds = c <= 0; break
+      default: inBounds = cmp(version, this.operator, this.semver)
+    }
+    if (!inBounds) {
       return false
     }
     // When a channel is declared, the version must carry a build in that
@@ -291,8 +300,18 @@ const cmp = (a, op, b) => {
       throw new TypeError(`Invalid operator: ${op}`)
   }
 }
-const sort = (list) => list.sort((a, b) => compare(a, b))
-const rsort = (list) => list.sort((a, b) => compare(b, a))
+// Parse each entry once (rather than on every comparison), then write the
+// original values back in order so the list is still sorted in place.
+const sortBy = (list, dir) => {
+  const parsed = list.map((value) => ({ value, sv: new Version(value) }))
+  parsed.sort((a, b) => dir * a.sv.compare(b.sv))
+  for (let i = 0; i < parsed.length; i++) {
+    list[i] = parsed[i].value
+  }
+  return list
+}
+const sort = (list) => sortBy(list, 1)
+const rsort = (list) => sortBy(list, -1)
 const satisfies = (version, range) => {
   if (version === range) {
     return true

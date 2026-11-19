@@ -38,6 +38,10 @@
 
       <div class="doc-layout">
         <aside class="toc reveal" aria-label="Questions">
+          <div class="toc-title">Common misconceptions</div>
+          <a href="#package-json">&ldquo;My package.json uses semver&rdquo;</a>
+          <a href="#official-standard">&ldquo;semver.org is a standard&rdquo;</a>
+          <a href="#same-everywhere">&ldquo;Every tool reads versions alike&rdquo;</a>
           <div class="toc-title">The specification</div>
           <a href="#semver-org">Differences from semver.org</a>
           <a href="#reset-to-zero">Resetting to <code>0</code></a>
@@ -46,6 +50,7 @@
           <a href="#deprecated">Deprecation</a>
           <div class="toc-title">Ecosystem</div>
           <a href="#purl">Package-URL (purl)</a>
+          <a href="#pep-440">Python's PEP 440</a>
           <div class="toc-title">The project</div>
           <a href="#grammar">Grammar</a>
           <a href="#contributing">Contributing</a>
@@ -53,6 +58,114 @@
         </aside>
 
         <article class="doc reveal">
+          <h2 id="misconceptions">Common misconceptions</h2>
+
+          <h3 id="package-json">Aren&rsquo;t the versions in my <code>package.json</code> &ldquo;semver&rdquo;?</h3>
+          <p>
+            Not quite. What you write under <code>dependencies</code> is a <em>range</em>
+            (<code>^1.2.0</code>, <code>~1.4</code>, <code>&gt;=2 &lt;3</code>, <code>1.x</code>), and
+            <a href="https://semver.org/" target="_blank" rel="noopener">Semantic Versioning 2.0.0</a>
+            does not define ranges at all. It specifies what a version string looks like and how two
+            versions order; carets, tildes, x-ranges, hyphen ranges and <code>||</code> appear nowhere
+            in it. npm&rsquo;s documentation sends you to the
+            <a href="https://github.com/npm/node-semver#ranges" target="_blank" rel="noopener"><code>semver</code> package&rsquo;s README</a>
+            for range syntax, and that README carries its own grammar. So the language millions of
+            manifests are written in is defined by one library&rsquo;s documentation, not by the spec
+            it is named after.
+          </p>
+          <p>
+            The same goes for behaviour people assume is &ldquo;semver&rdquo;. That
+            <code>^1.0.0</code> never matches <code>2.0.0-rc.1</code> is a node-semver rule: a
+            pre-release only satisfies a range when a comparator on the same
+            <code>major.minor.patch</code> carries a pre-release too. Reasonable, widely copied, and
+            nowhere in the spec. And a dependency field need not hold a version or range at all:
+            npm also accepts tarball and git URLs, GitHub shorthands, dist-tags like
+            <code>latest</code>, local paths and <code>npm:</code> aliases.
+          </p>
+          <p>
+            Semantic Versions writes these rules down as part of the
+            <a href="/spec/#ranges">specification</a>, with a <a href="/grammar/">grammar</a> and a
+            shared <a href="https://github.com/vltpkg/semantic-versions/tree/main/conformance" target="_blank" rel="noopener">conformance suite</a>,
+            so a range means the same thing in every tool that implements it.
+          </p>
+
+          <h3 id="official-standard">Isn&rsquo;t semver.org an official standard?</h3>
+          <p>
+            It is a widely adopted document rather than a standard in the formal sense. Semantic
+            Versioning was written by Tom Preston-Werner, announced in December 2009, and is
+            published on a website under CC BY 3.0. It has not gone through a standards body such as
+            the IETF, ECMA or ISO. Version 2.0.0 was released in June 2013, and it is still the
+            current version.
+          </p>
+          <p>
+            It does have stewards. In 2019 its long-time maintainer handed it to a group of
+            maintainers from package managers that use it (npm, Bundler, Cargo, Composer, NuGet,
+            CocoaPods and others), who adopted an RFC process. Under that process a change counts as
+            adopted only once the maintainers approve it and a majority of their implementations
+            ship it, and changes that would significantly break any of those communities are ruled
+            out. That makes the spec stable, which matters, but it also means the definitions tools
+            needed and invented for themselves (ranges, pre-release matching, what a build is for)
+            were never brought into it.
+          </p>
+          <p>
+            Ranges are the clearest example. The range syntax most people know comes from
+            <a href="https://github.com/npm/node-semver" target="_blank" rel="noopener">node-semver</a>,
+            which Isaac Z. Schlueter wrote for npm in 2011. In 2020 he proposed adding a ranges
+            specification to Semantic Versioning
+            (<a href="https://github.com/semver/semver/pull/584" target="_blank" rel="noopener">semver/semver#584</a>).
+            Maintainers of other package managers pointed out where their tools differ and that
+            aligning them would break existing constraints; the proposal is still open. Much of the
+            range grammar in Semantic Versions descends from that work, extended with pre-release and
+            build channels, wildcards and contexts. The <a href="/origin/">history</a> has the
+            timeline.
+          </p>
+          <p>
+            Semantic Versions does not try to replace that process. It is a separate, versioned
+            specification that keeps every Semantic Versioning 2.0.0 version valid and adds the
+            missing parts in the open, at
+            <a href="https://github.com/vltpkg/semantic-versions" target="_blank" rel="noopener">vltpkg/semantic-versions</a>.
+          </p>
+
+          <h3 id="same-everywhere">Doesn&rsquo;t every package manager read versions the same way?</h3>
+          <p>
+            They agree on the shape of a version and disagree on almost everything around it. A few
+            examples, each from the tool&rsquo;s own documentation:
+          </p>
+          <ul>
+            <li>
+              <strong>A bare version.</strong> In npm, <code>1.2.3</code> means exactly that version.
+              In Cargo, <code>1.2.3</code> is a caret requirement and means
+              <code>&gt;=1.2.3, &lt;2.0.0</code>.
+            </li>
+            <li>
+              <strong>The <code>v</code> prefix.</strong> Semantic Versioning 2.0.0 says
+              <code>v1.2.3</code> is not a semantic version. Go modules require it
+              (<code>v1.2.3</code>), while node-semver strips it and accepts the rest.
+            </li>
+            <li>
+              <strong>Builds.</strong> Semantic Versioning 2.0.0 says build metadata MUST be ignored
+              for precedence, so <code>1.0.0+linux</code> and <code>1.0.0+windows</code> are
+              &ldquo;equal&rdquo;. Go ignores the suffix when comparing versions, and node-semver
+              drops it when it normalizes one. Two different artifacts end up indistinguishable to
+              the resolver.
+            </li>
+            <li>
+              <strong>Range syntax.</strong> npm separates comparators with spaces and alternatives
+              with <code>||</code>; Cargo separates comparators with commas and has no
+              <code>||</code>; Python&rsquo;s <a href="#pep-440">PEP 440</a> uses
+              <code>~=</code> and <code>==1.4.*</code>; Composer and RubyGems each have their own.
+            </li>
+          </ul>
+          <p>
+            Each choice is defensible on its own. Together they mean that &ldquo;semver&rdquo; names
+            a family of dialects, and that the same version or range can resolve differently
+            depending on which tool reads it. That is the gap Semantic Versions closes: one
+            definition of versions, precedence (builds included), sets, ranges and comparators,
+            with <a href="/libraries/">implementations in eight languages</a> that give identical answers.
+            For how builds lost their meaning in the first place, see
+            <a href="#semver-org">how this differs from semver.org</a>.
+          </p>
+
           <h2 id="the-specification">The specification</h2>
 
           <h3 id="semver-org">How does this differ from <code>semver.org</code>?</h3>
@@ -204,6 +317,91 @@
             which is precisely the slot the <a href="/extensions/">extensions</a> occupy.
           </p>
 
+          <h3 id="pep-440">How does it work with Python&rsquo;s PEP 440?</h3>
+          <p>
+            <a href="https://peps.python.org/pep-0440/" target="_blank" rel="noopener">PEP 440</a>
+            is the other widely used version grammar, and it <em>recommends</em> Semantic
+            Versioning for the public release segment. Because Semantic Versions restores the two
+            things Semantic Versioning 2.0.0 discarded, <strong>build precedence</strong> and
+            <strong>default pre-release exclusion</strong>, it lines up with PEP 440&rsquo;s ordering
+            model more closely than 2.0.0 does. What follows is the interoperable subset; it adds no
+            grammar or precedence rules to the specification.
+          </p>
+
+          <h4>Compatible subset</h4>
+          <p>A version round-trips between the two schemes when it stays within this subset:</p>
+          <ol>
+            <li>
+              The release segment is exactly three components (<code>MAJOR.MINOR.PATCH</code>) with
+              no leading zeroes. PEP 440 permits an arbitrary-length release segment, but recommends
+              this form.
+            </li>
+            <li>
+              Pre-releases use the spellings <code>-a.N</code> (alpha), <code>-b.N</code> (beta)
+              and <code>-rc.N</code> (release candidate). These sort correctly under Semantic
+              Versions precedence (<code>a &lt; b &lt; rc</code>, then numerically), and map onto
+              PEP 440&rsquo;s normalized <code>aN</code> / <code>bN</code> / <code>rcN</code>
+              pre-release segments.
+            </li>
+          </ol>
+
+          <h4>Ordering alignment</h4>
+          <ul>
+            <li>
+              <strong>Local versions &harr; builds.</strong> PEP 440 local versions
+              (<code>1.0.0+abc</code>) participate in ordering and rank a labelled artifact above
+              its plain release. Semantic Versions&rsquo; restored
+              <a href="/spec/#precedence">build precedence</a> does the same
+              (<code>1.0.0 &lt; 1.0.0+build</code>), where Semantic Versioning 2.0.0 discards it.
+            </li>
+            <li>
+              <strong>Default pre-release exclusion.</strong> A range of stable comparators admits
+              no pre-releases unless it opts in (see
+              <a href="/spec/#pre-release-channels">pre-release channels</a>), mirroring
+              <code>pip</code>&rsquo;s requirement of <code>--pre</code>.
+            </li>
+            <li>
+              <strong>Post-releases.</strong> PEP 440 post-releases (<code>1.0.0.post1</code>)
+              rank <em>above</em> the release, matching the &ldquo;refinement above the
+              release&rdquo; shape of build precedence, though the two are not byte-for-byte
+              convertible (see below).
+            </li>
+          </ul>
+
+          <h4>Specifier mapping</h4>
+          <div class="doc-table-wrap">
+            <table class="doc-table">
+              <thead><tr><th>PEP 440 specifier</th><th>Semantic Versions range</th></tr></thead>
+              <tbody>
+                <tr><td><code>~=1.4.2</code></td><td><code>~1.4.2</code> (<code>&gt;=1.4.2 &lt;1.5.0-0</code>)</td></tr>
+                <tr><td><code>~=1.4</code></td><td><code>^1.4</code> (<code>&gt;=1.4.0 &lt;2.0.0-0</code>)</td></tr>
+                <tr><td><code>==1.4.*</code></td><td><code>1.4.x</code> (<code>&gt;=1.4.0 &lt;1.5.0-0</code>)</td></tr>
+                <tr><td><code>&gt;=1.4.2</code>, <code>&gt;1.4.2</code>, <code>&lt;=1.4.2</code>, <code>&lt;1.4.2</code></td><td>same operator, identical meaning</td></tr>
+                <tr><td><code>==1.4.2</code></td><td><code>1.4.2</code></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h4>Not representable</h4>
+          <p>These PEP 440 constructs have no Semantic Versions equivalent and are deliberately left unmapped rather than special-cased:</p>
+          <ul>
+            <li>
+              <strong>Epochs</strong> (<code>1!1.0</code>): an epoch cannot be encoded without
+              breaking Semantic Versioning 2.0.0 compatibility.
+            </li>
+            <li>
+              <strong>Development releases</strong> (<code>.devN</code>): PEP 440 sorts a dev
+              release <em>below</em> its own parent pre-release
+              (<code>1.0.0-a.1.dev.1 &lt; 1.0.0-a.1</code>), which contradicts the rule that a
+              larger set of identifiers ranks <em>higher</em>.
+            </li>
+            <li>
+              <strong>Exact post-release numerics</strong> (<code>.postN</code>): the &ldquo;above
+              the release&rdquo; concept maps onto build precedence, but the precise
+              <code>.postN</code> counter semantics do not survive the round trip.
+            </li>
+          </ul>
+
           <h2 id="the-project">The project</h2>
 
           <h3 id="grammar">Where is the grammar?</h3>
@@ -213,7 +411,14 @@
             <a href="/grammar/#comparators">comparators</a> are published on the
             <a href="/grammar/">grammar page</a>, alongside the reference parser,
             <a href="https://github.com/vltpkg/semantic-versions/tree/main/packages/parser" target="_blank" rel="noopener"><code>semantic-versions</code></a>.
-            You can also <a href="/selector/">try ranges</a> against it in your browser.
+            For quick validation there is also a
+            <a href="https://regex101.com/r/vkijKf/1/" target="_blank" rel="noopener">regular expression</a>,
+            and you can <a href="/selector/">try ranges</a> against the parser in your browser.
+          </p>
+          <p>
+            Ports of the parser for Rust, Python, Go, Ruby, Java, .NET and PHP pass the same
+            conformance suite; they are listed, with benchmarks, on the
+            <a href="/libraries/">libraries page</a>.
           </p>
 
           <h3 id="contributing">Can I contribute, or propose an extension?</h3>

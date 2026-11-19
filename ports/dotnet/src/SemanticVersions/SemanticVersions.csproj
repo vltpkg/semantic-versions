@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks Condition="'$(TargetFrameworks)' == ''">net8.0;net10.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IsAotCompatible>true</IsAotCompatible>
+    <RootNamespace>SemanticVersions</RootNamespace>
+
+    <PackageId>SemanticVersions</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>vlt technology inc.</Authors>
+    <Description>Parse, compare and match versions per the Semantic Versions specification (semver.xyz): strict parsing, build precedence, pre-release and build channels, contexts and npm-style ranges.</Description>
+    <PackageTags>semver;semantic-versioning;version;range;npm</PackageTags>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://semver.xyz/libraries/#dotnet</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/vltpkg/semantic-versions</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../README.md" Pack="true" PackagePath="/" />
+  </ItemGroup>
+
+</Project>

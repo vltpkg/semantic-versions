@@ -1,0 +1,273 @@
+{
+  "description": "Ordered pairs. `expected` is the sign of compare(a, b): -1, 0 or 1.",
+  "cases": [
+    {
+      "category": "precedence",
+      "a": "0.0.0",
+      "b": "0.0.0-foo",
+      "expected": 1
+    },
+    {
+      "category": "precedence",
+      "a": "0.0.1",
+      "b": "0.0.0",
+      "expected": 1
+    },
+    {
+      "category": "precedence",
+      "a": "1.0.0",
+      "b": "0.9.9",
+      "expected": 1
+    },
+    {
+      "category": "precedence",
+      "a": "0.10.0",
+      "b": "0.9.0",
+      "expected": 1
+    },
+    {
+      "category": "precedence",
+      "a": "0.99.0",
+      "b": "0.10.0",
+      "expected": 1
+    },
+    {
+      "category": "precedence",
+      "a": "2.0.0",
+      "b": "1.2.3",
+      "expected": 1
+    },
+    {
+      "category": "precedence",
+      "a": "1.2.3",
+      "b": "1.2.3-asdf",
+      "expected": 1
+    },
+    {
+      "category": "precedence",
+      "a": "1.2.3",
+      "b": "1.2.3-4",
+      "expected": 1
+    },
+    {
+      "category": "precedence",
+      "a": "1.2.3",
+      "b": "1.2.3-4-foo",
+      "expected": 1
+    },
+    {
+      "category": "precedence",
+      "a": "1.2.3-5-foo",
+      "b": "1.2.3-5",
+      "expected": 1
+    },
+    {
+      "category": "precedence",
+      "a": "1.2.3-5",
+      "b": "1.2.3-4",
+      "expected": 1
+    },
+    {
+      "category": "precedence",
+      "a": "1.2.3-5-foo",
+      "b": "1.2.3-5-Foo",
+      "expected": 1
+    },
+    {
+      "category": "precedence",
+      "a": "3.0.0",
+      "b": "2.7.2+asdf",
+      "expected": 1
+    },
+    {
+      "category": "precedence",
+      "a": "1.2.3-a.10",
+      "b": "1.2.3-a.5",
+      "expected": 1
+    },
+    {
+      "category": "precedence",
+      "a": "1.2.3-a.b",
+      "b": "1.2.3-a.5",
+      "expected": 1
+    },
+    {
+      "category": "precedence",
+      "a": "1.2.3-a.b",
+      "b": "1.2.3-a",
+      "expected": 1
+    },
+    {
+      "category": "precedence",
+      "a": "1.2.3-a.b.c.10.d.5",
+      "b": "1.2.3-a.b.c.5.d.100",
+      "expected": 1
+    },
+    {
+      "category": "precedence",
+      "a": "1.2.3-r2",
+      "b": "1.2.3-r100",
+      "expected": 1
+    },
+    {
+      "category": "precedence",
+      "a": "1.2.3-r100",
+      "b": "1.2.3-R2",
+      "expected": 1
+    },
+    {
+      "category": "precedence",
+      "a": "1.2.3",
+      "b": "1.2.3",
+      "expected": 0
+    },
+    {
+      "category": "precedence",
+      "a": "1.2.3-beta+build",
+      "b": "1.2.3-beta+build",
+      "expected": 0
+    },
+    {
+      "category": "precedence",
+      "a": "1.2.3+build",
+      "b": "1.2.3+build",
+      "expected": 0
+    },
+    {
+      "category": "precedence",
+      "a": "1.0.0",
+      "b": "2.0.0",
+      "expected": -1
+    },
+    {
+      "category": "precedence",
+      "a": "2.0.0",
+      "b": "2.1.0",
+      "expected": -1
+    },
+    {
+      "category": "precedence",
+      "a": "2.1.0",
+      "b": "2.1.1",
+      "expected": -1
+    },
+    {
+      "category": "precedence",
+      "a": "1.0.0-alpha",
+      "b": "1.0.0-alpha.1",
+      "expected": -1
+    },
+    {
+      "category": "precedence",
+      "a": "1.0.0-alpha.1",
+      "b": "1.0.0-alpha.beta",
+      "expected": -1
+    },
+    {
+      "category": "precedence",
+      "a": "1.0.0-alpha.beta",
+      "b": "1.0.0-beta",
+      "expected": -1
+    },
+    {
+      "category": "precedence",
+      "a": "1.0.0-beta",
+      "b": "1.0.0-beta.2",
+      "expected": -1
+    },
+    {
+      "category": "precedence",
+      "a": "1.0.0-beta.2",
+      "b": "1.0.0-beta.11",
+      "expected": -1
+    },
+    {
+      "category": "precedence",
+      "a": "1.0.0-beta.11",
+      "b": "1.0.0-rc.1",
+      "expected": -1
+    },
+    {
+      "category": "precedence",
+      "a": "1.0.0-rc.1",
+      "b": "1.0.0",
+      "expected": -1
+    },
+    {
+      "category": "build-precedence",
+      "a": "1.0.0",
+      "b": "1.0.0+build.1",
+      "expected": -1,
+      "note": "a build ranks above its plain release"
+    },
+    {
+      "category": "build-precedence",
+      "a": "1.0.0+build.1",
+      "b": "1.0.0+build.2",
+      "expected": -1,
+      "note": "a build ranks above its plain release"
+    },
+    {
+      "category": "build-precedence",
+      "a": "1.0.0",
+      "b": "1.0.0+0",
+      "expected": -1
+    },
+    {
+      "category": "build-precedence",
+      "a": "1.0.0+0",
+      "b": "1.0.0+0.0",
+      "expected": -1
+    },
+    {
+      "category": "build-precedence",
+      "a": "1.0.0+0.0",
+      "b": "1.0.0+1",
+      "expected": -1
+    },
+    {
+      "category": "build-precedence",
+      "a": "1.0.0+1",
+      "b": "1.0.0+1.0",
+      "expected": -1
+    },
+    {
+      "category": "build-precedence",
+      "a": "1.0.0-rc.1",
+      "b": "1.0.0",
+      "expected": -1
+    },
+    {
+      "category": "build-precedence",
+      "a": "1.0.0",
+      "b": "1.0.0+build.1",
+      "expected": -1
+    },
+    {
+      "category": "build-precedence",
+      "a": "1.0.0+build.9",
+      "b": "1.0.0+build.10",
+      "expected": -1,
+      "note": "numeric build identifiers compare numerically"
+    },
+    {
+      "category": "build-precedence",
+      "a": "1.0.0+linux.x64",
+      "b": "1.0.0+win.x64",
+      "expected": -1
+    },
+    {
+      "category": "context",
+      "a": "npm:react@1.2.3",
+      "b": "cargo:serde@1.2.3",
+      "expected": 0,
+      "note": "context never participates in precedence"
+    },
+    {
+      "category": "context",
+      "a": "npm:react@1.2.3",
+      "b": "1.2.4",
+      "expected": -1
+    }
+  ]
+}

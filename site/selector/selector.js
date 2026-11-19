@@ -313,7 +313,9 @@ async function loadFromNpm() {
         `Loaded from the registry, qualified as ${context}. Scope a range to it (e.g. ${context}@^1.0.0) to see a Contextual Set. Public registries don't publish build metadata, so use the Build variants sample for build-scoped selection.`;
     }
     try {
-      localStorage.setItem("semver-xyz.registry", origin);
+      // Remember only a registry the visitor chose, so a later default applies.
+      if (origin === DEFAULT_REGISTRY) localStorage.removeItem("semver-xyz.registry");
+      else localStorage.setItem("semver-xyz.registry", origin);
     } catch {
       /* storage may be unavailable; non-fatal */
     }
@@ -327,9 +329,14 @@ async function loadFromNpm() {
   }
 }
 
+// vlt's public mirror of the npm registry: same packuments, served with CORS.
+const DEFAULT_REGISTRY = "https://registry.vlt.io/upstream/npm";
+// The previous default. A saved origin equal to it was never a real choice.
+const PREVIOUS_DEFAULT = "https://registry.npmjs.org";
+
 function normalizeOrigin(value) {
   const trimmed = (value || "").trim().replace(/\/+$/, "");
-  return trimmed || "https://registry.npmjs.org";
+  return trimmed || DEFAULT_REGISTRY;
 }
 
 // Newest first, using the reference parser's precedence. Anything the parser
@@ -351,7 +358,8 @@ function init() {
 
   try {
     const saved = localStorage.getItem("semver-xyz.registry");
-    if (saved) registryInput.value = saved;
+    if (saved && saved !== PREVIOUS_DEFAULT) registryInput.value = saved;
+    else registryInput.value = DEFAULT_REGISTRY;
   } catch {
     /* storage may be unavailable; non-fatal */
   }

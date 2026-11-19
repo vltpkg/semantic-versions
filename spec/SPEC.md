@@ -278,6 +278,16 @@ satisfies, which is higher), not less than it (`1.2.8` satisfies, which is
 lower), and does not satisfy it. Test membership directly with
 `satisfies(version, range)`.
 
+> The range, comparator and advanced range syntax in this specification descend
+> from [`node-semver`](https://github.com/npm/node-semver), the `semver` package
+> Isaac Z. Schlueter wrote for npm in 2011, which became the de facto range
+> language of the JavaScript ecosystem. Isaac proposed bringing that grammar into
+> Semantic Versioning in 2020
+> ([semver/semver#584](https://github.com/semver/semver/pull/584)); the proposal
+> is still open. Semantic Versions adopts it as normative text and extends it
+> with the approximate operator `~>`, pre-release and build channels, explicit
+> pre-release wildcards, and contexts.
+
 ## Operators
 
 An `operator` expresses how to compare a version. Supported operators are:
@@ -513,78 +523,11 @@ platform or architecture targets, content digests.
 > channels and [Package Integrity](https://semver.xyz/extensions/integrity/) for
 > a channel built on content digests.
 
-## PEP 440 interoperability
+---
 
-Python's [PEP 440](https://peps.python.org/pep-0440/) is the other widely used
-version grammar, and it *recommends* Semantic Versioning for the public release
-segment. Because Semantic Versions restores the two things Semantic Versioning
-2.0.0 discarded, **build precedence** and **default pre-release exclusion**, it
-lines up with PEP 440's ordering model more closely than 2.0.0 does. This
-section defines the interoperable subset; it adds no grammar or precedence rules.
-
-### Compatible subset
-
-A version is round-trippable between the two schemes when it stays within this
-subset:
-
-1. The release segment is exactly three components (`MAJOR.MINOR.PATCH`) with no
-   leading zeroes. PEP 440 permits an arbitrary-length release segment, but
-   recommends this form.
-2. Pre-releases use the spellings `-a.N` (alpha), `-b.N` (beta) and `-rc.N`
-   (release candidate). These sort correctly under Semantic Versions precedence
-   (`a < b < rc`, then numerically), and map onto PEP 440's normalized `aN` /
-   `bN` / `rcN` pre-release segments.
-
-### Ordering alignment
-
-- **Local versions ↔ builds.** PEP 440 local versions (`1.0.0+abc`) participate
-  in ordering and rank a labelled artifact above its plain release. Semantic
-  Versions' restored [build precedence](#precedence) does the same
-  (`1.0.0 < 1.0.0+build`), where Semantic Versioning 2.0.0 discards it.
-- **Default pre-release exclusion.** A range of stable comparators admits no
-  pre-releases unless it opts in (see
-  [Pre-release channels](#pre-release-channels)), mirroring `pip`'s requirement
-  of `--pre`.
-- **Post-releases.** PEP 440 post-releases (`1.0.0.post1`) rank *above* the
-  release, matching the "refinement above the release" shape of build
-  precedence, though the two are not byte-for-byte convertible (see below).
-
-### Specifier mapping
-
-PEP 440 specifiers translate to Semantic Versions ranges:
-
-| PEP 440 specifier | Semantic Versions range |
-| --- | --- |
-| `~=1.4.2` | `~1.4.2` (`>=1.4.2 <1.5.0-0`) |
-| `~=1.4` | `^1.4` (`>=1.4.0 <2.0.0-0`) |
-| `==1.4.*` | `1.4.x` (`>=1.4.0 <1.5.0-0`) |
-| `>=1.4.2`, `>1.4.2`, `<=1.4.2`, `<1.4.2` | same operator, identical meaning |
-| `==1.4.2` | `1.4.2` |
-
-### Lossy / out of scope
-
-The following PEP 440 constructs are **not representable** in Semantic Versions
-and are deliberately left unmapped rather than special-cased:
-
-- **Epoch** (`1!1.0`): there is no Semantic Versions equivalent; an epoch cannot
-  be encoded without breaking Semantic Versioning 2.0.0 compatibility.
-- **Development releases** (`.devN`): PEP 440 sorts a dev release *below* its own
-  parent pre-release (`1.0.0-a.1.dev.1 < 1.0.0-a.1`), which contradicts the
-  Semantic Versions rule that a larger set of identifiers ranks *higher*.
-- **Exact post-release numerics** (`.postN`): the "above the release" concept
-  maps onto build precedence, but the precise `.postN` counter semantics do not
-  survive the round trip.
-
-## Grammar & reference implementation
-
-Backus–Naur forms for versions, references, ranges and comparators are published
-at [semver.xyz/grammar](https://semver.xyz/grammar/), and
-[`semantic-versions`](https://github.com/vltpkg/semantic-versions/tree/main/packages/parser)
-is the reference parser. A
-[regular expression](https://regex101.com/r/vkijKf/1/) is also available for
-quick validation.
-
-The specification text is licensed under
-[CC BY 3.0](https://creativecommons.org/licenses/by/3.0/); the reference parser
-under the Apache License 2.0. Answers to common questions are in the
+This specification is licensed under
+[CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). The BNF grammars are at
+[semver.xyz/grammar](https://semver.xyz/grammar/), implementations at
+[semver.xyz/libraries](https://semver.xyz/libraries/), and answers to common questions,
+including interoperability with Python's PEP 440, in the
 [FAQ](https://semver.xyz/faq/).

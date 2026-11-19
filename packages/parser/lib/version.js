@@ -1,4 +1,4 @@
-import { FULL, NUMERIC, MAX_LENGTH, MAX_SAFE_INTEGER, LETTERDASHNUMBER } from './regex.js'
+import { NUMERIC, MAX_LENGTH, MAX_SAFE_INTEGER } from './regex.js'
 
 // A *reference* is an optional context and an `@`-separated version (or, for a
 // Range, a range body): `context@1.2.3`. The context is the identity a version
@@ -22,14 +22,83 @@ export const splitReference = (str) => {
   return { context: head.slice(0, at), rest: head.slice(at + 1) + tail }
 }
 
-const parseVersion = (version) => {
-  validVersion(version)
-  const parts = version.trim().match(FULL)
-  if (!parts) {
-    throw new TypeError(`Invalid Version: ${version}`)
+// A single-pass scanner equivalent to the FULL grammar (see regex.js):
+//   (0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)
+//   (?:-(PRE(?:\.PRE)*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?
+// where PRE is `0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*`. It builds the parsed
+// parts as it goes, so nothing is re-split or re-joined afterwards.
+const isDigit = (c) => c >= 48 && c <= 57
+const isIdent = (c) => (c >= 48 && c <= 57) || (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || c === 45
+
+const invalid = (version) => new TypeError(`Invalid Version: ${version}`)
+
+const scan = (s, version) => {
+  const len = s.length
+  const nums = [0, 0, 0]
+  let i = 0
+  for (let n = 0; n < 3; n++) {
+    if (n > 0) {
+      if (s.charCodeAt(i) !== 46) throw invalid(version)
+      i++
+    }
+    const start = i
+    let value = 0
+    let c
+    while (i < len && isDigit(c = s.charCodeAt(i))) {
+      value = value * 10 + (c - 48)
+      i++
+    }
+    if (i === start || (i - start > 1 && s.charCodeAt(start) === 48)) throw invalid(version)
+    nums[n] = value
   }
-  return parts
+  const prerelease = []
+  const build = []
+  if (i < len && s.charCodeAt(i) === 45) {
+    i = scanIdentifiers(s, i + 1, prerelease, true, version)
+  }
+  if (i < len && s.charCodeAt(i) === 43) {
+    i = scanIdentifiers(s, i + 1, build, false, version)
+  }
+  if (i !== len) throw invalid(version)
+  return { major: nums[0], minor: nums[1], patch: nums[2], prerelease, build }
 }
+
+// Dot-separated identifiers from `i` into `out`. Pre-release identifiers that
+// are all digits must not have a leading zero and become numbers; build
+// identifiers stay strings exactly as written.
+const scanIdentifiers = (s, i, out, pre, version) => {
+  const len = s.length
+  for (;;) {
+    const start = i
+    let digits = true
+    let c
+    while (i < len && isIdent(c = s.charCodeAt(i))) {
+      if (c < 48 || c > 57) digits = false
+      i++
+    }
+    if (i === start) throw invalid(version)
+    const id = s.slice(start, i)
+    if (pre && digits) {
+      if (i - start > 1 && s.charCodeAt(start) === 48) {
+        throw new TypeError('Invalid pre-release version: Numbers MUST NOT begin with a leading zero')
+      }
+      const num = +id
+      if (!(num >= 0 && num < MAX_SAFE_INTEGER)) {
+        throw new TypeError('Invalid pre-release version: Numbers MUST be safe integers')
+      }
+      out.push(num)
+    } else {
+      out.push(id)
+    }
+    if (i < len && s.charCodeAt(i) === 46) {
+      i++
+      continue
+    }
+    return i
+  }
+}
+
+const isSpace = (c) => c === 32 || (c >= 9 && c <= 13) || c === 160 || c === 65279
 
 const validVersion = (version) => {
   if (version && typeof version !== 'string') {
@@ -61,44 +130,15 @@ const validPatch = (patch) => {
   return patch
 }
 
-const parsePrerelease = (prerelease) => {
-  const parse = (id) => {
-    if (NUMERIC.test(id)) {
-      if (id.length > 1 && id[0] === '0') {
-        throw new TypeError('Invalid pre-release version: Numbers MUST NOT begin with a leading zero')
-      }
-      const num = +id
-      if (num >= 0 && num < MAX_SAFE_INTEGER) {
-        return num
-      } else {
-        throw new TypeError('Invalid pre-release version: Numbers MUST be safe integers')
-      }
-    }
-    return id
-  }
-  return prerelease ? prerelease.split('.').map(parse) : []
-}
+// A cheap first-character check avoids running the numeric regex on
+// alphanumeric identifiers.
+const isNumeric = (id) => typeof id === 'number' || (id.charCodeAt(0) <= 57 && NUMERIC.test(id))
 
-const parseBuild = (build) => {
-  if (!build) {
-    return []
-  }
-  if (typeof build !== 'string') {
-    throw new TypeError(`Invalid build version: ${build}`)
-  }
-  const parse = (id) => {
-    if (LETTERDASHNUMBER.test(id)) {
-      return id
-    } else {
-      throw new TypeError(`Invalid build version: ${build}`)
-    }
-  }
-  return build.split('.').map(parse)
-}
+const compareNumbers = (a, b) => (a === b ? 0 : a < b ? -1 : 1)
 
 const compareIdentifiers = (a, b) => {
-  const one = NUMERIC.test(a)
-  const two = NUMERIC.test(b)
+  const one = isNumeric(a)
+  const two = isNumeric(b)
   if (one && two) {
     a = +a
     b = +b
@@ -150,10 +190,23 @@ const compareList = (one, two) => {
     } else if (a === b) {
       continue
     } else {
-      return compareIdentifiers(a, b)
+      // Identifiers can be equal without being identical (`001` and `1` in a
+      // build), so keep going rather than stopping at the first tie.
+      const c = compareIdentifiers(a, b)
+      if (c) {
+        return c
+      }
     }
   } while (++i)
 }
+
+// Precedence ignoring builds on both sides: the numeric part of a range
+// comparison, where a build is a channel filter rather than part of the bound.
+export const compareWithoutBuild = (a, b) =>
+  compareNumbers(a.major, b.major) ||
+  compareNumbers(a.minor, b.minor) ||
+  compareNumbers(a.patch, b.patch) ||
+  compareParts(a.prerelease, b.prerelease)
 
 export class Version {
   constructor (version) {
@@ -163,15 +216,26 @@ export class Version {
     // Split off an optional context (`npm:react@1.2.3`) before parsing the
     // version core. Context is identity, not ordering: it never participates in
     // precedence, so `version`/`raw` and every comparison stay on the bare core.
-    const { context, rest } = splitReference(version)
+    let context = null
+    let rest = version
+    if (typeof version === 'string' && version.indexOf('@') !== -1) {
+      ({ context, rest } = splitReference(version))
+    }
     this.context = context
-    const parts = parseVersion(rest)
-    this.major = validMajor(+parts[1])
-    this.minor = validMinor(+parts[2])
-    this.patch = validPatch(+parts[3])
-    this.prerelease = parsePrerelease(parts[4])
-    this.build = parseBuild(parts[5])
-    return this.format()
+    validVersion(rest)
+    // Only pay for trim() when there is surrounding whitespace.
+    const str = rest.length && (isSpace(rest.charCodeAt(0)) || isSpace(rest.charCodeAt(rest.length - 1)))
+      ? rest.trim()
+      : rest
+    const parts = scan(str, rest)
+    this.major = validMajor(parts.major)
+    this.minor = validMinor(parts.minor)
+    this.patch = validPatch(parts.patch)
+    this.prerelease = parts.prerelease
+    this.build = parts.build
+    // A string that scans is already in normal form, so it is the version.
+    this.raw = this.version = str
+    this.reference = context ? `${context}@${str}` : str
   }
 
   toString () {
@@ -200,49 +264,12 @@ export class Version {
       return 0
     }
     return (
-      compareIdentifiers(this.major, other.major) ||
-      compareIdentifiers(this.minor, other.minor) ||
-      compareIdentifiers(this.patch, other.patch) ||
+      compareNumbers(this.major, other.major) ||
+      compareNumbers(this.minor, other.minor) ||
+      compareNumbers(this.patch, other.patch) ||
       compareParts(this.prerelease, other.prerelease) ||
       compareBuild(this.build, other.build)
     )
-  }
-
-  #setPrerelease = (identifier, base) => {
-    const change = Number(base) ? 1 : 0
-    if (!identifier && base === false) {
-      throw new TypeError('Invalid increment argument: Identifier is empty.')
-    }
-    if (this.prerelease.length === 0) {
-      this.prerelease = [change]
-    } else {
-      let i = this.prerelease.length
-      while (--i >= 0) {
-        if (typeof this.prerelease[i] === 'number') {
-          this.prerelease[i]++
-          i = -2
-        }
-      }
-      if (i === -1) {
-        if (identifier === this.prerelease.join('.') && base === false) {
-          throw new TypeError('Invalid increment argument: Identifier already exists.')
-        }
-        this.prerelease.push(change)
-      }
-    }
-    if (identifier) {
-      let prerelease = [identifier, change]
-      if (base === false) {
-        prerelease = [identifier]
-      }
-      if (compareIdentifiers(this.prerelease[0], identifier) === 0) {
-        if (isNaN(this.prerelease[1])) {
-          this.prerelease = prerelease
-        }
-      } else {
-        this.prerelease = prerelease
-      }
-    }
   }
 
   incrementMajor () {
@@ -274,27 +301,27 @@ export class Version {
     this.patch = 0
     this.minor = 0
     this.major++
-    this.#setPrerelease(identifier, base)
+    setPrerelease(this, identifier, base)
   }
 
   incrementPreminor (identifier, base) {
     this.prerelease.length = 0
     this.patch = 0
     this.minor++
-    this.#setPrerelease(identifier, base)
+    setPrerelease(this, identifier, base)
   }
 
   incrementPrepatch (identifier, base) {
     this.prerelease.length = 0
     this.increment('patch', identifier, base)
-    this.#setPrerelease(identifier, base)
+    setPrerelease(this, identifier, base)
   }
 
   incrementPrerelease (identifier, base) {
     if (this.prerelease.length === 0) {
       this.increment('patch', identifier, base)
     }
-    this.#setPrerelease(identifier, base)
+    setPrerelease(this, identifier, base)
   }
 
   inc (release, identifier, base) {
@@ -330,5 +357,45 @@ export class Version {
     }
     this.raw = this.format()
     return this
+  }
+}
+
+// Shared by the pre-* increments. A module function rather than a method (or a
+// private #method, which needs ES2022), so constructing a Version allocates no
+// closure and the library runs on ES2020 engines.
+function setPrerelease (version, identifier, base) {
+  const change = Number(base) ? 1 : 0
+  if (!identifier && base === false) {
+    throw new TypeError('Invalid increment argument: Identifier is empty.')
+  }
+  if (version.prerelease.length === 0) {
+    version.prerelease = [change]
+  } else {
+    let i = version.prerelease.length
+    while (--i >= 0) {
+      if (typeof version.prerelease[i] === 'number') {
+        version.prerelease[i]++
+        i = -2
+      }
+    }
+    if (i === -1) {
+      if (identifier === version.prerelease.join('.') && base === false) {
+        throw new TypeError('Invalid increment argument: Identifier already exists.')
+      }
+      version.prerelease.push(change)
+    }
+  }
+  if (identifier) {
+    let prerelease = [identifier, change]
+    if (base === false) {
+      prerelease = [identifier]
+    }
+    if (compareIdentifiers(version.prerelease[0], identifier) === 0) {
+      if (isNaN(version.prerelease[1])) {
+        version.prerelease = prerelease
+      }
+    } else {
+      version.prerelease = prerelease
+    }
   }
 }

@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "semantic-versions"
+version = "1.0.0"
+description = "Parse, compare and match versions per the Semantic Versions specification (semver.xyz)"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.9"
+keywords = ["semver", "semantic versioning", "version", "range", "npm"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Operating System :: OS Independent",
+  "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://semver.xyz/libraries/#python"
+Repository = "https://github.com/vltpkg/semantic-versions"
+Specification = "https://semver.xyz/spec/"
+
+[project.optional-dependencies]
+bench = ["node-semver", "semver"]
+
+[tool.setuptools.package-data]
+semantic_versions = ["py.typed"]

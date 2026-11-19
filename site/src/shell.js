@@ -5,14 +5,51 @@
 // Current published version of the specification, shown in the nav and footer.
 const SPEC_VERSION = "1.0.0";
 
+// Icons for the Spec menu (16px, 1.5 stroke, currentColor).
+const ICON = (d) =>
+  `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const ICONS = {
+  spec: ICON('<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/>'),
+  grammar: ICON('<path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h1"/><path d="M16 21h1a2 2 0 0 0 2-2v-5a2 2 0 0 1 2-2 2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/>'),
+  variants: ICON('<path d="m12 3 9 4.5-9 4.5-9-4.5z"/><path d="m3 12 9 4.5 9-4.5"/><path d="m3 16.5 9 4.5 9-4.5"/>'),
+  integrity: ICON('<path d="M12 3 4 6v6c0 4.4 3.4 8.2 8 9 4.6-.8 8-4.6 8-9V6z"/><path d="m9 12 2 2 4-4"/>'),
+  locks: ICON('<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'),
+  extensions: ICON('<rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/>'),
+};
+
+// The Spec menu groups the specification with what is defined on top of it.
+const SPEC_MENU = {
+  label: "Spec",
+  badge: SPEC_VERSION,
+  featured: {
+    href: "/spec/",
+    icon: "spec",
+    title: "Specification",
+    desc: "Versions, precedence, sets, ranges and channels",
+  },
+  items: [
+    { href: "/grammar/", icon: "grammar", title: "Grammar", desc: "BNF forms and the reference parser" },
+    { href: "/extensions/variants/", icon: "variants", title: "Build Variants", desc: "Which artifact: os, arch and abi targets" },
+    { href: "/extensions/integrity/", icon: "integrity", title: "Package Integrity", desc: "Which bytes: a digest in the version" },
+    { href: "/extensions/dependency-locks/", icon: "locks", title: "Dependency Locks", desc: "Which graph: a pinned subgraph" },
+  ],
+  footer: { href: "/extensions/", icon: "extensions", title: "All extensions" },
+};
+
+// Then the case for the spec, background, and the one action ("Try", a pill
+// next to the theme toggle and GitHub link).
 const NAV = [
-  { href: "/spec/", label: "Spec", badge: SPEC_VERSION },
-  { href: "/extensions/", label: "Extensions" },
-  { href: "/grammar/", label: "Grammar" },
-  { href: "/selector/", label: "Try" },
   { href: "/proposal/", label: "Proposal" },
+  { href: "/libraries/", label: "Libraries" },
   { href: "/origin/", label: "History" },
   { href: "/faq/", label: "FAQ" },
+  { href: "/selector/", label: "Try", cta: true },
+];
+
+const SPEC_PATHS = [
+  SPEC_MENU.featured.href,
+  ...SPEC_MENU.items.map((i) => i.href),
+  SPEC_MENU.footer.href,
 ];
 
 // Apply a previously chosen theme as early as possible (visitors without an
@@ -47,13 +84,60 @@ function isActive(href) {
   return path.startsWith(href);
 }
 
+const CHEVRON = `<svg class="nav-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 6 4 4 4-4"/></svg>`;
+
+function renderSpecMenu() {
+  const m = SPEC_MENU;
+  const active = SPEC_PATHS.some(isActive);
+  const item = (i, cls) => {
+    const current = isActive(i.href) && (i.href !== "/extensions/" || location.pathname.replace(/index\.html$/, "") === "/extensions/");
+    return `<a class="${cls}${current ? " current" : ""}" href="${i.href}"${current ? ' aria-current="page"' : ""}>
+            <span class="menu-icon">${ICONS[i.icon]}</span>
+            <span class="menu-text"><span class="menu-title">${i.title}${
+              i === m.featured ? ` <span class="nav-ver">${m.badge}</span>` : ""
+            }</span>${i.desc ? `<span class="menu-desc">${i.desc}</span>` : ""}</span>
+          </a>`;
+  };
+  return `
+        <div class="nav-menu" data-nav-menu>
+          <button class="nav-menu-trigger${active ? " active" : ""}" type="button" aria-expanded="false" aria-controls="spec-menu">
+            ${m.label} <span class="nav-ver" aria-label="version ${m.badge}">${m.badge}</span>${CHEVRON}
+          </button>
+          <div class="nav-panel" id="spec-menu" hidden>
+            ${item(m.featured, "menu-item menu-featured")}
+            <div class="menu-grid">
+              ${m.items.map((i) => item(i, "menu-item")).join("")}
+            </div>
+            <a class="menu-footer" href="${m.footer.href}">${ICONS[m.footer.icon]}<span>${m.footer.title}</span><span aria-hidden="true">→</span></a>
+          </div>
+        </div>`;
+}
+
+function renderMobileSpec() {
+  const m = SPEC_MENU;
+  const all = [m.featured, ...m.items, m.footer];
+  return `<div class="mobile-group">
+          <div class="mobile-group-label">${m.label} <span class="nav-ver">${m.badge}</span></div>
+          ${all
+            .map(
+              (i) =>
+                `<a href="${i.href}"${isActive(i.href) && (i.href !== "/extensions/" || location.pathname.replace(/index\.html$/, "") === "/extensions/") ? ' class="active" aria-current="page"' : ""}><span class="menu-icon">${ICONS[i.icon]}</span>${i.title}</a>`,
+            )
+            .join("")}
+        </div>`;
+}
+
 function renderNav() {
-  const links = NAV.map(
-    (n) =>
-      `<a href="${n.href}"${isActive(n.href) ? ' class="active"' : ""}>${n.label}${
-        n.badge ? ` <span class="nav-ver" aria-label="version ${n.badge}">${n.badge}</span>` : ""
-      }</a>`,
-  ).join("");
+  const link = (n, { pill = false } = {}) => {
+    const cls = [isActive(n.href) && "active", pill && n.cta && "nav-cta"].filter(Boolean);
+    const badge = n.badge
+      ? ` <span class="nav-ver" aria-label="version ${n.badge}">${n.badge}</span>`
+      : "";
+    const current = isActive(n.href) ? ' aria-current="page"' : "";
+    return `<a href="${n.href}"${cls.length ? ` class="${cls.join(" ")}"` : ""}${current}>${n.label}${badge}</a>`;
+  };
+  const links = NAV.map((n) => link(n, { pill: true })).join("");
+  const mobileLinks = NAV.map((n) => link(n)).join("");
 
   return `
     <header class="nav">
@@ -61,13 +145,15 @@ function renderNav() {
         <span class="brand-word"><span class="brand-name">semver</span><span class="brand-tld">.xyz</span></span>
       </a>
       <nav class="nav-links">
+        ${renderSpecMenu()}
         ${links}
         ${THEME_TOGGLE}
         <a href="https://github.com/vltpkg/semantic-versions" class="nav-cta nav-cta-icon" target="_blank" rel="noopener" aria-label="GitHub repository" title="GitHub repository">${GITHUB_MARK}</a>
         <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobile-nav">${MENU_ICON}</button>
       </nav>
       <div class="mobile-nav" id="mobile-nav" hidden>
-        ${links}
+        ${renderMobileSpec()}
+        ${mobileLinks}
       </div>
     </header>`;
 }
@@ -289,6 +375,48 @@ function initMobileNav() {
   });
 }
 
+// The Spec dropdown: opens on hover (with a short close delay so the pointer
+// can travel to the panel) for fine pointers, and on click / Enter / Space
+// everywhere. Escape or a click outside closes it.
+function initNavMenu() {
+  document.querySelectorAll("[data-nav-menu]").forEach((menu) => {
+    const trigger = menu.querySelector(".nav-menu-trigger");
+    const panel = menu.querySelector(".nav-panel");
+    if (!trigger || !panel) return;
+    let closeTimer = 0;
+    const hoverable = window.matchMedia("(hover: hover) and (pointer: fine)");
+
+    const setOpen = (open) => {
+      clearTimeout(closeTimer);
+      trigger.setAttribute("aria-expanded", String(open));
+      panel.hidden = !open;
+      menu.classList.toggle("open", open);
+    };
+    const isOpen = () => trigger.getAttribute("aria-expanded") === "true";
+
+    trigger.addEventListener("click", () => setOpen(!isOpen()));
+    menu.addEventListener("pointerenter", (e) => {
+      if (e.pointerType === "mouse" && hoverable.matches) setOpen(true);
+    });
+    menu.addEventListener("pointerleave", (e) => {
+      if (e.pointerType !== "mouse" || !hoverable.matches) return;
+      closeTimer = setTimeout(() => setOpen(false), 140);
+    });
+    menu.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && isOpen()) {
+        setOpen(false);
+        trigger.focus();
+      }
+    });
+    menu.addEventListener("focusout", (e) => {
+      if (!menu.contains(e.relatedTarget)) setOpen(false);
+    });
+    document.addEventListener("click", (e) => {
+      if (isOpen() && !menu.contains(e.target)) setOpen(false);
+    });
+  });
+}
+
 // Highlight the table-of-contents entry for the section currently in view.
 function initTOC() {
   const links = [...document.querySelectorAll(".toc a")];
@@ -317,6 +445,7 @@ function initTOC() {
 mountChrome();
 initTheme();
 initMobileNav();
+initNavMenu();
 initReveal();
 initCopy();
 initHeadingAnchors();
