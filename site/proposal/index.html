@@ -28,17 +28,17 @@
     <main>
       <section class="page-hero reveal">
         <p class="eyebrow">Proposal</p>
-        <h1>Offered as <span class="grad">Semantic Versioning 3.0.0</span></h1>
+        <h1>A path to <span class="grad">Semantic Versioning 3.0.0</span></h1>
         <p class="lead">
           <strong>Semantic Versions</strong> ships as its own <code>1.0.0</code>, but the ambition is
           bigger than that. We think it makes a good candidate for the next version of
           <a href="https://semver.org/" target="_blank" rel="noopener">Semantic Versioning</a>: the
-          <code>3.0.0</code> that semver.org never got around to. Either way the spec stands on its
+          <code>3.0.0</code> that semver.org never got around to. We haven&rsquo;t opened a pull
+          request upstream; if there is enough interest, we will. Either way the spec stands on its
           own, so you can pick it up today whether or not that ever happens.
         </p>
         <div class="hero-actions">
-          <!-- TODO: swap in the real semver.org PR URL once the pull request is opened. -->
-          <a class="btn btn-primary" href="https://github.com/semver/semver" target="_blank" rel="noopener">View the proposal on GitHub</a>
+          <a class="btn btn-primary" href="https://github.com/vltpkg/semantic-versions/issues/new?title=Interest%3A%20upstream%20Semantic%20Versions%20as%20Semantic%20Versioning%203.0.0" target="_blank" rel="noopener">Tell us you&rsquo;d like it upstream</a>
           <a class="btn btn-ghost" href="#compare">See what changes vs 2.0.0</a>
         </div>
       </section>
@@ -150,15 +150,19 @@
         <div class="doc-status reveal">
           <p class="eyebrow">Where it stands</p>
           <p>
-            We are realistic about the odds. Semantic Versioning <code>2.0.0</code> has not
-            meaningfully changed in over a decade and there is no obvious route to a
-            <code>3.0.0</code>, so there is no guarantee the maintainers at
-            <a href="https://semver.org/" target="_blank" rel="noopener">semver.org</a> take any of
-            this on. That is the whole reason <strong>Semantic Versions</strong> has its own name and
-            its own version: it is a finished spec you can use right now, with a
-            <a href="https://github.com/vltpkg/semantic-versions" target="_blank" rel="noopener">reference parser</a>
-            to match. If the proposal goes somewhere, it is the basis for <code>3.0.0</code>. If it
-            does not, nothing here changes and you can still build on it.
+            We haven&rsquo;t proposed this to
+            <a href="https://github.com/semver/semver" target="_blank" rel="noopener">semver/semver</a>,
+            and we aren&rsquo;t opening a pull request for now. Semantic Versioning
+            <code>2.0.0</code> has not meaningfully changed in over a decade, there is no obvious
+            route to a <code>3.0.0</code>, and the last attempt to add ranges
+            (<a href="https://github.com/semver/semver/pull/584" target="_blank" rel="noopener">#584</a>)
+            stalled. If there is enough interest from package managers, registries and the people who
+            maintain them, we will open that pull request and offer this as the basis for
+            <code>3.0.0</code>; <a href="https://github.com/vltpkg/semantic-versions/issues/new?title=Interest%3A%20upstream%20Semantic%20Versions%20as%20Semantic%20Versioning%203.0.0" target="_blank" rel="noopener">say so in the repository</a>.
+            Until then, <strong>Semantic Versions</strong> keeps its own name and its own version: a
+            finished spec you can use right now, with
+            <a href="/libraries/">libraries in eight languages</a> to match. Nothing here depends on
+            semver.org taking it on.
           </p>
         </div>
       </section>
