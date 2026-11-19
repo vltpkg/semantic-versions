@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative "lib/semantic_versions"
+require_relative "lib/semantic_versions/version"
 
 Gem::Specification.new do |spec|
   spec.name = "semantic-versions"

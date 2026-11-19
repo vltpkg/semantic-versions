@@ -3,8 +3,9 @@
 # Parse, compare and match versions per the Semantic Versions specification
 # (https://semver.xyz). A port of the JavaScript reference implementation
 # (semantic-versions on npm), checked against the same conformance suite.
+require_relative "semantic_versions/version"
+
 module SemanticVersions
-  VERSION = "1.0.0"
   MAX_LENGTH = 256
   MAX_SAFE_INTEGER = 9_007_199_254_740_991
 
@@ -92,9 +93,17 @@ module SemanticVersions
       @context = context
     end
 
-    def major = @key[0]
-    def minor = @key[1]
-    def patch = @key[2]
+    def major
+      @key[0]
+    end
+
+    def minor
+      @key[1]
+    end
+
+    def patch
+      @key[2]
+    end
 
     # Parse a version, optionally context-qualified ("npm:react@1.2.3").
     # There is no coercion: "v1.2.3" and "1.2" raise InvalidVersion.
