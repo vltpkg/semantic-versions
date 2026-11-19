@@ -101,6 +101,7 @@ and the OpenSSF discussion on why publishing a shrinkwrap is
 | **Where it lives** | Inline in the version, as standard SemVer build metadata: `source:name@version+lock.<payload>` |
 | **What it encodes** | A resolved dependency graph: nodes (package instances) + typed edges |
 | **Who creates it** | Maintainers or tooling generate it from a resolved dependency closure |
+| **Node identity** | A source-qualified version, optionally carrying [variant](../variants/variants.md) coordinates and a [Package Integrity](../integrity/integrity.md) digest: `npm:sharp@0.33.0+linux.x64.musl.sha512.a91c…` |
 | **Payload** | A compact, deterministic binary graph → Brotli → frame byte → Base62 |
 | **Identity** | `SHA-256` over the canonical graph (the *lock digest*) |
 | **Semantics** | If honored, supplies resolved dependency targets for one rooted subgraph before user-level config is applied |
@@ -194,6 +195,22 @@ filters, and install mode can modify, reject, or ignore the locked result.
 tarball integrity. The package manager’s normal metadata, lockfile, and fetch pipeline
 remain responsible for enforcing artifact integrity; the lock’s digests are an optional
 pre-flight check, not the security boundary.
+
+2.7. **A lock introduces no new way to name a package.** Dependency Locks is the third of
+three extensions and it builds on the other two: a node is written as a source-qualified
+version carrying [Build Variant](../variants/variants.md) coordinates (where the node is
+target-specific) followed by a [Package Integrity](../integrity/integrity.md) digest, in
+that order.
+
+```txt
+npm:sharp@0.33.0+linux.x64.musl.sha512.a91c…
+              └─ variant ──┘└── integrity ──┘
+```
+
+Every decoded node is therefore a specifier you could paste into a manifest on its own.
+(Earlier drafts rendered node integrity as `@1.32.0#sha512-<base64>`; that form is
+withdrawn, because `#` and Base64's `+`/`/`/`=` are not legal build metadata, so it was
+not a version.)
 
 ---
 
@@ -291,6 +308,23 @@ or honor Dependency Locks.
 The one true incompatibility is a parser that **rejects** build metadata rather than
 ignoring it — then even the bare version can fail. Where a parser can’t be updated, a
 **sidecar** can carry the same graph outside the version string.
+
+There is also a hard **length ceiling**: `node-semver` caps a version string at 256
+characters, which leaves ~245 for the payload — measured, about ten nodes without
+integrity, or two or three carrying `sha512`. Beyond the cap npm silently reclassifies the
+specifier as a *range* and drops the lock from resolution (the install still succeeds on the
+bare version), so an oversized inline lock is quietly inert rather than an error. Inline is
+the optimization for small closures; the sidecar is the general transport. See
+[spec §12.5](./dependency-locks-spec.md#125-the-256-character-ceiling-measured-normative).
+
+Outside npm the inline form may be unavailable entirely rather than merely tight. Python is
+the worked example: PEP 440 treats the `+…` slot as a *local version identifier*, lowercases
+it (which destroys a Base62 payload), requires resolvers to ignore it when matching
+specifiers, and PyPI refuses to accept it at all. For such ecosystems the sidecar is the
+only transport, and what carries over is the graph model and notation rather than the
+in-version encoding. Measurements and the per-manager fidelity findings — including which
+parts of npm, pnpm, yarn, vlt and uv lockfiles a lock can and cannot round-trip — are in
+[spec Appendix E](./dependency-locks-spec.md#appendix-e--subgraph-fidelity-audit-measured).
 
 ---
 

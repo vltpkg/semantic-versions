@@ -87,9 +87,21 @@ The key words **MUST**, **MUST NOT**, **REQUIRED**, **SHALL**, **SHOULD**,
   for a package's distributed artifact (tarball). Dependency Locks do not replace it.
 
 A **resolved package instance** is the unit identified by the tuple
-`(source, name, version, resolution-context)`. Two dependents that resolve the same package
+`(source, name, version, context)`. Two dependents that resolve the same package
 to the same tuple share one node; if resolution differs (e.g. different peer
 context forcing a different version) they are distinct nodes.
+
+- **Context** — an opaque, producer-supplied string that distinguishes two instances of
+  the *same* `(source, name, version)` that a resolver deliberately kept apart. It is
+  empty for the overwhelmingly common single-instance case. A producer sets it to
+  whatever its resolver already uses for this purpose: pnpm's peer suffix
+  (`react@18.2.0(redux@5.0.0)` → context `(redux@5.0.0)`), vlt's Dependency-ID extra
+  field, or a bare ordinal. Consumers **MUST** treat it as an opaque identity
+  discriminator and **MUST NOT** parse it — its only required property is that
+  `(source, name, version, context)` is unique within a lock (§7.2). Without it the
+  peer-duplication the format claims to encode (§4.9) would have no total order, and two
+  encoders could assign different `node_id`s to the same graph and so produce different
+  lock digests.
 
 ---
 
@@ -473,6 +485,29 @@ Decoders MUST verify `len(digest)` matches the algorithm's fixed length and reje
 otherwise. Digests are sorted ascending by `(algo, digest-bytes)` and de-duplicated
 for determinism.
 
+**Textual rendering (normative).** On the wire a digest is raw bytes, but whenever a
+node is *displayed* — a decoded-graph dump, a diff, a log line, an error message — its
+digest **MUST** be rendered in
+[Package Integrity](../integrity/integrity.md) form as build metadata on the node's
+version:
+
+```txt
+<source>:<name>@<version>+<algorithm>.<digest>
+npm:lightningcss@1.32.0+sha512.357601ce29cd…
+```
+
+`<algorithm>` and `<digest>` are the same two dot-separated build identifiers Package
+Integrity defines, with `<digest>` in lowercase hex. Earlier drafts of this document
+rendered node integrity as `…@<version>#sha512-<base64>`, borrowing npm's SRI
+spelling. That form is **withdrawn**: `#` is not a build-metadata character, `+`/`/`/`=`
+from Base64 are not either, and the result was not a version you could paste anywhere.
+The Package Integrity form is a legal SemVer version, so a rendered node is a
+*specifier in its own right* rather than lock-specific notation. Where a node also
+carries variant coordinates, they precede the digest per
+[Build Variants](../variants/variants.md) —
+`npm:sharp@0.33.0+linux.x64.musl.sha512.a91c…`. The transcoding between npm's
+`sha512-<base64>` and `sha512.<hex>` is lossless in both directions.
+
 ### 4.7 Condition table
 
 Platform/runtime conditions gate optional or platform-specific nodes/edges (e.g.
@@ -529,6 +564,7 @@ NodeRecord :=
     [ source_id : uvarint ] ; present iff FLAG_HAS_SOURCE
     [ digest_id : uvarint ] ; present iff FLAG_HAS_INTEGRITY
     [ cond_id   : uvarint ] ; present iff FLAG_HAS_CONDITION
+    [ ctx_id    : uvarint ] ; present iff FLAG_HAS_CONTEXT
 ```
 
 Node `flags` (`u8`):
@@ -541,14 +577,24 @@ Node `flags` (`u8`):
 | 3   | `FLAG_OPTIONAL`     | This instance is optional (failure to fetch is non-fatal).    |
 | 4   | `FLAG_DEV_ONLY`     | Instance is reachable only via dev edges (informational).     |
 | 5   | `FLAG_BUNDLED`      | Artifact is bundled inside its parent; no separate fetch.     |
-| 6–7 | reserved            | MUST be 0.                                                     |
+| 6   | `FLAG_HAS_CONTEXT`  | `ctx_id` field present (§2 *context*). If clear ⇒ empty context.|
+| 7   | reserved            | MUST be 0.                                                     |
 
 Optional fields are present **only** when their flag is set, so the steady-state
-node (default registry, unconditional) costs `name_id + ver_id + flags` ≈ 3–5 bytes
-pre-compression before any optional source, digest, or condition fields.
+node (default registry, unconditional, single-instance) costs
+`name_id + ver_id + flags` ≈ 3–5 bytes pre-compression before any optional source,
+digest, condition, or context fields.
 
 The **resolved version** (`ver_id`) is always an exact version, never a range. A lock
 encodes the *result* of resolution, not constraints.
+
+**Instance uniqueness (REQUIRED).** `(name_id, ver_id, source_id, ctx_id)` **MUST** be
+unique across the `NodeTable`. Two nodes that a resolver kept apart — the classic peer
+"virtual store" duplication — therefore **MUST** carry distinct `ctx_id` values;
+`FLAG_HAS_CONTEXT` is what makes such a pair representable at all, and what gives the
+canonical node order (§7.2) a total order. Encoders **MUST** reject a graph containing
+two same-`(name, version, source)` instances with equal context, because the resulting
+blob would depend on input order rather than on the graph.
 
 ### 4.9 Edge section
 
@@ -699,11 +745,15 @@ FrontCodedName :=
     suffix : bytes      ; the remaining suffix (length-prefixed UTF-8)
 ```
 
-**Canonical order (REQUIRED).** Nodes are sorted by `(name-bytes, version-bytes)` as in
-§7.2, assigning `node_id`. The `NameTable` is the deduped set of node names sorted
-bytewise and front-coded against the previous entry. Within each node's edge group,
-edges are sorted by `(to_id, type, alias_id)`; targets are delta+zigzag coded against
-the group's `from_id`, then the previous target, exactly as §4.9.
+**Canonical order (REQUIRED).** Nodes are sorted by the full §7.2 key — leading with
+`(name-bytes, version-bytes)` and broken by `source_id`, then `context` — assigning
+`node_id`. The `NameTable` is the deduped set of **node names *and* edge alias names**,
+sorted bytewise and front-coded against the previous entry. Alias names must be in the
+table: an alias is by definition a name no node carries (`"lodash4": "npm:lodash@4"`
+aliases the node named `lodash`), so a table built from node names alone has no index to
+point `alias_ids` at and every real alias is silently lost on decode. Within each node's
+edge group, edges are sorted by `(to_id, type, alias_id)`; targets are delta+zigzag coded
+against the group's `from_id`, then the previous target, exactly as §4.9.
 
 **Structural-version escape.** If a resolved version is not of the shape
 `<num>.<num>.<num>[tail]`, the encoder stores `0,0,0` in the numeric columns and an
@@ -712,23 +762,50 @@ version on decode. Otherwise, when the tail is non-empty, the extra entry is the
 tail — `"-" pre`, `"+" build`, or `"-" pre "+" build` — appended to `major.minor.patch`
 to reconstruct the string.
 
-**Non-default profile.** When `ALL_DEFAULT` is clear, the lock carries optional per-node
-**integrity** (`DigestTable`, §4.6) and/or **conditions** (`ConditionTable`, §4.7). The
-byte layout extends `Blob2` as follows (only the additions to the `ALL_DEFAULT` layout
-above are shown):
+**Non-default profile.** When `ALL_DEFAULT` is clear, the lock carries any combination of
+per-node **sources** (`SourceTable`, §4.5), **integrity** (`DigestTable`, §4.6),
+**conditions** (`ConditionTable`, §4.7) and **contexts** (§2, §4.8). The byte layout
+extends `Blob2` as follows (only the additions to the `ALL_DEFAULT` layout above are
+shown):
 
 ```text
-    ...ExtraPool...                               ; also holds condition-value strings
+    ...ExtraPool...                               ; also holds condition-value and context strings
+    source_count : uvarint
+    SourceTable  : source_count * SourceEntry     ; kind u8, ref uvarint → ExtraPool (§4.5)
     digest_count : uvarint
     DigestTable  : digest_count * DigestEntry     ; algo u8, len uvarint, raw bytes (§4.6)
     cond_count   : uvarint
     ConditionTable : cond_count * ConditionSet    ; set 0 = "always"; preds (axis,op,value) (§4.7)
     ...name_ids, majors, minors, patches, extras  ; version columns, unchanged
-    flags        : node_count * u8                ; node flags (§4.8): bit1=integrity, bit2=condition
+    flags        : node_count * u8                ; node flags (§4.8)
+    source_ids   : (#source nodes) * uvarint      ; node_id order, only where flag bit 0 is set
     digest_ids   : (#integrity nodes) * uvarint   ; node_id order, only where flag bit 1 is set
-    cond_ids     : (#condition nodes) * uvarint    ; node_id order, only where flag bit 2 is set
-    ...edge section                               ; unchanged
+    cond_ids     : (#condition nodes) * uvarint   ; node_id order, only where flag bit 2 is set
+    ctx_ids      : (#context nodes) * uvarint     ; node_id order, only where flag bit 6 is set,
+                                                  ;   → ExtraPool index
+    ...out_degrees, targets, types, alias_ids     ; edge section, as above
+    edge_cond_ids : (#conditional edges) * uvarint ; edge emission order, only where a type
+                                                   ;   byte has bit 0x40 set (see below)
 ```
+
+Two clarifications the earlier draft left open:
+
+- **`SourceTable` placement.** §4.12 previously said only that source "stays implicitly
+  default … until a non-default source appears," without saying where the table goes when
+  one does. It is the first non-default table, before `DigestTable`, and each node's
+  `source_id` rides in its own column gated by node-flag bit 0. A `SourceEntry.ref`
+  indexes the shared `ExtraPool` (format 1's `StringTable` has no format-2 counterpart).
+  `ALL_DEFAULT` means precisely "no node sets **any** flag bit," so a graph that is
+  default-registry but carries, say, `FLAG_BUNDLED` also takes this profile.
+- **Edge conditions.** §4.7 and §7.7 both speak of conditions gating "nodes/edges," but
+  no `EdgeRecord` field ever carried one. Format 2 adds it: an edge's `type` byte uses
+  bit `0x40` as `HAS_CONDITION` (alongside `0x80` `HAS_ALIAS`, leaving bits 0–5 for the
+  type enum), and flagged edges append a `ConditionTable` index to `edge_cond_ids` in
+  edge emission order. This is not a nicety: node conditions express npm's package-level
+  `os`/`cpu`/`libc`, but a PEP 508 environment marker
+  (`requests ; python_version < "3.11"`) and a Cargo target-conditional dependency are
+  properties of the **edge**, and collapsing them onto the target node is wrong whenever
+  two dependents reach the same node under different markers.
 
 A `Predicate`'s `value` indexes the shared `ExtraPool` (the same pool that holds version
 tails), so condition strings — `os`/`cpu`/`libc` values and `engines` ranges — cost
@@ -736,10 +813,9 @@ nothing extra beyond the pool entry. Digests are stored as raw, length-prefixed 
 deduplicated, so platform-sibling packages that share no digest still each carry their
 own. **Integrity is advisory:** a consumer MAY use it as a pre-flight tamper-evidence
 check, but its package manager still verifies every fetched artifact independently (§6.7,
-§10). Source stays implicitly default — `FLAG_HAS_SOURCE` clear, no `SourceTable` — until
-a non-default source appears. The reference encoder (`site/src/lock/encode.js`) emits this
-profile whenever any node carries integrity or a platform condition, and the
-`ALL_DEFAULT` fast path otherwise.
+§10). The reference encoder
+(`site/extensions/dependency-locks/lock/encode.js`) emits this profile whenever any node
+sets a flag bit, and the `ALL_DEFAULT` fast path otherwise.
 
 > **Size note.** Digest bytes are effectively random and do **not** compress, so embedding
 > a sha512 per node adds ~64 raw bytes (~86 Base62 chars) each — often dwarfing the rest of
@@ -954,7 +1030,9 @@ Formally, a lock is a tuple `G = (N, E, root, sources, conditions)` where:
 - **Is this an installation graph?** No — layout is not encoded (§6.2).
 - **Are peer dependency placements encoded?** Yes — as concrete `peer`/`peer-opt`
   edges to specific instances (§4.9). The lock captures the resolver's peer
-  decisions, including context-dependent duplication.
+  decisions, including context-dependent duplication, which requires each duplicated
+  instance to carry a distinct **context** (§2, §4.8) so the pair is both representable
+  and canonically ordered.
 - **Are platform-specific nodes encoded?** Yes — via the condition table and the
   per-node/edge condition reference (§4.7, §4.8). A node that applies only on
   `os=linux,cpu=arm64` carries that condition; consumers prune unsatisfied nodes per
@@ -1049,10 +1127,10 @@ to/from its native graph mechanically:
 
 | vlt graph lockfile concept | This spec (§4) |
 |----------------------------|----------------|
-| **Node** keyed by a *Dependency ID* that encodes the **source/type** (registry, git, workspace, file, remote) together with package identity | A **node** is a resolved instance identified by `(source, name, version, resolution context)`; `source` carries the type/registry (§4.5) |
-| Node carries **name**, resolved location, and flags | Node carries `name_id`, `ver_id`, `source_id` (resolved location), optional `digest_id`, and `flags` (§4.8) |
-| **Edge** keyed by *(dependent, dependency-name)*, valued by *(type, spec, target node)* | An **edge** is `(from_id, name_id, to_id, type)` (§4.9); the original *range spec* is a publish-time input, not stored (a lock records the resolved result) |
-| Graph is the **source-aware identity** unit (the same name+version from different sources are distinct) | Same: node identity includes `source` and resolution context, so duplicates across sources/peer-contexts are distinct nodes |
+| **Node** keyed by a *Dependency ID* that encodes the **source/type** (registry, git, workspace, file, remote) together with package identity, plus a peer-context suffix (`~npm~tap@16.3.10~peer.1`) | A **node** is a resolved instance identified by `(source, name, version, context)`; `source` carries the type/registry (§4.5) and `context` (§2, §4.8) is the direct counterpart of vlt's `~peer.N` suffix |
+| Node carries **name**, resolved location, and flags | Node carries `name_id`, `ver_id`, `source_id` (resolved location), optional `digest_id`, `cond_id`, `ctx_id`, and `flags` (§4.8) |
+| **Edge** keyed by *(dependent, dependency-name)*, valued by *(type, spec, target node)* | An **edge** is `(from_id, name_id, to_id, type)` (§4.9). **The declared range spec is not stored** — vlt keeps it (`"dev ^8.0.0 ~npm~vite@8.2.1~peer.4"`) and a lock does not, which is a real subtraction rather than a difference in kind; see Appendix E.3.1 for what a consumer loses |
+| Graph is the **source-aware identity** unit (the same name+version from different sources are distinct) | Same: node identity includes `source` and `context`, so duplicates across sources/peer-contexts are distinct nodes |
 
 Three deliberate differences from a full native lockfile like vlt's:
 
@@ -1072,6 +1150,46 @@ This mapping is why vlt is a natural first-class consumer: absorbing a lock is l
 "decode the canonical graph → emit nodes/edges into the native graph lockfile" (§6.6).
 The binary format (§4) is just a compact, deterministic, language-neutral serialization
 of the same nodes-and-edges idea vlt's JSON lockfile expresses in text.
+
+The correspondence was measured field-by-field against a real `vlt-lock.json` rather than
+asserted; **Appendix E** records the result, including the per-node metadata a lock does
+*not* carry (declared ranges, `bin` entries, install-script markers) and the one gap that
+needs a format extension rather than a clarification (a node can hold only one artifact,
+which Python's sdist-plus-many-wheels model breaks — E.3.2).
+
+### 6.9 Relationship to Build Variants and Package Integrity
+
+Dependency Locks is the **third** of the three Semantic Versions extensions, and it is
+third because it consumes the other two rather than competing with them. Each node in a
+lock is a version-with-build-metadata written in exactly the vocabulary the first two
+extensions define:
+
+| Extension | Question it answers | Contribution to a lock node |
+|-----------|--------------------|------------------------------|
+| [Build Variants](../variants/variants.md) | *Which artifact?* | Target coordinates (`os`, `arch`, `abi`, features) identifying a target-specific node |
+| [Package Integrity](../integrity/integrity.md) | *Which bytes?* | The `<algorithm>.<digest>` build identifiers of the node's digest (§4.6) |
+| **Dependency Locks** | *Which graph?* | The nodes and typed edges wiring those identities together |
+
+So a fully-qualified node renders as one legal version:
+
+```txt
+npm:sharp@0.33.0+linux.x64.musl.sha512.a91c…
+              └─ variant ──┘└── integrity ──┘
+```
+
+Two consequences worth stating normatively:
+
+1. **A lock introduces no new way to name a package.** A decoded node is a specifier a
+   consumer could paste into a manifest on its own. Implementations **SHOULD** render
+   nodes in this form (§4.6) rather than inventing a lock-local spelling.
+2. **Variant coordinates and conditions are different things and both are kept.** A
+   variant coordinate is a *fact about the artifact* ("this is the linux/x64/musl
+   build"); a `ConditionSet` (§4.7) is a *predicate gating installation* ("install only
+   where `os=linux`"). They frequently coincide — an npm platform-sibling package like
+   `sharp-linux-x64` is gated by exactly the coordinates that describe it — but they are
+   not interchangeable: `engines=>=18` is a condition with no variant reading, and a
+   variant-qualified node may be installed unconditionally. Encoders **MUST NOT** derive
+   one from the other silently.
 
 ---
 
@@ -1104,8 +1222,13 @@ and a non-canonical blob is a **malformed lock**:
   entries are strictly ascending by their byte ordering and contain no duplicates.
 - Source ID 0 (`default`) and Condition ID 0 (`always`), when used, are first.
 - Nodes are sorted ascending by the tuple
-  `(name-bytes, version-bytes, source_id, cond_id, optional-digest-bytes)`; this
-  ordering defines `node_id`.
+  `(name-bytes, version-bytes, source_id, context-bytes, cond_id,
+  optional-digest-bytes)`; this ordering defines `node_id`. Because
+  `(name, version, source_id, context)` is unique per §4.8, the first four components
+  alone are already a **total** order — the remaining components never have to break a
+  tie, and a blob whose node order depends on anything else (such as the producer's input
+  order) is not canonical.
+- `(name_id, ver_id, source_id, ctx_id)` is unique across nodes (§4.8).
 - Within each `EdgeGroup`, edges are sorted ascending by `(name_id, to_id, type)`.
 - No unused table entries (every string/source/digest/condition is referenced at
   least once), no unreachable nodes (every node ≠ root is reachable from root).
@@ -1113,12 +1236,22 @@ and a non-canonical blob is a **malformed lock**:
 
 The bullets above describe the **format-1** blob. For **format 2** (§4.12) the
 canonical rules are the analogous ones over its columnar layout: shortest-form varints;
-`NameTable` strictly ascending bytewise, deduped, and front-coded against the previous
-entry; nodes sorted by `(name-bytes, version-bytes)` (defining `node_id`); within each
-edge group, edges sorted by `(to_id, type, alias_id)` with targets delta+zigzag coded;
-every `NameTable`/`ExtraPool` entry referenced at least once; every non-root node
-reachable from the root. Format 2 has no `magic` and no `Trailer`, so those checks do
-not apply; the framed payload length bounds the blob.
+`NameTable` strictly ascending bytewise, deduped, front-coded against the previous entry,
+and covering **edge alias names as well as node names**; nodes sorted by the same key
+above, leading with `(name-bytes, version-bytes)` and broken by `source_id` then
+`context` (defining `node_id`); within each edge group, edges sorted by
+`(to_id, type, alias_id)` with targets delta+zigzag coded; every `NameTable`/`ExtraPool`
+entry referenced at least once; every non-root node reachable from the root. Format 2 has
+no `magic` and no `Trailer`, so those checks do not apply; the framed payload length
+bounds the blob.
+
+> **Why the node key must be total.** The canonical order *is* the `node_id` assignment,
+> and every edge is expressed in terms of `node_id`s, so an ordering that leaves two nodes
+> tied does not merely sort them arbitrarily — it makes the whole edge section
+> input-order-dependent. A graph with two deliberately-distinct instances of
+> `react@18.2.0` then encodes to two different blobs, hence two different lock digests,
+> which silently voids the equality, caching, and audit guarantees this section exists to
+> provide (§6.4). The `context` discriminator (§2) is what closes this.
 
 The **lock digest** is `SHA-256(canonical_blob)` — computed over the *decompressed*
 canonical bytes (not the frame byte, the compression, or the Base62 text), for whichever
@@ -1143,8 +1276,12 @@ format, not corruption):
 - Invalid UTF-8; mis-sorted or duplicated table entry.
 - Unknown enum value in a non-reserved-tolerant position; set reserved flag bit.
 - Digest length mismatch for its algorithm.
+- Two nodes sharing `(name, version, source_id, ctx_id)` (§4.8 instance uniqueness), or a
+  node order that does not match the §7.2 key.
+- An edge `alias_id` pointing at a name absent from the name table.
 - Header hint flag contradicts contents (e.g., `HAS_PEER_EDGES` set but no peer edge,
-  or clear but a peer edge exists).
+  or clear but a peer edge exists) — format 1 only; format 2 carries only `ALL_DEFAULT`,
+  which is a lie if any node flag byte is non-zero.
 - Cycle among non-`dev`/non-`optional` prod edges where the resolver model forbids it
   (see §7.6); unreachable node; unreferenced table entry.
 - Trailing bytes after `end_marker`; trailer checksum mismatch when present.
@@ -1632,15 +1769,16 @@ Notes:
 
 - The **small-library** case is dominated by fixed overhead (frame byte + magic +
   header + one digest); ~120 chars is the practical floor and is perfectly fine inline.
-- For **average packages** (~3 KB) inline embedding is reasonable.
+- Only the small-library row fits inline in the npm ecosystem. **Every other row exceeds
+  a hard 256-character parser limit** — see §12.5, which is the governing constraint on
+  this whole table.
 - For **large framework / application** closures (tens to ~150 KB of Base62), consumers
   SHOULD prefer the sidecar option (§8.5) or apply locks at smaller sub-roots rather
-  than one giant root lock. Beyond ergonomics, very long build-metadata strings risk
-  tripping length assumptions in some SemVer parsers (§5.5 caps input length), so the
-  sidecar is the safe home for oversized payloads.
+  than one giant root lock.
 - Optional digest metadata, when carried, scales ~linearly with distinct-package count.
   Omit it unless the package manager needs to preserve host-integrity metadata through the
   payload; artifact integrity is normally enforced by the native lockfile/fetch pipeline.
+  Under the §12.5 budget, omitting it is close to mandatory.
 
 ### 12.3 Levers to reduce size
 
@@ -1659,6 +1797,70 @@ resolution (which matches on the base version anyway), but tools that must disti
 *which* lock is in play SHOULD key on `(version, lock-digest)` (§7.2). This is the price
 of riding standard build metadata, and it is small.
 
+### 12.5 The 256-character ceiling (measured, normative)
+
+The estimates in §12.2 are governed by a hard limit that earlier drafts referred to only
+vaguely as "length assumptions in some SemVer parsers." It is worth stating exactly,
+because it is the single most restrictive practical constraint on inline locks.
+
+`node-semver` — the parser npm, and much of the JavaScript ecosystem, depends on — caps a
+version string at **256 characters** and a single build identifier at **250**
+(`MAX_LENGTH`, `MAX_SAFE_BUILD_LENGTH`). Measured against node-semver 7.8.4 and
+npm 11.17:
+
+| Version component | `semver.valid()` | `npm-package-arg` type |
+|-------------------|------------------|------------------------|
+| `1.2.3+lock.` + 244 chars (255 total) | `1.2.3` | `version` |
+| `1.2.3+lock.` + 245 chars (256 total) | `1.2.3` | `version` |
+| `1.2.3+lock.` + 246 chars (257 total) | `null`  | **`range`** |
+
+So for a `major.minor.patch` root the **payload budget is 245 Base62 characters**, ≈ 182
+bytes of framed payload. Measured with the reference format-2 encoder against live npm
+metadata (the `lock` marker costs 11–12 characters of the version component on top of the
+payload):
+
+| Root | Nodes | Edges | Integrity | Codec | Payload chars | Version component | ≤ 256? |
+|------|-------|-------|-----------|-------|---------------|-------------------|--------|
+| `left-pad@1.3.0` | 1 | 0 | off | raw 22 B | 31 | 42 | ✅ |
+| `left-pad@1.3.0` | 1 | 0 | `sha512` | raw 92 B | 125 | 136 | ✅ |
+| `lightningcss@1.33.0` | 13 | 12 | off | brotli 226 B | 305 | 317 | ❌ |
+| `lightningcss@1.33.0` | 13 | 12 | `sha512` | brotli 1120 B | 1506 | 1518 | ❌ |
+
+Two things fall out of these numbers. First, integrity is the dominant term by a factor of
+~5 — thirteen `sha512` digests are ~832 bytes of incompressible entropy sitting on a graph
+whose entire structure Brotli reduces to 226 bytes — so omitting it (§4.12's `ALL_DEFAULT`
+profile) is the single biggest lever, not a micro-optimization. Second, the practical inline
+ceiling is **lower than the cost model suggests**: a 13-node closure overruns the budget
+*even with integrity switched off*. Realistically inline locks hold **on the order of ten
+nodes without integrity, or two or three with `sha512`**.
+
+Crossing the limit is **not** a hard failure, which is exactly why it is easy to miss. At
+257 characters `npm-package-arg` silently reclassifies the specifier from `version` to
+`range`, and node-semver's range parser coerces it back to a bare `1.2.3`, discarding the
+build metadata. A measured end-to-end `npm install` of a 411-character lock-bearing
+version exits 0, installs `left-pad@1.3.0`, and preserves the full string verbatim in
+`package-lock.json` — the lock simply stops participating in resolution. That is the
+intended degradation floor (§9), but it means an oversized inline lock is **silently
+inert** rather than loudly rejected.
+
+Consequences for implementers:
+
+1. Producers targeting the npm ecosystem **MUST** keep the whole version component
+   ≤ 256 characters, and **SHOULD** enforce it at generation time rather than trusting
+   install to complain — it will not.
+2. Inline locks are therefore for **small closures**: a leaf library, a CLI with a handful
+   of dependencies, or a deliberately shallow sub-root. The "average npm package" row of
+   §12.2 (~60 nodes, ~3.1 KB) does **not** fit inline, and never did.
+3. Anything larger belongs in the sidecar (§8.5), which carries the identical canonical
+   payload with no length ceiling. The sidecar is not an exotic fallback; for most real
+   packages it is the primary transport, and inline is the optimization for small graphs.
+4. A greenfield manager not bound by node-semver (Appendix C) has no such limit;
+   ecosystems with their own version parsers should measure their own ceiling rather than
+   assume 256. That measurement can come back as *zero*: for Python the answer is not a
+   different ceiling but that the inline form is unusable at any length, because PEP 440
+   case-folds the `+…` label, PyPI refuses local version identifiers, and resolvers must
+   ignore them (**Appendix E.5**). Inline is an npm-ecosystem mechanism.
+
 ---
 
 ## 13. Reference Algorithms (Pseudocode)
@@ -1672,11 +1874,14 @@ guarantees over micro-optimization. Error returns are shown as `fail(Class, deta
 > the table/enum semantics. The **format-2** encoder (current) follows the columnar
 > layout of §4.12 — structural versions, edge-name elision, front-coded names, no
 > magic/trailer — and the codec auto-select of §5.3. See the reference implementation in
-> [`site/src/lock/encode.js`](./site/src/lock/encode.js) for a faithful format-2 encoder.
+> [`../../site/extensions/dependency-locks/lock/encode.js`](../../site/extensions/dependency-locks/lock/encode.js)
+> for a faithful format-2 encoder.
 
 ```text
 encode(G):                          # G: resolver output (instances + edges + root)
-    # 1. Intern strings (names, versions, edge names, source refs, condition values)
+    # 1. Intern strings. NOTE: "edge names" means every edge's declared dependency
+    #    name INCLUDING aliases, which are by construction names no node carries.
+    #    Interning only node names silently drops every alias (§4.12).
     strings = sorted_unique_bytewise(collect_all_strings(G))
     sidx    = index_map(strings)
 
@@ -1692,12 +1897,16 @@ encode(G):                          # G: resolver output (instances + edges + ro
     ensure_always_first(conds)                          # cond 0 == "always" if used
     cidx    = index_map(conds)
 
-    # 3. Canonical node order defines node_id
-    nodes = sort(G.nodes, by = (name_bytes, ver_bytes, source_id, digest(algo,bytes), cond_id))
+    # 3. Canonical node order defines node_id. The key must be TOTAL (§7.2): the
+    #    (name, version, source, context) prefix is unique by §4.8, so no tie can
+    #    remain. A tie here would make the whole edge section input-order-dependent.
+    nodes = sort(G.nodes, by = (name_bytes, ver_bytes, source_id, ctx_bytes,
+                                cond_id, digest(algo,bytes)))
     nidx  = index_map(nodes)                            # node -> node_id
     root_id = nidx[G.root]
 
-    # 4. Validate structural pre-conditions (reachability, no unused entries)
+    # 4. Validate structural pre-conditions (uniqueness, reachability, no unused entries)
+    assert distinct(map(nodes, n -> (n.name, n.version, n.source, n.context)))
     assert reachable_closure(nodes, G.edges, root_id) == set(nodes)
     assert every_entry_referenced(strings, sources, digests, conds)
 
@@ -1718,6 +1927,7 @@ encode(G):                          # G: resolver output (instances + edges + ro
         if flags.HAS_SOURCE:    write_uvarint(out, soidx[n.source])
         if flags.HAS_INTEGRITY: write_uvarint(out, didx[n.digest])
         if flags.HAS_CONDITION: write_uvarint(out, cidx[n.condition])
+        if flags.HAS_CONTEXT:   write_uvarint(out, sidx[n.context])
 
     for n in nodes:                                     # edge groups, in node_id order
         es = sort(out_edges(G, n), by = (sidx[e.name], nidx[e.to], e.type))
@@ -1960,6 +2170,9 @@ component.
 6. **Compatibility analysis** — §11.
 7. **Example encoded dependency specifiers** — §4.11, §14.
 8. **Reference implementation pseudocode** — §13 (`encode`/`decode`/`validate`/`install`).
+9. **Subgraph fidelity audit** — Appendix E (what the node/edge model can and cannot
+   round-trip against real npm/pnpm/yarn/vlt/uv/`pylock.toml` lockfiles), including the
+   ecosystem bound on the inline transport (E.5).
 
 ---
 
@@ -1974,8 +2187,10 @@ These enums are shared by both wire formats; format 2 (§4.12) reuses them uncha
 | Condition axis  | 0 os, 1 cpu, 2 libc, 3 runtime, 4 engines, 5+ reserved            |
 | Condition op    | 0 eq, 1 neq, 2 in, 3 semver-range                                 |
 | Edge type       | 0 prod, 1 dev, 2 optional, 3 peer, 4 peer-opt, 5+ reserved        |
-| Node flags      | b0 source, b1 integrity, b2 condition, b3 optional, b4 dev, b5 bundled |
-| Header flags    | b0 has-conditions, b1 has-peer, b2 has-optional, b3 trailer-sum   |
+| Edge type-byte flags (format 2) | `0x40` has-condition, `0x80` has-alias; bits 0–5 hold the type enum |
+| Node flags      | b0 source, b1 integrity, b2 condition, b3 optional, b4 dev, b5 bundled, b6 context, b7 reserved |
+| Header flags    | b0 has-conditions, b1 has-peer, b2 has-optional, b3 trailer-sum (format 1 only) |
+| Header flags (format 2) | b0 `ALL_DEFAULT` (no node sets any node flag); b1+ reserved |
 
 New values are added only in reserved ranges and only in ways that older decoders
 **reject** (fail-closed), never silently ignore.
@@ -1983,8 +2198,10 @@ New values are added only in reserved ranges and only in ways that older decoder
 ## Appendix B — Canonicalization Checklist (normative)
 
 A blob is canonical iff: shortest varints; all tables strictly ascending and
-deduped; default-source/always-condition first when used; nodes sorted by the §7.2
-key; edges per group sorted by `(name_id,to_id,type)`; no unused table entry; no
+deduped; the name table covers edge alias names as well as node names;
+default-source/always-condition first when used; nodes sorted by the §7.2
+key; `(name, version, source, context)` unique per node; edges per group sorted by
+`(name_id,to_id,type)`; no unused table entry; no
 unreachable node; trailer marker present; no trailing bytes. Decoders MUST verify all.
 
 ## Appendix C — Base64URL / Independent-Extension Profile (greenfield, optional)
@@ -2106,6 +2323,322 @@ The spec therefore keeps two claims separate:
 Where a target manager rejects build metadata or where payloads exceed parser/manifest
 size limits, the same canonical lock payload can be carried outside the version string in
 a tool-specific sidecar (§8.5), while the dependency remains a plain exact pin.
+
+---
+
+## Appendix E — Subgraph Fidelity Audit (measured)
+
+§6.1 claims the node/edge model is "the precise model" for a resolved dependency graph and
+§6.8 claims its correspondence to vlt's graph lockfile is "deliberately close." This
+appendix tests both claims against real lockfiles rather than asserting them, and records
+what the model **cannot** currently represent. Findings that changed the normative text
+are marked ✅ *fixed*; findings that remain limitations are marked ⚠️.
+
+### E.1 Method
+
+The `nodes`/`edges` model was compared field-by-field against real generated lockfiles
+rather than against documentation: the [`vlt-lock.json`](../../vlt-lock.json) in this
+repository (311 nodes, 457 edges, `lockfileVersion` 1, DepIDs round-tripped through
+`@vltpkg/dep-id`), plus `package-lock.json` (`lockfileVersion` 3), `pnpm-lock.yaml`
+(`lockfileVersion` `'9.0'`), `yarn.lock` (`__metadata.version` **10**, `cacheKey` `10c0`,
+as written by yarn 4.18.0 — note there is no `yarn.lock` v8; version 8 was a Yarn 3-era
+format), `uv.lock`, and `pylock.toml` (PEP 751, via `pip lock`). Version-grammar claims
+were checked against the `packaging` reference implementation and the published
+specifications. Reference-encoder behaviour
+(`site/extensions/dependency-locks/lock/encode.js`) was exercised directly rather than
+read.
+
+### E.2 Correctness defects found in the model itself
+
+**✅ E.2.1 — Same-`(name, version)` instances had no total order (was: silent
+non-determinism).** §4.9 claimed peer duplication was "encoded explicitly" and §2 defined
+node identity as including a "resolution context", but no field ever carried that context,
+and the canonical node sort keyed on `(name-bytes, version-bytes)` alone. Feeding the
+reference encoder two graphs that differ *only* in which input slot holds which of two
+deliberately-distinct `react@18.2.0` instances produced two different canonical blobs, and
+therefore two different lock digests, for one semantic graph — voiding the equality,
+caching, and audit guarantees of §6.4/§7.2.
+
+This is not a hypothetical shape. The real `vlt-lock.json` in this repo contains five such
+nodes, and vlt discriminates them in the Dependency ID itself:
+
+```txt
+~npm~tap@16.3.10~peer.1
+~npm~vite@8.2.1~peer.4
+~npm~@babel+helper-module-transforms@7.29.7~peer.2
+```
+
+pnpm does the same thing with a peer suffix on the snapshot key
+(`react@18.2.0(redux@5.0.0)`). *Fixed* by promoting **context** to a real, encoded field
+(§2, `FLAG_HAS_CONTEXT` in §4.8), requiring `(name, version, source, context)` to be
+unique, and making the §7.2 sort key total.
+
+**✅ E.2.2 — Every aliased edge was silently dropped.** §4.12 defined the format-2
+`NameTable` as "the deduped set of node **names**", but `alias_ids` index that same table,
+and an alias is by definition a name no node carries. Encoding
+`{"lodash4": "npm:lodash@4.17.21"}` in the reference encoder produced a blob with **no
+alias bit set anywhere** and no `lodash4` entry — the edge decoded as a plain dependency on
+`lodash`, losing the alias entirely and with no error. *Fixed* in §4.12/§7.2 (the table
+covers node names *and* alias names), in §13.1, and in the reference encoder.
+
+**✅ E.2.3 — Conditions were specified on edges but never encodable.** §4.7 and §7.7 both
+described conditions gating "nodes/edges", yet no `EdgeRecord` in either format had a
+condition field. This is load-bearing outside npm: a PEP 508 marker
+(`requests ; python_version < "3.11"`) and a Cargo `[target.'cfg(...)'.dependencies]` entry
+are properties of the *edge*, and folding them onto the target node is wrong as soon as two
+dependents reach the same node under different markers. *Fixed* by adding the `0x40`
+`HAS_CONDITION` bit on the format-2 edge type byte plus an `edge_cond_ids` column (§4.12).
+
+**✅ E.2.4 — Format 2 had no defined home for the `SourceTable`.** §4.12 said source "stays
+implicitly default … until a non-default source appears" but never said where the table
+goes when one does, and the reference encoder never emits one, so a non-default source was
+unrepresentable in the current format. This matters more than it looks: the `resolved`
+tarball URLs in the real `vlt-lock.json` point at
+`https://registry.vlt.io/vltpkg/npm/…`, not `registry.npmjs.org`, so "default registry" is
+a per-consumer assumption, not a property of the graph. *Fixed* by specifying table
+placement and a `source_ids` column (§4.12), and by defining `ALL_DEFAULT` as "no node sets
+any flag bit."
+
+**✅ E.2.5 — The inline size budget was overstated by an order of magnitude.** §12.2
+described inline embedding as "reasonable" for an average ~60-node package (~3.1 KB of
+Base62). Measured, `node-semver` rejects any version string over **256 characters**, which
+leaves a **245-character payload budget**. Running the reference encoder against live npm
+metadata, `lightningcss@1.33.0` (13 nodes) produces a 1506-character payload with `sha512`
+integrity and still 305 characters with integrity off — both over the limit; only
+single-digit-node closures fit. Past the limit `npm-package-arg` silently reclassifies the
+specifier from `version` to `range` and the payload is dropped from resolution while
+surviving verbatim in the lockfile text, so the failure is invisible. *Fixed* in the new
+§12.5, which carries the measured table; the sidecar (§8.5) is now described as the primary
+transport for anything beyond a small closure.
+
+### E.3 Fidelity gaps vs. real lockfiles (remaining limitations)
+
+These are cases where the model is internally consistent but **cannot round-trip** what a
+host lockfile records. §6.6 requires "faithful graph transfer", so each of these is a place
+where a consumer must re-fetch manifests to complete an absorption.
+
+**⚠️ E.3.1 — Declared ranges are not stored, but every real lockfile keeps them.** §6.8
+dismisses the original range spec as "a publish-time input"; in practice it is a *recorded
+output*. vlt stores it on every edge (`"workspace~site vite" => "dev ^8.0.0 ~npm~vite@8.2.1~peer.4"`);
+pnpm has a dedicated `specifier:` field; npm keeps the range in
+`packages."".dependencies`; yarn keeps it in the descriptor key
+(`"lodash@npm:^4.17.21"`); uv has `specifier` on each `requires-dist` entry. All seven
+formats examined retain it. A consumer absorbing a lock therefore cannot populate its own
+lockfile without re-reading each package's `package.json`, and cannot answer "is this lock
+still consistent with the declared manifest?" — which is exactly the `StaleLock` check §7.9
+asks for. Producers that need that check must keep ranges out-of-band today.
+
+There is a notable inversion here worth recording, because it cuts the other way. PEP 751
+`pylock.toml` records `packages.dependencies` but states that tools **"MUST NOT use this
+information when doing installation; it is purely informational for auditing purposes."**
+In other words the one format that standardizes an interchange resolution file deliberately
+demotes its edges to advisory, and expects installers to work from the flat package set. So
+the declared range is universally *retained* (this gap is real) while the resolved edge is
+not universally *trusted* for installation. A lock's edge set is closer to `pylock.toml`'s
+auditing role than to npm's install-driving role, and §6.6's "faithful graph transfer"
+should be read with that distinction in mind.
+
+**⚠️ E.3.2 — One node can carry only one artifact.** A node has at most one `digest_id` and
+one source, i.e. exactly one artifact. This was originally assessed as a Python-only gap on
+the assumption that npm always means one tarball per version. That assumption is wrong, and
+the gap is broader than first recorded.
+
+pnpm's current lockfile types define a `variations` resolution whose shape is almost exactly
+the fix proposed below — a node holding a *set* of platform-qualified artifacts:
+
+```ts
+// @pnpm/lockfile.types 1100.0.19 (re-exported from @pnpm/resolving.resolver-base)
+interface VariationsResolution     { type: 'variations'; variants: PlatformAssetResolution[] }
+interface PlatformAssetResolution  { resolution: AtomicResolution; targets: PlatformAssetTarget[] }
+interface PlatformAssetTarget      { os: string; cpu: string; libc?: 'musl' }
+```
+
+Two things follow. First, one-artifact-per-node is a gap in the **npm** ecosystem too, not
+just in Python, so E.3.2 cannot be deferred as an out-of-scope concern. Second — and more
+usefully — `PlatformAssetTarget`'s axes are `os`, `cpu` and `libc`, which are *already three
+of the five condition axes* in §4.7. A shipping implementation independently converged on
+the same coordinate vocabulary this extension family defines, which is good evidence the
+axis choice is right and that the fix below is the conventional shape rather than an
+invention.
+
+The Python case is the same shape with more artifacts. A uv locked package is one node
+carrying an **sdist *plus* an array of wheels**, each with its own URL, hash, size and
+filename — and the wheel's filename is what encodes the platform it serves:
+
+```jsonc
+// uv, node "iniconfig==2.0.0@registry+https://pypi.org/simple"
+"sdist":  { "url": "…/iniconfig-2.0.0.tar.gz",            "hashes": { "sha256": "2d91e1…" } },
+"wheels": [ { "url": "…/iniconfig-2.0.0-py3-none-any.whl", "hashes": { "sha256": "b6a858…" },
+              "filename": "iniconfig-2.0.0-py3-none-any.whl" } ]
+```
+
+The counts here are the problem: a single locked `numpy` release carries dozens of wheels
+(41 in the resolution examined) covering interpreter version, ABI, platform and architecture.
+Selection among those artifacts happens at install time against the target interpreter and
+platform. Modelling each wheel as its own node misrepresents them as separate package
+*instances* and collides with E.2.1's uniqueness rule, since they all share
+`name@version@source`.
+
+This is the one gap needing a genuine format extension rather than a clarification, and it
+is precisely where [Build Variants](../variants/variants.md) belongs: a node should carry a
+*set* of variant-qualified artifacts — `+cp312.manylinux2014.x86_64.sha256.…` — rather than
+a single digest, with the existing coordinate vocabulary doing the platform-tag work, as
+pnpm's `variants`/`targets` pairing already does for `os`/`cpu`/`libc`. Until then both a
+pnpm consumer (for `variations` nodes) and any Python consumer must re-resolve artifact
+selection themselves, so a lock conveys topology but not installability.
+
+**⚠️ E.3.3 — Extras/dependency-groups are not modelled, though `context` now nearly covers
+them.** `package[extra]` selects an additional dependency group, and uv represents it as a
+*separate node* over the same `name@version@source`, discriminated by a `kind` field
+(`"kind": "package"` vs `"kind": { "extra": "myextra" }`) with its own `dependencies` array.
+Structurally this is the same shape as peer duplication, so the **context** field added in
+E.2.1 is the right carrier for it — but the spec does not say so, and there is no registered
+convention for spelling an extra in a context string. Two producers would invent different
+ones and their locks would not compare equal. A future revision should register the
+encoding rather than leave it to convention.
+
+**⚠️ E.3.4 — Install-relevant per-package metadata is absent.** Real lockfiles cache more
+than identity and wiring, because installers need it before fetching anything. The real
+`vlt-lock.json` stores per node an SRI digest, an explicit resolved tarball URL, and a
+manifest fragment carrying `engines`, `os`, `cpu` and **`bin`**
+(`{"parser":"./bin/babel-parser.js"}`); npm additionally records `hasInstallScript`. The
+lock model covers `engines`/`os`/`cpu` (as conditions) and the digest, but has no `bin` and
+no lifecycle-script marker — so a consumer cannot link `node_modules/.bin` or make a
+trust decision about install scripts from a lock alone.
+
+**⚠️ E.3.5 — Source kinds omit `workspace` and `link`.** §4.5 enumerates `default`,
+`registry`, `https`, `git`, `file`; vlt's Dependency IDs also range over `workspace` and
+`remote`, and the observed lockfile uses `workspace~site` and `file~_d` prefixes. Published
+locks arguably should never contain workspace or symlink nodes — but the spec never says
+so, while §6.8's comparison table implies full DepID correspondence. The spec should either
+reserve the kinds or state the prohibition; today it does neither.
+
+**⚠️ E.3.6 — Non-SemVer versions fall back to a verbatim escape.** The format-2 structural
+version is `major.minor.patch` plus a tail. PEP 440 admits epochs (`1!2.0`),
+variable-length release segments (`1.2`, `1.2.3.4`), and `post`/`dev` releases, so most
+Python versions take the `"="`-prefixed verbatim escape path (§4.12). It is lossless, but
+the compact numeric columns — a major reason format 2 exists — buy nothing there. Any
+non-SemVer ecosystem should expect format 2 to behave like format 1 on size.
+
+**⚠️ E.3.7 — Universal (multi-platform) locks are only partly expressible.** A `uv.lock` is
+deliberately *universal*: one lockfile resolves for every OS, architecture and Python
+version at once, with PEP 508 markers deciding what applies where. The condition machinery
+(§4.7) plus the new edge conditions (E.2.3) cover the marker *placement*, but the axis enum
+(`os`, `cpu`, `libc`, `runtime`, `engines`) has no `python_version`,
+`implementation_name` or `platform_machine`, and `op` has no ordered comparison beyond
+`semver-range` — which is not PEP 440's ordering. The enum is extensible, so this is a
+registration task rather than a redesign, but today a Python marker cannot be encoded
+faithfully. Note also that PEP 751 `pylock.toml` now standardizes a tool-agnostic resolution
+file for this ecosystem, and is the more appropriate interchange target to measure against
+than `uv.lock` itself. A further subtlety: uv's stored markers are *simplified* against
+`requires-python` and the parent context, so they are not context-free predicates — a
+consumer re-expanding them without that context will not reproduce uv's own decisions.
+
+**⚠️ E.3.8 — An edge cannot resolve to nothing.** §4.4 requires an edge's `to_id` to name a
+valid node index, so every edge must terminate at a node. Real graphs need a third state.
+This repository's own `vlt-lock.json` uses the literal `MISSING` in the resolved-target slot
+for optional peers that were deliberately left unsatisfied — 19 of its 457 edges (about 4%):
+
+```jsonc
+"~npm~vite@8.2.1~peer.4 @types/node":  "peerOptional ^20.19.0 || >=22.12.0 MISSING",
+"~npm~tap@16.3.10~peer.1 typescript":  "peerOptional >=3.7.2 MISSING",
+```
+
+Dropping such edges on encode is lossy in a way that matters: it erases the distinction
+between "this optional peer was never declared" and "it was declared, considered, and
+resolved to nothing." That is precisely the information a `StaleLock` check (§7.9) needs in
+order to avoid re-resolving an optional peer that was already decided against. The fix is
+small — a reserved sentinel target, or a `to_id` of `0` meaning unresolved — but the format
+has no encoding for it today.
+
+**⚠️ E.3.9 — npm's node identity is an install path, not a package identity.** npm's
+`lockfileVersion` 2/3 keys its `packages` map by *location* (`node_modules/foo` versus
+`node_modules/bar/node_modules/foo`), which is how npm represents a version conflict at all:
+the nesting path *is* the resolution. The lock model is deliberately layout-agnostic (§6.2),
+which is the right call for pnpm, yarn PnP and vlt — none of which are path-addressed — but
+it means npm absorption is not a translation. A consumer must run its own tree-placement
+algorithm to turn the lock's abstract graph back into paths, and two npm versions with
+different hoisting heuristics will produce different trees from the same lock. The lock
+pins *what resolves to what*, not *where it lands on disk*; §6.2 should say so explicitly
+rather than leaving "layout-agnostic" to imply the placement step is free.
+
+### E.4 Verdict
+
+**npm / pnpm / yarn / vlt — sound after the E.2 fixes.** The nodes-and-edges model does
+capture a resolved npm-shaped graph, and the mapping to vlt's graph is as close as §6.8
+claims, now that context (E.2.1) supplies the counterpart to vlt's `~peer.N` suffix. The
+documented subtractions are larger than first assessed, though, and they are per-manager:
+
+| Manager | Remaining subtraction |
+|---|---|
+| all four | no declared range (E.3.1); no `bin`/install-script metadata (E.3.4) |
+| npm | placement must be recomputed; the lock does not pin the tree (E.3.9) |
+| pnpm | `variations` nodes cannot be represented (E.3.2) |
+| yarn | peer-virtualized instances are absent from `yarn.lock`, so a lock's `context` nodes have no source to be built *from*; and `checksum` is a `cacheKey`-salted hash of yarn's own zip (`10c0/3fb59c…`), not of the registry tarball, so it cannot populate a `digest` |
+| vlt | `MISSING` edge targets have no encoding (E.3.8) |
+
+So absorption is "decode the graph, then re-read manifests for the rest" rather than a pure
+translation. The binding practical constraint is still size (§12.5), but expressiveness is
+no longer a clean pass: E.3.2 in particular is now known to affect pnpm, not just Python.
+
+**pip — mostly out of scope.** A hash-pinned `requirements.txt` is a flat list with no graph
+wiring at all, so a lock is strictly more expressive; there is nothing to round-trip.
+
+**uv / PEP 751 — not expressible, and the inline form is unavailable.** The node/edge
+*topology* transfers cleanly, but E.3.2 is disqualifying on its own: until a node can hold a
+*set* of variant-qualified artifacts, a lock cannot represent one locked Python package's
+sdist-plus-wheels, and a consumer would have to re-resolve artifact selection itself. E.3.3
+(extras) and E.3.7 (marker axes) are registration work on top. Separately and more
+fundamentally, **E.5** shows the in-version transport cannot be used in this ecosystem at
+all: PEP 440 case-folds the `+…` label (destroying Base62), PyPI refuses local version
+identifiers outright, and resolvers are required to ignore them. Python is a sidecar-only
+ecosystem for this family.
+
+**The recurring theme** is that the three gaps that matter — multi-artifact nodes, extras,
+and platform markers — are all places where the model needs the *other two extensions'*
+vocabulary rather than new lock-specific machinery. Multi-artifact nodes want
+[Build Variants](../variants/variants.md) coordinates plus per-artifact
+[Package Integrity](../integrity/integrity.md) digests; that is the strongest argument for
+treating Dependency Locks as the third layer built on the first two (§6.9) rather than as a
+self-contained format.
+
+### E.5 Python: the inline transport is unavailable, not merely lossy (measured)
+
+E.3.6 treats non-SemVer versions as a size and elegance problem. For Python that
+understates the situation, and the distinction is worth stating separately because it bounds
+**all three extensions**, not just this one.
+
+The `+…` slot this extension family uses as its carrier is, in PEP 440, the *local version
+identifier*. Three independently verified properties make it unusable as a transport:
+
+1. **It is case-folded.** Python normalizes local labels to lower case. Base62 needs 62
+   distinct symbols; case folding collapses it to Base36 and destroys the payload
+   irrecoverably. Verified against the `packaging` reference implementation:
+
+   ```text
+   Version('1.2.3+lock.AbC123XyZ')  ->  1.2.3+lock.abc123xyz     # payload corrupted
+   Version('1.0+ubuntu-1')          ->  1.0+ubuntu.1             # separators normalized too
+   ```
+
+2. **PyPI rejects it outright.** The version specifiers specification is explicit: "As the
+   Python Package Index is intended solely for indexing and hosting upstream projects, it
+   **MUST NOT** allow the use of local version identifiers." So a variant-, integrity- or
+   lock-carrying version cannot be published to the primary index at all.
+
+3. **It is ignored in matching.** "Local version identifiers MUST NOT be permitted in
+   version specifiers, and local version labels MUST be ignored entirely when checking if
+   candidate versions match a given version specifier." Even where a local label survives,
+   resolvers are required to disregard it — so it cannot influence resolution, which is the
+   whole point of the integrity and variants extensions.
+
+The consequence for this specification is narrow but should be stated plainly: the §5
+in-version transport is an **npm-ecosystem mechanism**. For Python, only the sidecar form is
+viable, and the extension family's value there is as a *vocabulary* for variant coordinates
+and digests — which E.3.2 shows is genuinely needed — rather than as an encoding that rides
+inside the version string. §12.5 already establishes that the inline form is size-bound to
+small graphs even on npm; E.5 establishes that it is structurally unavailable off npm.
+Together they argue the sidecar is the primary transport and the inline form is the
+optimization, not the reverse.
 
 ---
 

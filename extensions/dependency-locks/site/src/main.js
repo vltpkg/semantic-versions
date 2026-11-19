@@ -41,12 +41,24 @@ const escapeHtml = (s) =>
       ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]
   );
 
-// Truncate an SRI string for the decoded preview ("sha512-<b64>" → "sha512-abc…").
-function shortIntegrity(sri) {
+// Render an SRI string ("sha512-<b64>") in Package Integrity form
+// ("sha512.<lowercase hex>"), truncated for the decoded preview. The transcoding is
+// lossless: both spellings are the same digest bytes.
+function integrityBuild(sri) {
   const tok = String(sri).trim().split(/\s+/)[0];
   const dash = tok.indexOf("-");
   if (dash < 0) return tok;
-  return `${tok.slice(0, dash)}-${tok.slice(dash + 1, dash + 13)}…`;
+  const algo = tok.slice(0, dash);
+  let hex = "";
+  try {
+    const raw = atob(tok.slice(dash + 1));
+    for (let i = 0; i < raw.length && hex.length < 12; i++) {
+      hex += raw.charCodeAt(i).toString(16).padStart(2, "0");
+    }
+  } catch {
+    return `${algo}.${tok.slice(dash + 1, dash + 13)}…`;
+  }
+  return `${algo}.${hex}…`;
 }
 
 // Platform/runtime conditions a node is gated by, as bracket annotations.
@@ -60,7 +72,8 @@ function condBrackets(n) {
 }
 
 // Decoded view: a compact INI-style rendering. Each node is one origin-qualified
-// id (e.g. npm:debug@4.4.3), optionally with #integrity and [platform] conditions;
+// id (e.g. npm:debug@4.4.3), optionally with a +<algo>.<digest> integrity build
+// (Package Integrity form) and [platform] conditions;
 // edges are "from -> to = type". This is a presentation of the same graph the
 // binary blob encodes, not the wire format itself.
 function buildDecodedText(graph) {
@@ -71,7 +84,8 @@ function buildDecodedText(graph) {
 
   const shownNodes = nodes.slice(0, NODE_LIMIT);
   shownNodes.forEach((n, i) => {
-    const integ = n.integrity ? `#${shortIntegrity(n.integrity)}` : "";
+    const sep = n.version.includes("+") ? "." : "+";
+    const integ = n.integrity ? `${sep}${integrityBuild(n.integrity)}` : "";
     lines.push(`${i} = npm:${n.name}@${n.version}${integ}${condBrackets(n)}`);
   });
   if (nodes.length > NODE_LIMIT) {

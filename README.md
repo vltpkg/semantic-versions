@@ -18,14 +18,18 @@ This repository is a [vlt](https://www.vlt.io) workspace (`vlt.json`):
 │   ├── selector/             # Client-side range selector (uses the parser)
 │   ├── grammar/              # BNF grammars + downloads
 │   ├── origin/               # History of build metadata
-│   ├── extensions/
-│   │   └── dependency-locks/ # Folded-in Dependency Locks extension + live generator
+│   ├── extensions/           # One page per extension, in layering order
+│   │   ├── variants/         # Build Variants
+│   │   ├── integrity/        # Package Integrity
+│   │   └── dependency-locks/ # Dependency Locks + live generator
 │   ├── public/               # CNAME, favicon, downloadable *.bnf grammars
 │   └── src/                  # Shared design system (style.css) + shell (nav/footer)
 ├── packages/
 │   └── parser/               # `semantic-versions` — the reference implementation
-├── extensions/
-│   └── dependency-locks/     # The Dependency Locks specification (markdown + source)
+├── extensions/               # Extension specifications (markdown + source)
+│   ├── variants/             # 1. Build Variants — which artifact
+│   ├── integrity/            # 2. Package Integrity — which bytes
+│   └── dependency-locks/     # 3. Dependency Locks — which graph (builds on 1 and 2)
 └── spec/                     # Specification source notes
 ```
 
@@ -47,36 +51,40 @@ The root `package.json` also exposes convenience wrappers, e.g. `vlt run build`.
 The [range selector](https://semver.xyz/selector/) imports the `semantic-versions`
 parser directly, so the site and the reference implementation never drift.
 
-## Deployment (GitHub Pages + Cloudflare)
+## Deployment (Cloudflare Pages)
 
-The site deploys to **GitHub Pages** via
-[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml): every push to
-`main` installs vlt, runs `vlt install`, builds `site/dist`, and publishes it
-with `actions/deploy-pages`.
+The site is a static [Cloudflare Pages](https://developers.cloudflare.com/pages/)
+project, `semver-xyz`, served at [`semver.xyz`](https://semver.xyz). The custom
+domain is attached to the Pages project in the Cloudflare dashboard;
+[`wrangler.toml`](wrangler.toml) points Wrangler at `site/dist`.
 
-Custom domain: [`semver.xyz`](https://semver.xyz).
+```sh
+vlt run deploy           # build, then publish site/dist to production (branch main)
+vlt run deploy:preview   # build, then publish a preview deployment
+vlt run cf:whoami        # check which Cloudflare account Wrangler is using
+```
 
-- `site/public/CNAME` contains `semver.xyz`, so the Pages deploy sets the custom
-  domain automatically.
-- `site/public/.nojekyll` disables Jekyll processing (needed so files/directories
-  beginning with `_` are served as-is).
-- Vite is configured with `base: "/"` because the site is served from the domain
-  root.
+Use `wrangler pages deploy`, not `wrangler deploy`: the latter is the Workers
+command and fails on a Pages project with "Missing entry-point to Worker script
+or to assets directory".
 
-### Cloudflare
+[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) does the same on
+every push to `main` once two repository secrets are set:
 
-Point the domain at GitHub Pages through Cloudflare:
+- `CLOUDFLARE_API_TOKEN`: an API token with the **Cloudflare Pages: Edit** permission
+- `CLOUDFLARE_ACCOUNT_ID`: the account that owns the `semver-xyz` project
 
-1. **DNS** — add a proxied (orange-cloud) `CNAME` record:
-   `semver.xyz` → `vltpkg.github.io`. For the apex, Cloudflare's CNAME flattening
-   handles the root record.
-2. **SSL/TLS mode** — set to **Full** (not "Flexible"). GitHub Pages already
-   terminates TLS on its origin; "Flexible" causes a redirect loop.
-3. In the repository's **Settings → Pages**, enable **Enforce HTTPS** once the
-   certificate for `semver.xyz` has been provisioned.
-4. If you hit a redirect loop, confirm SSL mode is **Full** and, in Cloudflare
-   **Rules → Settings**, that "Always Use HTTPS" is not fighting the Pages
-   redirect.
+Without them the workflow still builds the site and skips the publish step.
+
+Vite is configured with `base: "/"` because the site is served from the domain
+root.
+
+### Registry
+
+[`vlt.json`](vlt.json) pins the npm registry alias to `https://registry.npmjs.org/`
+under its `config` key, so `vlt-lock.json` resolves from the public registry for
+everyone (CI included) rather than from whatever registry a contributor's
+user-level vlt config points at.
 
 ## License
 

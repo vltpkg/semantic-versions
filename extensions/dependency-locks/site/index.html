@@ -309,7 +309,7 @@
             The <code>+lock.&lt;payload&gt;</code> blob is compact binary built for transport.
             Decode it and you get a plain graph — each <code>node</code> is an
             origin-qualified id like <code>npm:lightningcss@1.32.0</code>, optionally
-            carrying its artifact integrity (<code>#sha512-…</code>) and platform conditions
+            carrying its artifact integrity (<code>+sha512.…</code>) and platform conditions
             (<code>[os=… cpu=…]</code>); each <code>edge</code> is just
             <code>from -&gt; to = type</code> (<code>prod</code>, <code>optional</code>,
             <code>peer</code>). Nothing tool-specific; it maps one-to-one onto vlt's lockfile
@@ -326,10 +326,10 @@
 <span class="t-key">root</span> = <span class="t-edge">0</span>
 
 <span class="t-cmt">[nodes]</span>
-<span class="t-edge">0</span> = <span class="t-str">npm:lightningcss@1.32.0#sha512-NXYBzinN…</span> <span class="t-cmt">[engines=&gt;=12]</span>
-<span class="t-edge">1</span> = <span class="t-str">npm:detect-libc@2.1.2#sha512-Btj2BOOO…</span> <span class="t-cmt">[engines=&gt;=8]</span>
-<span class="t-edge">2</span> = <span class="t-str">npm:lightningcss-darwin-arm64@1.32.0#sha512-RzeG9Ju5…</span> <span class="t-cmt">[os=darwin cpu=arm64]</span>
-<span class="t-edge">3</span> = <span class="t-str">npm:lightningcss-linux-x64-gnu@1.32.0#sha512-V7Qr52Ih…</span> <span class="t-cmt">[os=linux cpu=x64 libc=glibc]</span>
+<span class="t-edge">0</span> = <span class="t-str">npm:lightningcss@1.32.0+sha512.357601ce29cd…</span> <span class="t-cmt">[engines=&gt;=12]</span>
+<span class="t-edge">1</span> = <span class="t-str">npm:detect-libc@2.1.2+sha512.06d8f604e38e…</span> <span class="t-cmt">[engines=&gt;=8]</span>
+<span class="t-edge">2</span> = <span class="t-str">npm:lightningcss-darwin-arm64@1.32.0+sha512.473786f49bb9…</span> <span class="t-cmt">[os=darwin cpu=arm64]</span>
+<span class="t-edge">3</span> = <span class="t-str">npm:lightningcss-linux-x64-gnu@1.32.0+sha512.57b42be76221…</span> <span class="t-cmt">[os=linux cpu=x64 libc=glibc]</span>
 
 <span class="t-cmt">[edges]</span>
 <span class="t-edge">0</span> -&gt; <span class="t-edge">1</span> = <span class="t-str">prod</span>
@@ -338,7 +338,7 @@
         </div>
         <p class="caption reveal">
           A deliberately small, generic shape — origin-qualified node ids, optional
-          <code>#integrity</code> and <code>[platform]</code> annotations, and
+          <code>+&lt;algorithm&gt;.&lt;digest&gt;</code> integrity and <code>[platform]</code> annotations, and
           <code>from -&gt; to = type</code> edges, nothing tool-specific. Integrity is
           advisory tamper-evidence — your package manager still verifies every artifact. It
           translates one-to-one to vlt's lockfile graph (and back), but is simple enough for

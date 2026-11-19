@@ -94,7 +94,12 @@ precedence: "the latest linux/x64 build of 1.x" is well-defined and resolvable.
 - **npm `os`/`cpu`/`libc` + optional-dependency fanout.** Build Variants expresses
   the same target matrix inside one version instead of across many packages, and
   makes it *rangeable*. A resolver can still map a selected variant onto whatever
-  artifact layout a registry uses.
+  artifact layout a registry uses. pnpm has since grown a first-class version of
+  the same idea in its lockfile — a `variations` resolution holding a list of
+  `variants`, each pairing one artifact with a list of `targets` typed exactly
+  `{ os, cpu, libc? }` — which is independent evidence that these are the right
+  axes; Build Variants differs in putting the coordinate in the version, where it
+  survives outside a lockfile.
 - **OCI / Docker multi-arch manifests.** A manifest list selects an image by
   `os`/`architecture`/`variant`; Build Variants lifts that platform tuple into the
   version grammar so the same selection works in a specifier or a lockfile, not
@@ -108,10 +113,27 @@ precedence: "the latest linux/x64 build of 1.x" is well-defined and resolvable.
 ## Composability
 
 Variant coordinates are ordinary build identifiers, so they compose with other
-build-metadata extensions. A variant can precede an integrity digest
-(`1.0.0+linux.x64.musl.sha512.<digest>` pins the exact bytes of one target), and a
-[Dependency Lock](../dependency-locks/dependency-locks.md) can pin the resolved
-variant chosen for each node of a graph.
+build-metadata extensions. Build Variants is the **first** of the three extensions
+for a reason: it answers *which artifact*, and the other two build on that answer. A
+variant precedes an integrity digest — `1.0.0+linux.x64.musl.sha512.<digest>` pins
+the exact bytes of one target — and a
+[Dependency Lock](../dependency-locks/dependency-locks.md) pins a whole resolved
+graph whose every node is an identity of exactly that shape.
+
+## Ecosystem applicability
+
+Because coordinates live in the `+…` build-metadata slot, this extension applies
+wherever that slot is preserved and comparable. That is true of SemVer and of the
+npm ecosystem. It is **not** true of Python: PEP 440 calls the same slot a *local
+version identifier*, normalizes it to lower case, and requires resolvers to ignore
+it when matching version specifiers — and PyPI "MUST NOT allow the use of local
+version identifiers" at all. So a variant coordinate cannot be published to PyPI
+in a version, and could not influence resolution if it were. In Python-like
+ecosystems the coordinate vocabulary is still useful as a *notation* — for
+labelling wheels in a lockfile or sidecar, where the platform tags already exist —
+but not as an in-version mechanism. See the
+[Dependency Locks spec, Appendix E.5](../dependency-locks/dependency-locks-spec.md)
+for the measurements.
 
 ## Grammar (BNF)
 

@@ -10,6 +10,7 @@
     />
     <meta name="color-scheme" content="light" />
     <meta name="theme-color" content="#ffffff" />
+    <link rel="describedby" type="text/markdown" href="/llms.txt" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="stylesheet" href="/src/style.css" />
   </head>
@@ -150,12 +151,14 @@
 
           <h2 id="f-locks">vs. Dependency Locks</h2>
           <p>
-            <a href="/extensions/dependency-locks/">Dependency Locks</a> capture integrity for an
-            entire resolved subgraph in a digest table. Package Integrity is the single-artifact,
-            inline form for one identity. They compose: a lock pins the graph; an inline digest
-            pins one package where a full lock is unnecessary. A digest also composes with a
-            <a href="/extensions/variants/">Build Variant</a>:
-            <code>1.0.0+linux.x64.musl.sha512.…</code> pins the exact bytes of one target.
+            Package Integrity is the single-artifact, inline form for one identity, and it is the
+            second of the three extensions: it takes the artifact a
+            <a href="/extensions/variants/">Build Variant</a> names and pins its exact bytes
+            (<code>1.0.0+linux.x64.musl.sha512.…</code>).
+            <a href="/extensions/dependency-locks/">Dependency Locks</a> then build on both — a lock
+            pins an entire resolved subgraph in which <em>each node</em> is written in exactly this
+            form, so the digest notation you learn here is the notation a decoded lock uses. Reach for
+            an inline digest where a full lock is unnecessary.
           </p>
 
           <h2 id="f-grammar">Grammar (BNF)</h2>

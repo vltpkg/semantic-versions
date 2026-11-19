@@ -35,6 +35,7 @@ const CODEC_NONE = 0x1; // frame byte bits 3..0
 const FLAG_ALL_DEFAULT = 0x01; // header flags bit 0: no source/digest/condition tables
 const FLAG_HAS_INTEGRITY = 0x02; // node flags bit 1 (§4.8): digest_id present
 const FLAG_HAS_CONDITION = 0x04; // node flags bit 2 (§4.8): cond_id present
+const FLAG_HAS_CONTEXT = 0x40; // node flags bit 6 (§4.8): ctx_id present
 
 const TYPE_ENUM = { prod: 0, dev: 1, optional: 2, peer: 3, "peer-opt": 4 };
 const EDGE_ALIAS_BIT = 0x80; // high bit of an edge's type byte: carries an alias name
@@ -152,28 +153,57 @@ export function buildCanonicalBlob(graph) {
   const { nodes, edges, rootIndex } = graph;
   const n = nodes.length;
 
-  // Canonical node order (§7.2): (name-bytes, version-bytes). Assigns node_id.
+  // Canonical node order (§7.2): (name-bytes, version-bytes, context-bytes). The
+  // context (§2) is what keeps the key TOTAL — two instances a resolver deliberately
+  // kept apart (peer duplication) share name@version, so without it the order, and
+  // hence every node_id and the whole edge section, would depend on input order and
+  // the same graph could yield different lock digests.
   const meta = nodes.map((nd, i) => ({
     i,
     name: nd.name,
     version: nd.version,
+    context: nd.context || "",
     nameBytes: te.encode(nd.name),
     verBytes: te.encode(nd.version),
+    ctxBytes: te.encode(nd.context || ""),
   }));
   const order = [...meta].sort(
     (a, b) =>
-      cmpBytes(a.nameBytes, b.nameBytes) || cmpBytes(a.verBytes, b.verBytes)
+      cmpBytes(a.nameBytes, b.nameBytes) ||
+      cmpBytes(a.verBytes, b.verBytes) ||
+      cmpBytes(a.ctxBytes, b.ctxBytes)
   );
+  // Instance uniqueness (§4.8). Two same-(name, version, context) nodes are not
+  // orderable, so refuse rather than emit an input-order-dependent blob.
+  for (let i = 1; i < order.length; i++) {
+    const a = order[i - 1];
+    const b = order[i];
+    if (a.name === b.name && a.version === b.version && a.context === b.context) {
+      throw new Error(
+        `duplicate node instance ${a.name}@${a.version}` +
+          `${a.context ? ` (context ${a.context})` : ""}: distinct instances of the ` +
+          `same name@version must carry distinct \`context\` values (§4.8)`
+      );
+    }
+  }
   const oldToNew = new Array(n);
   order.forEach((m, id) => {
     oldToNew[m.i] = id;
   });
   const rootId = oldToNew[rootIndex];
 
-  // Name table: unique names, canonically sorted, front-coded.
-  const names = [...new Set(nodes.map((nd) => nd.name))].sort((a, b) =>
-    cmpBytes(te.encode(a), te.encode(b))
-  );
+  // Name table: unique names, canonically sorted, front-coded. It must cover edge
+  // alias names as well as node names — an alias is by definition a name no node
+  // carries (`"lodash4": "npm:lodash@4"`), so indexing only node names would drop
+  // every real alias.
+  const names = [
+    ...new Set([
+      ...nodes.map((nd) => nd.name),
+      ...edges
+        .filter((e) => e.name && e.name !== nodes[e.to].name)
+        .map((e) => e.name),
+    ]),
+  ].sort((a, b) => cmpBytes(te.encode(a), te.encode(b)));
   const nameIndex = new Map(names.map((s, i) => [s, i]));
 
   // Shared string pool for the rare prerelease/build (or non-semver) version
@@ -245,14 +275,18 @@ export function buildCanonicalBlob(graph) {
   });
   // Register condition value strings into the shared pool before it is emitted.
   for (const preds of condSets) for (const p of preds) addExtra(p.value);
+  // …and context strings (§2), which share the same pool.
+  const nodeCtxId = order.map((m) => (m.context ? addExtra(m.context) : -1));
 
   const extraList = [...extras.keys()];
 
-  // Per-node flags; integrity is advisory metadata, conditions gate platform nodes.
+  // Per-node flags; integrity is advisory metadata, conditions gate platform nodes,
+  // context discriminates same-name@version instances.
   const flags = order.map(
     (m, i) =>
       (nodeDigest[i] ? FLAG_HAS_INTEGRITY : 0) |
-      (nodeCondId[i] >= 0 ? FLAG_HAS_CONDITION : 0)
+      (nodeCondId[i] >= 0 ? FLAG_HAS_CONDITION : 0) |
+      (nodeCtxId[i] >= 0 ? FLAG_HAS_CONTEXT : 0)
   );
   const allDefault = flags.every((f) => f === 0);
 
@@ -266,7 +300,7 @@ export function buildCanonicalBlob(graph) {
     groups[from].push({
       to,
       type: TYPE_ENUM[e.type] ?? 0,
-      aliasId: aliased ? nameIndex.get(e.name) : -1,
+      aliasId: aliased ? (nameIndex.get(e.name) ?? -1) : -1,
     });
   }
   for (const g of groups) {
@@ -339,6 +373,9 @@ export function buildCanonicalBlob(graph) {
     }
     for (let i = 0; i < n; i++) {
       if (nodeCondId[i] >= 0) pushUvarint(out, nodeCondId[i]);
+    }
+    for (let i = 0; i < n; i++) {
+      if (nodeCtxId[i] >= 0) pushUvarint(out, nodeCtxId[i]);
     }
   }
 

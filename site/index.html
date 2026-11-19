@@ -18,6 +18,7 @@
     />
     <meta property="og:type" content="website" />
 
+    <link rel="describedby" type="text/markdown" href="/llms.txt" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="stylesheet" href="/src/style.css" />
   </head>
@@ -154,16 +155,22 @@
             <p>How builds were introduced, and how a later change made them meaningless.</p>
             <div class="card-arrow">Trace →</div>
           </a>
-          <a class="card reveal" href="/extensions/dependency-locks/">
+          <a class="card reveal" href="/extensions/variants/">
             <span class="card-kicker">EXTENSION</span>
-            <h3>Dependency Locks</h3>
-            <p>Pinning a resolved subgraph inside a source-qualified version, built on this spec.</p>
+            <h3>Build Variants</h3>
+            <p>Target coordinates carried in the version: <code>napi:sharp@0.33.0+linux.x64.musl</code></p>
             <div class="card-arrow">Explore →</div>
           </a>
           <a class="card reveal" href="/extensions/integrity/">
             <span class="card-kicker">EXTENSION</span>
             <h3>Package Integrity</h3>
             <p>A verifiable content digest carried in the version: <code>npm:react@18.2.0+sha512.…</code></p>
+            <div class="card-arrow">Explore →</div>
+          </a>
+          <a class="card reveal" href="/extensions/dependency-locks/">
+            <span class="card-kicker">EXTENSION</span>
+            <h3>Dependency Locks</h3>
+            <p>Pinning a resolved subgraph whose nodes are variant- and integrity-qualified identities.</p>
             <div class="card-arrow">Explore →</div>
           </a>
         </div>

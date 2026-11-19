@@ -1,7 +1,8 @@
 {
   "workspaces": ["packages/*", "site"],
-  "default-registry-alias": "npm",
-  "registries": [
-    "npm=https://registry.npmjs.org/"
-  ]
+  "config": {
+    "registries": {
+      "npm": "https://registry.npmjs.org/"
+    }
+  }
 }

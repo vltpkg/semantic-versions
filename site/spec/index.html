@@ -10,6 +10,7 @@
     />
     <meta name="color-scheme" content="light" />
     <meta name="theme-color" content="#ffffff" />
+    <link rel="describedby" type="text/markdown" href="/llms.txt" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="stylesheet" href="/src/style.css" />
   </head>
@@ -83,9 +84,10 @@
             <li>Once a versioned package has been released, the contents of that version <strong>MUST NOT</strong> be modified. Any modifications <strong>MUST</strong> be released as a new version.</li>
             <li>Major version zero (<code>0.y.z</code>) is for initial development. Anything <strong>MAY</strong> change at any time. The public API <strong>SHOULD NOT</strong> be considered stable.</li>
             <li>Version <code>1.0.0</code> <strong>SHOULD</strong> be the first stable release and <strong>MUST</strong> define the public API.</li>
-            <li>Patch version <code>Z</code> (<code>x.y.Z | x &gt; 0</code>) <strong>MUST</strong> be incremented if only a fix for unintended behaviour is introduced. A fix is defined as an internal change that corrects incorrect behaviour.</li>
-            <li>Minor version <code>Y</code> (<code>x.Y.z | x &gt; 0</code>) <strong>MUST</strong> be incremented if new, backward compatible functionality is introduced to the public API. It <strong>MUST</strong> be incremented if any public API functionality is marked as deprecated. It <strong>MAY</strong> include patch level changes. Patch version <strong>MUST</strong> be reset to 0 when minor version is incremented.</li>
-            <li>Major version <code>X</code> (<code>X.y.z | X &gt; 0</code>) <strong>MUST</strong> be incremented if any backward incompatible changes are introduced to the public API. Patch and minor versions <strong>MUST</strong> be reset to 0 when major version is incremented.</li>
+            <li>Patch version <code>Z</code> (<code>x.y.Z | x &gt; 0</code>) <strong>MUST</strong> be incremented when a release leaves the declared public API unchanged. That covers corrections which bring behaviour into agreement with the declaration, corrections which honour the evident intended behaviour where the declaration is silent, and changes with no bearing on the declaration at all &mdash; refactors, dependency updates, performance work. A patch <strong>MAY</strong> be externally observable, and a correction usually is. What makes it a patch is that the declared contract is the same before and after, not that nothing visible changed.</li>
+            <li>Minor version <code>Y</code> (<code>x.Y.z | x &gt; 0</code>) <strong>MUST</strong> be incremented if new, backward compatible functionality is introduced to the public API. It <strong>MUST</strong> be incremented if any public API functionality is marked as deprecated. It <strong>MAY</strong> be incremented if substantial new functionality or improvements are introduced within the private code. It <strong>MAY</strong> include patch level changes. Patch version <strong>MUST</strong> be reset to 0 when minor version is incremented.</li>
+            <li>Major version <code>X</code> (<code>X.y.z | X &gt; 0</code>) <strong>MUST</strong> be incremented if any backward incompatible changes are introduced to the declared public API. Patch and minor versions <strong>MUST</strong> be reset to 0 when major version is incremented.</li>
+            <li>Behaviour that the declaration does not describe <strong>and</strong> that was never intended to form part of the public API &mdash; a symbol exported by accident, an undocumented side effect, or an implementation detail a consumer can reach &mdash; is <strong>NOT</strong> covered by the compatibility guarantees above. Correcting or removing such behaviour <strong>MUST NOT</strong> require a major increment. Where it is known to be relied upon in practice, authors <strong>SHOULD</strong> announce the correction in a minor release before removing the behaviour, and <strong>SHOULD</strong> record it in release notes. Undocumented behaviour that <em>was</em> intended is a different case: the declaration is incomplete rather than the behaviour wrong. Correcting it toward that intent is a patch; writing it into the declaration is a minor.</li>
             <li>A pre-release version <strong>MAY</strong> be denoted by appending a hyphen and a series of dot separated identifiers immediately following the patch version. Identifiers <strong>MUST</strong> comprise only ASCII alphanumerics and hyphens <code>[0-9A-Za-z-]</code>, <strong>MUST NOT</strong> be empty, and numeric identifiers <strong>MUST NOT</strong> include leading zeroes. Pre-release versions have lower precedence than the associated normal version. Examples: <code>1.0.0-alpha</code>, <code>1.0.0-alpha.1</code>, <code>1.0.0-0.3.7</code>, <code>1.0.0-x.7.z.92</code>.</li>
             <li>A build <strong>MAY</strong> be denoted by appending a plus sign and a series of dot separated identifiers immediately following the patch or pre-release version. Identifiers <strong>MUST</strong> comprise only ASCII alphanumerics and hyphens <code>[0-9A-Za-z-]</code> and <strong>MUST NOT</strong> be empty. Unlike "build metadata" in later drafts, a build <strong>participates</strong> in precedence; it is the antithesis of a pre-release. Examples: <code>1.0.0+001</code>, <code>1.0.0+20130313144700</code>, <code>1.0.0-beta+exp.sha.5114f85</code>.</li>
           </ol>
@@ -637,9 +639,10 @@
             The one behavioural divergence to be aware of is <strong>build precedence</strong>:
             tooling that assumes builds are ignored will order build-bearing versions differently.
             This is deliberate. It is what lets extensions like
-            <a href="/extensions/dependency-locks/">Dependency Locks</a> and
-            <a href="/extensions/integrity/">Package Integrity</a> carry meaning in the build. See
-            the <a href="/origin/">history</a> for the full story.
+            <a href="/extensions/variants/">Build Variants</a>,
+            <a href="/extensions/integrity/">Package Integrity</a> and
+            <a href="/extensions/dependency-locks/">Dependency Locks</a> carry meaning in the build.
+            See the <a href="/origin/">history</a> for the full story.
           </p>
 
           <h2 id="faq">FAQ</h2>
@@ -669,6 +672,36 @@
             carry both. The one thing neither <code>purl</code> qualifiers nor <code>vers</code> model
             is a <strong>precedence-bearing build</strong>, which is precisely the slot our
             <a href="/extensions/">extensions</a> occupy.
+          </p>
+          <h3>What does the spec mean by &ldquo;deprecated&rdquo;?</h3>
+          <p>
+            Deprecation is a <strong>documentation and registry concern, not version syntax</strong>.
+            The spec references it once &mdash; a minor <strong>MUST</strong> be incremented when
+            public API functionality is marked as deprecated &mdash; and deliberately defines no
+            notation for it. None is planned.
+          </p>
+          <p>
+            The reason is that deprecation is <em>retroactive</em> while a version string is not.
+            You deprecate <code>1.2.3</code> after publishing it, often long after, and registries
+            model this as mutable metadata attached to an already-published version. But the
+            contents of a released version <strong>MUST NOT</strong> be modified, and its version
+            string is fixed at publish time. There is no moment at which the string could be
+            rewritten to record a decision made later.
+          </p>
+          <p>
+            Encoding it anyway would break precedence in both available slots. A pre-release lowers
+            precedence and announces instability, which is not what a deprecation says: a deprecated
+            release is usually stable, just unwanted. A build is worse. Because a build
+            <a href="#precedence">participates in precedence</a> here,
+            <code>1.2.3+deprecated</code> would sort <em>above</em> <code>1.2.3</code> and be
+            preferred by every range that matched it &mdash; the deprecated release would win, which
+            is precisely backwards.
+          </p>
+          <p>
+            So mark deprecations in your documentation and in your registry&rsquo;s metadata, and
+            ship the announcement in a minor release. A version number records what changed in the
+            declared interface; it does not carry advice about whether to use a release. That advice
+            is real and worth publishing &mdash; it simply belongs somewhere mutable.
           </p>
           <h3>Where is the grammar?</h3>
           <p>

@@ -40,6 +40,9 @@ metadata:
   unambiguous. A more compact **Base62** encoding (`[0-9A-Za-z]+`, the same
   alphabet used by [Dependency Locks](../dependency-locks/dependency-locks.md))
   **MAY** be used where size matters; both are grammar-valid build identifiers.
+  Note that Base62 is case-sensitive and therefore does not survive
+  case-normalizing ecosystems — a reason to prefer hex as the interchange default
+  even though it is twice the length (see *Ecosystem applicability* below).
 - The algorithm and its digest are two separate, dot-separated build
   identifiers (`sha512` then `<digest>`), so the pair is trivially tokenised.
 - Multiple digests **MAY** be present, each as its own `<algorithm>.<digest>`
@@ -85,13 +88,36 @@ To verify `<source>:<name>@<version>+<algorithm>.<digest>`:
 The transcoding is lossless: an npm `dist.integrity` of `sha512-<base64>` is the
 same bytes as `sha512.<hex>` here; either can be produced from the other.
 
-## Relationship to Dependency Locks
+## Relationship to Build Variants and Dependency Locks
 
-[Dependency Locks](../dependency-locks/dependency-locks.md) capture integrity for
-an entire resolved subgraph inside a digest table. Package Integrity is the
-single-artifact, **inline** form for one identity. They compose: a lock pins the
-graph; an inline integrity digest pins one package where a full lock is
-unnecessary.
+Package Integrity is the **second** of the three extensions: it takes the artifact a
+[Build Variant](../variants/variants.md) names and pins its exact bytes
+(`1.0.0+linux.x64.musl.sha512.<digest>`).
+[Dependency Locks](../dependency-locks/dependency-locks.md) then build on both — a
+lock pins an entire resolved subgraph in which **each node** is written in exactly
+this form, so the digest notation defined here is the notation a decoded lock uses.
+Package Integrity remains the single-artifact, **inline** form: reach for it where a
+full lock is unnecessary.
+
+## Ecosystem applicability
+
+The inline form depends on the `+…` build-metadata slot being preserved verbatim and
+on a resolver being willing to act on it. Both hold in SemVer and npm. Neither holds
+in Python, where the same slot is PEP 440's *local version identifier*: it is
+normalized to lower case, resolvers **MUST** ignore it when matching version
+specifiers, and PyPI "MUST NOT allow the use of local version identifiers" at all.
+Lowercase hex digests survive the case-folding; a Base62 digest does not. But
+publishing an integrity-bearing version to PyPI is not possible regardless, so in
+that ecosystem the digest belongs in a lockfile or sidecar — where the notation here
+is still the useful part. Measurements are in the
+[Dependency Locks spec, Appendix E.5](../dependency-locks/dependency-locks-spec.md).
+
+Two adjacent portability notes for npm-ecosystem tooling. An npm `dist.integrity` is
+a hash of the published tarball and transcodes cleanly, as above. A **yarn**
+`checksum` does not: it is a hash of yarn's own zip artifact, salted with the
+lockfile's `cacheKey` (`10c0/3fb59c…`), so it is not the artifact digest and cannot
+be transcoded into this form. Take digests from the registry, not from a
+`yarn.lock`.
 
 ## Grammar (BNF)
 

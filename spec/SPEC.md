@@ -67,9 +67,14 @@ at any time. The public API **SHOULD NOT** be considered stable.
 is incremented after this release is dependent on this public API and how it
 changes.
 
-1. Patch version `Z` (`x.y.Z | x > 0`) **MUST** be incremented if only backward
-compatible bug fixes are introduced. A bug fix is defined as an internal
-change that fixes incorrect behavior.
+1. Patch version `Z` (`x.y.Z | x > 0`) **MUST** be incremented when a release
+leaves the declared public API unchanged. That covers corrections which bring
+behaviour into agreement with the declaration, corrections which honour the
+evident intended behaviour where the declaration is silent, and changes with no
+bearing on the declaration at all — refactors, dependency updates, performance
+work. A patch **MAY** be externally observable, and a correction usually is. What
+makes it a patch is that the declared contract is the same before and after, not
+that nothing visible changed.
 
 1. Minor version Y (`x.Y.z | x > 0`) **MUST** be incremented if new, backward
 compatible functionality is introduced to the public API. It **MUST** be
@@ -79,9 +84,20 @@ within the private code. It **MAY** include patch level changes. Patch version
 **MUST** be reset to 0 when minor version is incremented.
 
 1. Major version `X` (`X.y.z | X > 0`) **MUST** be incremented if any backward
-incompatible changes are introduced to the public API. It MAY also include minor
+incompatible changes are introduced to the declared public API. It MAY also include minor
 and patch level changes. Patch and minor versions **MUST** be reset to 0 when major
 version is incremented.
+
+1. Behaviour that the declaration does not describe **and** that was never
+intended to form part of the public API — a symbol exported by accident, an
+undocumented side effect, or an implementation detail a consumer can reach — is
+**NOT** covered by the compatibility guarantees above. Correcting or removing such
+behaviour **MUST NOT** require a major increment. Where it is known to be relied
+upon in practice, authors **SHOULD** announce the correction in a minor release
+before removing the behaviour, and **SHOULD** record it in release notes.
+Undocumented behaviour that *was* intended is a different case: the declaration is
+incomplete rather than the behaviour wrong. Correcting it toward that intent is a
+patch; writing it into the declaration is a minor.
 
 1. A pre-release version **MAY** be denoted by appending a hyphen and a
 series of dot separated identifiers immediately following the patch
@@ -97,8 +113,10 @@ normal version. Examples: `1.0.0-alpha, 1.0.0-alpha.1, 1.0.0-0.3.7,
 1. Build versions **MAY** be denoted by appending a plus sign and a series of dot
 separated identifiers immediately following the patch or pre-release version.
 Identifiers **MUST** comprise only ASCII alphanumerics and hyphens [0-9A-Za-z-].
-Identifiers **MUST NOT** be empty. Build version **MUST** be ignored when determining
-version precedence of normal versions. Thus two versions that differ only in the build, have the same precedence. Examples: `1.0.0-alpha+001, 1.0.0+20130313144700,
+Identifiers **MUST NOT** be empty. Unlike "build metadata" in later drafts, a build
+**participates** in precedence; it is the antithesis of a pre-release. Two versions
+that differ only in the build therefore do **not** have the same precedence — see
+the precedence rules below. Examples: `1.0.0-alpha+001, 1.0.0+20130313144700,
 1.0.0-beta+exp.sha.5114f85, 1.0.0+21AF26D3\-\-\-\-117B344092BD`.
 
 1. Precedence refers to how versions are compared to each other when ordered.
@@ -618,6 +636,32 @@ communicates roadmap or pricing, not interface compatibility. That is a
 legitimate thing to want, but it is not what a semantic version measures. If you
 need both, version the declared interface semantically and let the product carry
 its own separate, contextual label.
+
+### What does the spec mean by "deprecated"?
+
+Deprecation is a **documentation and registry concern, not version syntax**. The
+spec references it once — a minor **MUST** be incremented when public API
+functionality is marked as deprecated — and deliberately defines no notation for
+it. None is planned.
+
+The reason is that deprecation is *retroactive* while a version string is not.
+You deprecate `1.2.3` after publishing it, often long after, and registries model
+this as mutable metadata attached to an already-published version. But the
+contents of a released version **MUST NOT** be modified, and its version string is
+fixed at publish time. There is no moment at which the string could be rewritten
+to record a decision made later.
+
+Encoding it anyway would break precedence in both available slots. A pre-release
+lowers precedence and announces instability, which is not what a deprecation says:
+a deprecated release is usually stable, just unwanted. A build is worse. Because a
+build **participates** in precedence here, `1.2.3+deprecated` would sort *above*
+`1.2.3` and be preferred by every range that matched it — the deprecated release
+would win, which is precisely backwards.
+
+So mark deprecations in your documentation and in your registry's metadata, and
+ship the announcement in a minor release. A version number records what changed in
+the declared interface; it does not carry advice about whether to use a release.
+That advice is real and worth publishing — it simply belongs somewhere mutable.
 
 ### License
 

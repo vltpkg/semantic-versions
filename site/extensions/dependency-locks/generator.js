@@ -10,11 +10,25 @@ const escapeHtml = (s) =>
       ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c],
   );
 
-function shortIntegrity(sri) {
+// Render an SRI string (`sha512-<base64>`) in Package Integrity form
+// (`sha512.<lowercase hex>`), truncated for display. The transcoding is lossless:
+// both spellings are the same digest bytes.
+// See /extensions/integrity/.
+function integrityBuild(sri) {
   const tok = String(sri).trim().split(/\s+/)[0];
   const dash = tok.indexOf("-");
   if (dash < 0) return tok;
-  return `${tok.slice(0, dash)}-${tok.slice(dash + 1, dash + 13)}…`;
+  const algo = tok.slice(0, dash);
+  let hex = "";
+  try {
+    const raw = atob(tok.slice(dash + 1));
+    for (let i = 0; i < raw.length && hex.length < 12; i++) {
+      hex += raw.charCodeAt(i).toString(16).padStart(2, "0");
+    }
+  } catch {
+    return `${algo}.${tok.slice(dash + 1, dash + 13)}…`;
+  }
+  return `${algo}.${hex}…`;
 }
 
 function condBrackets(n) {
@@ -34,7 +48,10 @@ function buildDecodedText(graph) {
 
   const shownNodes = nodes.slice(0, NODE_LIMIT);
   shownNodes.forEach((n, i) => {
-    const integ = n.integrity ? `#${shortIntegrity(n.integrity)}` : "";
+    // A version that already carries build metadata gains the digest as a further
+    // dot-separated identifier, not a second `+`.
+    const sep = n.version.includes("+") ? "." : "+";
+    const integ = n.integrity ? `${sep}${integrityBuild(n.integrity)}` : "";
     lines.push(`${i} = npm:${n.name}@${n.version}${integ}${condBrackets(n)}`);
   });
   if (nodes.length > NODE_LIMIT) {

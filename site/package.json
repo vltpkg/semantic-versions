@@ -5,7 +5,10 @@
   "type": "module",
   "description": "The semver.xyz specification site",
   "scripts": {
+    "ai-artifacts": "node scripts/ai-artifacts.mjs",
+    "predev": "node scripts/ai-artifacts.mjs",
     "dev": "vite",
+    "prebuild": "node scripts/ai-artifacts.mjs",
     "build": "vite build",
     "preview": "vite preview --port 4321"
   },

@@ -10,6 +10,7 @@
     />
     <meta name="color-scheme" content="light dark" />
     <meta name="theme-color" content="#ffffff" />
+    <link rel="describedby" type="text/markdown" href="/llms.txt" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="stylesheet" href="/src/style.css" />
   </head>
@@ -163,11 +164,12 @@
           <h2 id="f-compose">Composability</h2>
           <p>
             Variant coordinates are ordinary build identifiers, so they compose with other build-metadata
-            extensions. A variant can precede an integrity digest
-            (<code>1.0.0+linux.x64.musl.sha512.…</code> pins the exact bytes of one target), and a
-            <a href="/extensions/dependency-locks/">Dependency Lock</a> can pin the resolved variant
-            chosen for each node of a graph. See <a href="/extensions/integrity/">Package Integrity</a>
-            for the digest half.
+            extensions. Build Variants is the <em>first</em> of the three extensions for a reason: it
+            answers <em>which artifact</em>, and the other two build on that answer. A variant precedes
+            an integrity digest — <code>1.0.0+linux.x64.musl.sha512.…</code> pins the exact bytes of one
+            target — and a <a href="/extensions/dependency-locks/">Dependency Lock</a> pins a whole graph
+            whose every node is an identity of exactly that shape. See
+            <a href="/extensions/integrity/">Package Integrity</a> for the digest half.
           </p>
 
           <h2 id="f-grammar">Grammar (BNF)</h2>
