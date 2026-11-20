@@ -25,7 +25,8 @@ Given a semantic version `MAJOR.MINOR.PATCH`, increment the:
 
 - `MAJOR` version when you make incompatible API changes;
 - `MINOR` version when you add functionality in a backward compatible manner;
-- `PATCH` version when you make a fix for unintended behaviour.
+- `PATCH` version when you make changes that leave the declared public API
+  as it is.
 
 Optional labels for a pre-release and build extend the format:
 `MAJOR.MINOR.PATCH-PRERELEASE+BUILD`.
@@ -52,7 +53,8 @@ Optional labels for a pre-release and build extend the format:
    release is dependent on this public API and how it changes.
 
 6. Patch version `Z` (`x.y.Z | x > 0`) **MUST** be incremented when a release
-   leaves the declared public API unchanged. That covers corrections which bring
+   leaves the declared public API unchanged, unless the release takes the minor
+   increment that rule 7 allows. That covers corrections which bring
    behaviour into agreement with the declaration, corrections which honour the
    evident intended behaviour where the declaration is silent, and changes with
    no bearing on the declaration at all: refactors, dependency updates,
@@ -131,9 +133,10 @@ Precedence refers to how versions are compared to each other when ordered.
 
    Example: `1.0.0 < 1.0.0+build.1 < 1.0.0+build.2`
 
-5. Precedence for two pre-release or build versions with the same major, minor
-   and patch **MUST** be determined by comparing each dot separated identifier
-   from left to right until a difference is found:
+5. Precedence for two pre-releases with the same major, minor and patch, or
+   for two builds whose versions are equal up to the build, **MUST** be
+   determined by comparing each dot separated identifier from left to right
+   until a difference is found:
 
    1. Identifiers consisting of only digits are compared numerically.
    2. Identifiers with letters or hyphens are compared lexically in ASCII sort
@@ -146,6 +149,11 @@ Precedence refers to how versions are compared to each other when ordered.
    Example: `1.0.0-alpha < 1.0.0-alpha.1 < 1.0.0-alpha.beta < 1.0.0-beta <
    1.0.0-beta.2 < 1.0.0-beta.11 < 1.0.0-rc.1 < 1.0.0 < 1.0.0+build.1`
 
+6. A [context](#context) is identity, not precedence. It is not one of the
+   identifiers above, so it never changes how two versions order; which
+   versions may be compared or selected together is a property of the
+   [set](#sets) or [range](#ranges) that holds them.
+
 ## Sets
 
 A **Set** is a collection of versions. Sets are how the ecosystem actually
@@ -154,16 +162,15 @@ reasons about software: *"every version of this package"*, *"the 1.x line"*,
 can talk about *groups* of versions, not just one at a time.
 
 1. A **Set** **MUST** contain a collection of semantic versions.
-2. All potential `MAJOR`, `MINOR`, `PATCH` and `PRE-RELEASE` versions **MUST** be
-   interpreted as valid subsets of any set.
-3. A Set **MAY** be scoped to a **context**; such a **Contextual Set** **MUST**
+2. A Set **MAY** be scoped to a **context**; such a **Contextual Set** **MUST**
    contain only versions sharing that context.
-4. Fixing any single identifier (`MAJOR`, `MINOR`, `PATCH`, `PRE-RELEASE` or
+3. Fixing any single identifier (`MAJOR`, `MINOR`, `PATCH`, `PRE-RELEASE` or
    `BUILD`) partitions a set into **Subsets**.
-5. A Set **MAY** be sorted according to version precedence.
-6. Sets **MAY** contain duplicate versions.
-7. Duplicate versions in a set **MUST** have unique build metadata.
-8. An **Unordered Set** imposes no ordering; an **Ordered Set** **MUST** be
+4. A Set **MUST NOT** contain two versions of equal [precedence](#precedence).
+   Versions that differ in their build are distinct versions with distinct
+   precedence ([Versions](#versions), 11), so `3.2.1` and `3.2.1+build.123`
+   **MAY** both be members.
+5. An **Unordered Set** imposes no ordering; an **Ordered Set** **MUST** be
    sorted by precedence.
 
 Examples:
@@ -173,9 +180,9 @@ Examples:
 - Valid set: `3.2.1, 3.2.1+build.123`
 - Ordered set: `0.9.8, 1.16.3, 3.2.1, 3.2.1+build.123, 4.0.0, 5.6.7`
 - Unordered set: `5.6.7, 3.2.1+build.123, 3.2.1, 4.0.0, 1.16.3, 0.9.8`
-- Normal set: `0.9.8, 1.16.3, 3.2.1, 4.0.0, 5.6.7`
-- Pre-release set: `1.0.0-pre.1, 1.0.0-pre.2, 1.0.0-pre.3`
-- Build set: `1.0.0+build.1, 1.0.0+build.2, 1.0.0+build.3`
+- Normal versions only: `0.9.8, 1.16.3, 3.2.1, 4.0.0, 5.6.7`
+- The pre-releases of one release: `1.0.0-pre.1, 1.0.0-pre.2, 1.0.0-pre.3`
+- The builds of one release: `1.0.0+build.1, 1.0.0+build.2, 1.0.0+build.3`
 
 ### Context
 
@@ -184,7 +191,8 @@ the identity a version belongs to: a package, module, image, crate, service or
 any other named artifact. It scopes a version with an `@` separator
 (`context@MAJOR.MINOR.PATCH-PRE+BUILD`), so that where a bare `1.2.3` is
 ambiguous, `app@1.2.3-canary.1+sha.1a8c…` names a specific build of a specific
-thing.
+thing. A version never contains `@`, so the context is everything before the
+last one; a name may itself contain `@`, as an npm scope does.
 
 Context is deliberately **ecosystem-agnostic**. Everything above (the version
 grammar, precedence, sets and ranges) makes no assumption about where a version
@@ -202,8 +210,12 @@ other: `internal:billing@2.4.0`. Source-qualified contexts are what the
 ### SubSets
 
 Fixing any one coordinate of a version yields a **subset** of `context@*`. Every
-position (major, minor, patch, pre-release and build) defines its own family. The
-full set `<context>@*` is the union of all of them.
+position (major, minor, patch, pre-release and build) defines its own family.
+The major, minor and patch families each partition the full set `<context>@*`;
+the pre-release and build families partition the versions that carry that
+label. The table below is set notation, not range syntax: a
+[range](#ranges) fixes leading coordinates only (`1.2.x`), and `*.0.*` is not
+a range.
 
 | Major SubSet | Minor SubSet | Patch SubSet | Pre-release SubSet | Build SubSet |
 | --- | --- | --- | --- | --- |
@@ -254,8 +266,13 @@ Ranges may be non-contiguous, so a version might be neither greater than, less
 than, *nor* a member of a range. For example, `1.2 <1.2.9 || >2.0.0` has a hole
 from `1.2.9` to `2.0.0`: `1.2.10` is not greater than the range (`2.0.1`
 satisfies, which is higher), not less than it (`1.2.8` satisfies, which is
-lower), and does not satisfy it. Test membership directly with
-`satisfies(version, range)`.
+lower), and does not satisfy it. Test membership directly.
+
+A range **MAY** carry a [context](#context) the same way a version does
+(`npm:react@^18.0.0`). A context-scoped range selects from the
+[contextual set](#contextual-sets) of that context: a version of another
+context, or of none, does not satisfy it, whatever its number. A range with
+no context places no constraint on context, so it selects by number alone.
 
 > The range, comparator and advanced range syntax in this specification descend
 > from [`node-semver`](https://github.com/npm/node-semver), the `semver` package
@@ -285,13 +302,26 @@ joined by whitespace to form a *comparator set*, satisfied by the
 
 - `>=1.2.7` matches `1.2.7`, `1.2.8`, `2.5.3` and `1.3.9`, but not `1.2.6` or
   `1.1.0`.
-- `>1` is equivalent to `>=2.0.0`; it matches `2.0.0` and `3.1.0`, but not
-  `1.0.1` or `1.1.0`.
+
+The operator **MAY** be omitted, in which case `=` is implied: `1.2.3` is
+`=1.2.3`. A partial version after an operator stands for the whole tuple it
+names, so the comparator applies to all of it:
+
+- `>1` := `>=2.0.0`; it matches `2.0.0` and `3.1.0`, but not `1.0.1` or
+  `1.1.0`.
+- `>1.2` := `>=1.3.0`, and `>=1.2` := `>=1.2.0`
+- `<1.2` := `<1.2.0-0`, and `<=1.2` := `<1.3.0-0`
+- `=1.2` := `>=1.2.0 <1.3.0-0` (an [x-range](#x-ranges-12x-1x-12-))
 
 ## Advanced range syntax
 
 Advanced ranges desugar to primitive comparators in deterministic ways, and may
 be combined in the same way as primitive comparators, using whitespace or `||`.
+
+Upper bounds desugar to `<X.Y.Z-0`. Because `0` is the lowest possible
+pre-release identifier, such a bound excludes `X.Y.Z` and every pre-release of
+it; it does not open a [pre-release channel](#pre-release-channels), since
+nothing on that tuple can fall below it.
 
 ### Hyphen ranges `X.Y.Z - A.B.C`
 
@@ -415,8 +445,8 @@ pre-releases" switch; admission is always a property of the range.
 2. A comparator, tilde, or caret carrying a pre-release declares a channel whose
    prefix is its pre-release identifiers, scoped to its tuple. A pre-release
    candidate is admitted if and only if it is within the numeric bounds **and**
-   its identifiers, compared left to right, **begin with** some declared
-   channel's on the **same** tuple.
+   its identifiers, compared left to right, **begin with** the prefix of some
+   channel declared on the **same** tuple.
    - `^1.0.0-rc` (prefix `rc`) admits `1.0.0-rc`, `1.0.0-rc.1`, `1.0.0-rc.2`;
      never `1.0.0-beta` (different channel) and never `1.5.0-rc` (different
      tuple).
@@ -461,7 +491,7 @@ from [precedence](#precedence):
 | Label | Ranks vs. its release | Meaning | Default in a range | Opt in / narrow with |
 | --- | --- | --- | --- | --- |
 | Pre-release | **below** (`1.0.0-rc < 1.0.0`) | provisional, on the way *to* the release | **excluded** | name it (`-rc`), `-*`, or `*-*` |
-| Build | **at/above** (`1.0.0 < 1.0.0+win`) | a refinement, a specific artifact *of* the release | **included** | a channel narrows (`+win`) |
+| Build | **above** (`1.0.0 < 1.0.0+win`) | a refinement, a specific artifact *of* the release | **included** | a channel narrows (`+win`) |
 
 A version is in a range when it passes every comparator's numeric test **and**,
 for whichever labels it carries, the range's channels admit them. Nothing is
