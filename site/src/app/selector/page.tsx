@@ -52,8 +52,8 @@ export default function Page() {
               spellCheck="false"
               autoComplete="off"
               aria-label="Registry origin"
-              placeholder="https://registry.vlt.io/upstream/npm"
-              defaultValue="https://registry.vlt.io/upstream/npm"
+              placeholder="https://registry.npmjs.org"
+              defaultValue="https://registry.npmjs.org"
             />{" "}
             <input
               id="pkg"
@@ -74,13 +74,8 @@ export default function Page() {
           </div>
         </div>
         <p className="hint fetch-note reveal">
-          Fetches the package document directly from any npm-compatible registry origin, entirely client-side. The
-          default is{" "}
-          <a href="https://vlt.sh" target="_blank" rel="noopener">
-            vlt
-          </a>
-          's mirror of the public npm registry; npm itself (<code>https://registry.npmjs.org</code>), Verdaccio, GitHub
-          Packages or a private mirror work too. Note that public registries don't publish{" "}
+          Fetches the package document directly from any npm-compatible registry origin (npm, Verdaccio, GitHub
+          Packages, a private mirror, and so on), entirely client-side. Note that public registries don't publish{" "}
           <strong>build metadata</strong> and rarely carry long pre-release trains, so the <em>Build variants</em> and{" "}
           <em>Release train</em> sample sets above are the best way to explore those parts of the grammar.
         </p>

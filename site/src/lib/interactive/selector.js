@@ -377,10 +377,8 @@ export function mount() {
     }
   }
 
-  // vlt's public mirror of the npm registry: same packuments, served with CORS.
-  const DEFAULT_REGISTRY = "https://registry.vlt.io/upstream/npm";
-  // The previous default. A saved origin equal to it was never a real choice.
-  const PREVIOUS_DEFAULT = "https://registry.npmjs.org";
+  // The public npm registry, which serves packuments with CORS.
+  const DEFAULT_REGISTRY = "https://registry.npmjs.org";
 
   function normalizeOrigin(value) {
     const trimmed = (value || "").trim().replace(/\/+$/, "");
@@ -406,8 +404,7 @@ export function mount() {
 
     try {
       const saved = localStorage.getItem("semver-xyz.registry");
-      if (saved && saved !== PREVIOUS_DEFAULT) registryInput.value = saved;
-      else registryInput.value = DEFAULT_REGISTRY;
+      registryInput.value = saved || DEFAULT_REGISTRY;
     } catch {
       /* storage may be unavailable; non-fatal */
     }
