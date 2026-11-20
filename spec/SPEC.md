@@ -193,32 +193,11 @@ written `source:name`, which names the origin or ecosystem. The same rules then
 apply identically everywhere: `npm:react@18.2.0`, `pypi:flask@3.0.0`,
 `gem:rails@7.1.3`, `cargo:serde@1.0.203`, `golang:golang.org/x/text@0.14.0`.
 
-A source-qualified context is what the
-[extensions](https://semver.xyz/extensions/) build on, and it lines up with a
-[Package-URL](https://github.com/package-url/purl-spec). Where an ecosystem
-already has a
-[Package-URL type](https://github.com/package-url/purl-spec/blob/main/PURL-TYPES.rst),
-use it as the source, so a reference maps onto a `purl` one-to-one. The same
-spec then covers JavaScript, Python, Ruby, Rust, Go, Java, .NET, PHP and
-container images without change:
-
-| Ecosystem | Semantic Versions reference | Package-URL |
-| --- | --- | --- |
-| JavaScript · npm | `npm:react@18.2.0` | `pkg:npm/react@18.2.0` |
-| Python · PyPI | `pypi:flask@3.0.0` | `pkg:pypi/flask@3.0.0` |
-| Ruby · RubyGems | `gem:rails@7.1.3` | `pkg:gem/rails@7.1.3` |
-| Rust · Cargo | `cargo:serde@1.0.203` | `pkg:cargo/serde@1.0.203` |
-| Go · modules | `golang:golang.org/x/text@0.14.0` | `pkg:golang/golang.org/x/text@0.14.0` |
-| Java · Maven | `maven:com.google.guava/guava@33.0.0` | `pkg:maven/com.google.guava/guava@33.0.0` |
-| .NET · NuGet | `nuget:Newtonsoft.Json@13.0.3` | `pkg:nuget/Newtonsoft.Json@13.0.3` |
-| PHP · Composer | `composer:symfony/console@7.0.4` | `pkg:composer/symfony/console@7.0.4` |
-| Containers · OCI | `oci:alpine@3.20.0` | `pkg:oci/alpine@3.20.0` |
-
-Namespaces carry across too: an npm scope or a Maven group is part of the name
-(`npm:@vue/cli@5.0.8`, `maven:com.google.guava/guava@33.0.0`), the same segment a
-`purl` puts in its namespace. A source is just a lowercase token, so an ecosystem
-without a Package-URL type (or a private origin) still fits:
-`napi:sharp@0.33.0`, `internal:billing@2.4.0`.
+A source is a lowercase token, and a name keeps whatever namespace its
+ecosystem uses, such as an npm scope or a Maven group: `npm:@vue/cli@5.0.8`,
+`maven:com.google.guava/guava@33.0.0`. A private origin is a source like any
+other: `internal:billing@2.4.0`. Source-qualified contexts are what the
+[extensions](https://semver.xyz/extensions/) build on.
 
 ### SubSets
 

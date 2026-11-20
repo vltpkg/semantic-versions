@@ -49,7 +49,7 @@
           <a href="#public-api">Public API &amp; products</a>
           <a href="#deprecated">Deprecation</a>
           <div class="toc-title">Ecosystem</div>
-          <a href="#purl">Package-URL (purl)</a>
+          <a href="#purl">Do I still need purl?</a>
           <a href="#pep-440">Python's PEP 440</a>
           <div class="toc-title">The project</div>
           <a href="#grammar">Grammar</a>
@@ -295,26 +295,34 @@
 
           <h2 id="ecosystem">Ecosystem</h2>
 
-          <h3 id="purl">How does this relate to Package-URL (<code>purl</code>)?</h3>
+          <h3 id="purl">Do I still need Package-URL (<code>purl</code>)?</h3>
           <p>
-            They solve different problems and compose cleanly.
-            <a href="https://github.com/package-url/purl-spec" target="_blank" rel="noopener">Package-URL</a>
-            (ECMA-427) is an <em>identifier</em>: <code>pkg:npm/react@18.2.0</code> standardises how
-            to name and locate a package across ecosystems, and is what SBOMs (CycloneDX, SPDX) and
-            vulnerability databases (OSV, CVE) reference. It deliberately says nothing about version
-            <em>semantics</em> (precedence, ordering or matching) and defers ranges to its separate
-            <a href="https://github.com/package-url/purl-spec/blob/main/VERSION-RANGE-SPEC.rst" target="_blank" rel="noopener"><code>vers</code></a>
-            constraint syntax.
+            For most uses, no. A source-qualified <a href="/spec/#context">context</a> already
+            identifies a package version across ecosystems: <code>npm:react@18.2.0</code> names
+            the same thing as <code>pkg:npm/react@18.2.0</code>. The difference is what comes with
+            it. A <code>purl</code> is only an identifier: it says nothing about how versions order
+            or match, and leaves ranges to a separate syntax
+            (<a href="https://github.com/package-url/purl-spec/blob/main/VERSION-RANGE-SPEC.rst" target="_blank" rel="noopener"><code>vers</code></a>).
+            A Semantic Versions reference carries its semantics with it: precedence (builds
+            included), sets, ranges and comparators, defined once and shared by every ecosystem.
           </p>
           <p>
-            Semantic Versions is the complementary layer: it defines what a version <em>means</em>,
-            covering precedence (including build), sets, ranges and comparators. A <code>purl</code>
-            says <em>which</em> package; Semantic Versions says how its versions <em>order and
-            match</em>. The source-qualified identity used here maps onto a <code>purl</code>
-            one-to-one across every ecosystem (see the <a href="/spec/#context">mapping table</a>
-            under Context), so a tool can carry both. The one thing neither <code>purl</code>
-            qualifiers nor <code>vers</code> model is a <strong>precedence-bearing build</strong>,
-            which is precisely the slot the <a href="/extensions/">extensions</a> occupy.
+            The rest of a <code>purl</code> has a place here too. Platform and distribution
+            qualifiers (<code>?arch=&hellip;&amp;os=&hellip;</code>) sit outside a
+            <code>purl</code>&rsquo;s version, so nothing can order or select by them; as
+            <a href="/extensions/variants/">Build Variants</a> they live in the build, where ranges
+            can select them. An origin other than the public registry is just another source
+            (<code>internal:billing@2.4.0</code>).
+          </p>
+          <p>
+            Where a tool or SBOM format still asks for a <code>purl</code>, converting is
+            mechanical: <code>source:name@version</code> becomes
+            <code>pkg:source/name@version</code>, with an npm scope or Maven group moving into its
+            namespace segment (<code>npm:@vue/cli@5.0.8</code> becomes
+            <code>pkg:npm/%40vue/cli@5.0.8</code>). Using the familiar ecosystem tokens as sources
+            (<code>npm</code>, <code>pypi</code>, <code>gem</code>, <code>cargo</code>,
+            <code>golang</code>, <code>maven</code>, <code>nuget</code>, <code>composer</code>,
+            <code>oci</code>) keeps that conversion one-to-one.
           </p>
 
           <h3 id="pep-440">How does it work with Python&rsquo;s PEP 440?</h3>
