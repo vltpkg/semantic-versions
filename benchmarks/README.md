@@ -8,7 +8,7 @@ libraries people use today, in each language:
 
 | Language | Package | Conformance | Compared with | Speed vs. it |
 | --- | --- | :---: | --- | ---: |
-| [JavaScript](../libraries/javascript) | `semantic-versions` (npm) | 476/476 | `semver` 396/476 | 1.2–11× |
+| [JavaScript](../libraries/javascript) | `semantic-versions` (npm) | 476/476 | `semver` 396/476 | 1.4–9.8× |
 | [Rust](../libraries/rust) | `semantic-versions` (crates.io) | 476/476 | `nodejs-semver` 366/476 | 0.9–1.3× |
 | [Python](../libraries/python) | `semantic-versions` (PyPI) | 476/476 | `node-semver` 366/476 | 1.5–17× |
 | [Go](../libraries/go) | `semver.xyz/go` (pkg.go.dev) | 476/476 | `Masterminds/semver` 348/436 | 2.8–23× |
@@ -79,13 +79,13 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 
 | Operation | `semantic-versions@1.0.1` | `semver@7.8.5` | semantic-versions vs semver |
 | --- | ---: | ---: | --- |
-| Parse a version | **109 ns** | 277 ns | **2.5× faster** |
-| Sort versions | **409 ns** | 4.41 µs | **11× faster** |
-| Parse a range | **5.73 µs** | 6.77 µs | **1.2× faster** |
-| satisfies(version, range) | **449 ns** | 993 ns | **2.2× faster** |
-| Resolve a range | **16.7 µs** | 54.8 µs | **3.3× faster** |
+| Parse a version | **59.3 ns** | 163 ns | **2.7× faster** |
+| Sort versions | **257 ns** | 2.51 µs | **9.8× faster** |
+| Parse a range | **2.14 µs** | 3.05 µs | **1.4× faster** |
+| satisfies(version, range) | **336 ns** | 677 ns | **2.0× faster** |
+| Resolve a range | **10.6 µs** | 32.7 µs | **3.1× faster** |
 
-<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. Node.js 22.23.5 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x64 · 2026-11-20.</sub>
+<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. Node.js 24.18.0 · Apple M3 · darwin arm64 · 2026-11-20.</sub>
 
 ### Conformance
 

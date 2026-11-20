@@ -33,7 +33,7 @@ Every implementation passes the same [conformance suite](conformance) and is
 
 | Language | Package | Conformance | Compared with | Speed vs. it |
 | --- | --- | :---: | --- | ---: |
-| [JavaScript](libraries/javascript) | `semantic-versions` (npm) | 476/476 | `semver` 396/476 | 1.2–11× |
+| [JavaScript](libraries/javascript) | `semantic-versions` (npm) | 476/476 | `semver` 396/476 | 1.4–9.8× |
 | [Rust](libraries/rust) | `semantic-versions` (crates.io) | 476/476 | `nodejs-semver` 366/476 | 0.9–1.3× |
 | [Python](libraries/python) | `semantic-versions` (PyPI) | 476/476 | `node-semver` 366/476 | 1.5–17× |
 | [Go](libraries/go) | `semver.xyz/go` (pkg.go.dev) | 476/476 | `Masterminds/semver` 348/436 | 2.8–23× |

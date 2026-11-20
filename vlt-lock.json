@@ -2,7 +2,8 @@
   "lockfileVersion": 1,
   "options": {
     "registries": {
-      "npm": "https://registry.npmjs.org/"
+      "npm": "https://registry.npmjs.org/",
+      "main": "https://registry.vlt.io/vltpkg/main/"
     }
   },
   "nodes": {
