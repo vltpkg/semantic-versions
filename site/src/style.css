@@ -750,7 +750,6 @@ a.card:hover { background: var(--hover); }
   .talk-grid .section-head { max-width: none; }
   .talk-grid .talk { max-width: 560px; justify-self: start; }
 }
-.tl-item .talk { margin-top: 16px; max-width: 560px; }
 
 .doc-status { margin-top: 72px; padding-top: 36px; border-top: 1px solid var(--border); }
 .doc-status .eyebrow { margin-bottom: 12px; }
