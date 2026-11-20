@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>History: how build metadata lost its meaning · semver.xyz</title>
+    <title>History: a short history of Semantic Versioning · semver.xyz</title>
     <meta
       name="description"
-      content="A short history of Semantic Versioning: how builds were introduced in 2.0.0-rc.1, and how 2.0.0-rc.2 turned them into inert build metadata."
+      content="A short history of Semantic Versioning, from semver.org in 2009 to today: how builds were introduced in 2.0.0-rc.1, how 2.0.0-rc.2 turned them into inert build metadata, and what has and hasn't changed since."
     />
     <meta name="color-scheme" content="light" />
     <meta name="theme-color" content="#ffffff" />
@@ -20,24 +20,46 @@
     <main>
       <section class="page-hero reveal">
         <p class="eyebrow">History</p>
-        <h1>How <span class="grad">build</span> lost its meaning.</h1>
+        <h1>A short history of <span class="grad">Semantic Versioning</span>.</h1>
         <p class="lead">
           Semantic Versioning is well intentioned, but it carries a few bad definitions and a few
-          missing ones. The most consequential mistake happened between two release candidates, and
-          we still live with it today. Here is the paper trail.
+          missing ones. The most consequential mistake happened between two release candidates in
+          2013, and we still live with it today. Here is the paper trail, from the first commit of
+          semver.org to the proposal that never landed.
         </p>
       </section>
 
       <section class="timeline">
         <div class="tl-item reveal">
           <span class="tl-dot"></span>
-          <div class="tl-date">2010</div>
-          <h3>Node &amp; npm sidestep dependency hell</h3>
+          <div class="tl-date">Dec 2009 · semver.org · @mojombo</div>
+          <h3>Versioning gets a name</h3>
           <p>
-            Node introduces nested modules and npm arrives. Because you can safely scope while
-            still consuming conflicting transitive dependencies, JavaScript avoids the first circle
-            of dependency hell that trapped single-version ecosystems. The community goes on to
-            publish more packages than anywhere else.
+            Tom Preston-Werner, a cofounder of GitHub, publishes Semantic Versioning: a name, a
+            specification and a URL for the <code>MAJOR.MINOR.PATCH</code> convention many projects
+            already followed loosely. The pitch is dependency hell: with a public API declared and
+            the three numbers meaning what they say, a consumer can state what it needs and a tool
+            can resolve it. The CommonJS group is discussing whether to require it the same day.
+            Within days it has &ldquo;special versions&rdquo; (<code>1.0.0beta1</code>), the
+            ancestor of pre-releases.
+          </p>
+          <p>
+            <a href="https://github.com/semver/semver.org/commit/ca64580" target="_blank" rel="noopener">semver.org@ca64580 &mdash; &ldquo;First commit&rdquo;</a> ·
+            <a href="https://semver.org/spec/v0.9.0.html" target="_blank" rel="noopener">semver.org/spec/v0.9.0.html</a>
+          </p>
+        </div>
+
+        <div class="tl-item reveal">
+          <span class="tl-dot"></span>
+          <div class="tl-date">Jan 2010 · npm · @isaacs</div>
+          <h3>npm makes it the rule</h3>
+          <p>
+            npm arrives, adopts Semantic Versioning for package versions from the start, and nests
+            <code>node_modules</code>, so conflicting transitive dependencies can be
+            installed side by side instead of fighting over one slot. JavaScript sidesteps the first
+            circle of dependency hell that trapped single-version ecosystems, and the registry goes
+            on to hold more packages than anywhere else. Every one of them is versioned by this spec,
+            which makes npm the spec&rsquo;s largest test, and the place its gaps show first.
           </p>
         </div>
 
@@ -55,6 +77,24 @@
           </p>
           <p>
             <a href="https://github.com/npm/node-semver" target="_blank" rel="noopener">npm/node-semver</a>
+          </p>
+        </div>
+
+        <div class="tl-item reveal">
+          <span class="tl-dot"></span>
+          <div class="tl-date">Mar&ndash;Jun 2011 · 1.0.0</div>
+          <h3>1.0.0, and pre-releases get their dash</h3>
+          <p>
+            The document becomes <strong>Semantic Versioning 1.0.0</strong>. Special versions are
+            renamed pre-releases, and in June they get the dash that every parser now expects:
+            <code>1.0.0-alpha1</code> rather than <code>1.0.0alpha1</code>. Precedence is still
+            &ldquo;lexicographic ASCII sort order&rdquo;, which is why <code>1.0.0-beta11</code>
+            would sort before <code>1.0.0-beta2</code>; the dotted identifiers that fix that are
+            still a few months away.
+          </p>
+          <p>
+            <a href="https://semver.org/spec/v1.0.0.html" target="_blank" rel="noopener">semver.org/spec/v1.0.0.html</a> ·
+            <a href="https://github.com/semver/semver/commit/05a00df" target="_blank" rel="noopener">semver@05a00df &mdash; &ldquo;Delimit pre-release versions by dash&rdquo;</a>
           </p>
         </div>
 
@@ -105,6 +145,22 @@
             <a href="https://github.com/semver/semver/pull/77" target="_blank" rel="noopener">semver/semver#77</a> ·
             <a href="https://github.com/semver/semver/commit/57fd19400f53b5d4559de4dcf6ede2e638250625" target="_blank" rel="noopener">57fd194</a> ·
             <a href="https://github.com/semver/semver/commit/13aaadaadb0d572b59c84a9851540ed1caeea35f" target="_blank" rel="noopener">13aaada</a>
+          </p>
+        </div>
+
+        <div class="tl-item reveal">
+          <span class="tl-dot"></span>
+          <div class="tl-date">Jun 2013 · 2.0.0</div>
+          <h3>2.0.0 is final. Then nothing.</h3>
+          <p>
+            <code>2.0.0</code> is published on 18 June 2013 with rc.2&rsquo;s definitions intact:
+            build metadata is ignored for precedence, and the spec still says nothing about ranges.
+            It is the version every package manager cites today. In the years since, the document
+            has gained a grammar, a regex and translations, but no change to what a version means,
+            and no successor has been published.
+          </p>
+          <p>
+            <a href="https://semver.org/spec/v2.0.0.html" target="_blank" rel="noopener">semver.org/spec/v2.0.0.html</a>
           </p>
         </div>
 
