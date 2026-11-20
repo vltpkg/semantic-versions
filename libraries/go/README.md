@@ -71,11 +71,11 @@ All implementations: [semver.xyz/libraries](https://semver.xyz/libraries/).
 
 | Operation | `semantic-versions@1.0.0` | `Masterminds/semver@3.5.0` | `blang/semver@4.0.0` | semantic-versions vs Masterminds/semver |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **29.7 ns** | 591 ns | 170 ns | **20× faster** |
-| Sort versions | **192 ns** | 492 ns | 248 ns | **2.6× faster** |
-| Parse a range | **371 ns** | 6.77 µs | — | **18× faster** |
-| Range.Test(version) | **27.3 ns** | 636 ns | — | **23× faster** |
-| Resolve a range | **4.24 µs** | 91.1 µs | — | **21× faster** |
+| Parse a version | **31.1 ns** | 602 ns | 173 ns | **19× faster** |
+| Sort versions | **203 ns** | 558 ns | 262 ns | **2.8× faster** |
+| Parse a range | **388 ns** | 6.91 µs | — | **18× faster** |
+| Range.Test(version) | **28.4 ns** | 647 ns | — | **23× faster** |
+| Resolve a range | **4.26 µs** | 95.5 µs | — | **22× faster** |
 
 <sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. go1.24.7 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux amd64 · 2026-11-19. `Masterminds/semver`: NewVersion is lenient by design (it accepts v1.2 and coerces it), which is why it fails the strict-parsing cases. `blang/semver`: Its range syntax has no ^, ~ or x-ranges, so it is compared on versions only.</sub>
 

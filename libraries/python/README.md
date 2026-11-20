@@ -72,11 +72,11 @@ All implementations: [semver.xyz/libraries](https://semver.xyz/libraries/).
 
 | Operation | `semantic-versions@1.0.0` | `node-semver@0.9.1` | `semver@3.1.2` | semantic-versions vs node-semver |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **1.19 µs** | 1.76 µs | 1.67 µs | **1.5× faster** |
-| Sort versions | **803 ns** | 11.9 µs | 6.32 µs | **15× faster** |
-| Parse a range | **5.04 µs** | 18.8 µs | — | **3.7× faster** |
-| range.test(version) | **302 ns** | 1.95 µs | — | **6.4× faster** |
-| Resolve a range | **37.3 µs** | 251.6 µs | — | **6.7× faster** |
+| Parse a version | **1.05 µs** | 1.60 µs | 1.64 µs | **1.5× faster** |
+| Sort versions | **645 ns** | 11.1 µs | 7.04 µs | **17× faster** |
+| Parse a range | **4.15 µs** | 15.5 µs | — | **3.7× faster** |
+| range.test(version) | **229 ns** | 2.01 µs | — | **8.8× faster** |
+| Resolve a range | **47.5 µs** | 319.8 µs | — | **6.7× faster** |
 
 <sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. CPython 3.13.18 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x86_64 · 2026-11-19. `semver`: python-semver has no npm-style ranges (only single comparisons such as >=1.2.3), so it is compared on versions only.</sub>
 

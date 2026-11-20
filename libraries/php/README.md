@@ -71,11 +71,11 @@ All implementations: [semver.xyz/libraries](https://semver.xyz/libraries/).
 
 | Operation | `semantic-versions@1.0.0` | `composer/semver@3.6.0` | `z4kn4fein/php-semver@3.0.0` | semantic-versions vs composer/semver |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **434 ns** | 1.03 µs | 789 ns | **2.4× faster** |
-| Sort versions | **1.96 µs** | 1.98 µs | 2.64 µs | about the same |
-| Parse a range | **2.69 µs** | 2.92 µs | 4.47 µs | **1.1× faster** |
-| range->test(version) | **211 ns** | 740 ns | 634 ns | **3.5× faster** |
-| Resolve a range | **32.2 µs** | 92.6 µs | 65.8 µs | **2.9× faster** |
+| Parse a version | **440 ns** | 1.00 µs | 755 ns | **2.3× faster** |
+| Sort versions | **1.99 µs** | 1.94 µs | 2.61 µs | about the same |
+| Parse a range | **2.77 µs** | 2.85 µs | 3.26 µs | about the same |
+| range->test(version) | **205 ns** | 741 ns | 601 ns | **3.6× faster** |
+| Resolve a range | **33.4 µs** | 124.1 µs | 86.7 µs | **3.7× faster** |
 
 <sub>Median time per operation (lower is better) on 5,398 published versions and 797 dependency ranges from the npm registry. PHP 8.3.6 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x86_64 · 2026-11-20. `composer/semver`: Composer's model differs by design: versions normalize to four parts with stability flags (1.0.0-rc.1 becomes 1.0.0.0-RC1), builds are dropped, and pre-release names outside alpha, beta, RC and patch are rejected. Versions are scored on parsing to the same value.</sub>
 

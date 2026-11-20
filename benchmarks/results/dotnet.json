@@ -46,16 +46,16 @@
       "description": "5398 published versions",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 30.2,
-          "opsPerSec": 33151707
+          "nsPerOp": 36.6,
+          "opsPerSec": 27299706
         },
         "Semver": {
-          "nsPerOp": 348.8,
-          "opsPerSec": 2867258
+          "nsPerOp": 372.5,
+          "opsPerSec": 2684227
         },
         "SemanticVersioning": {
-          "nsPerOp": 598.2,
-          "opsPerSec": 1671662
+          "nsPerOp": 594.4,
+          "opsPerSec": 1682495
         }
       }
     },
@@ -65,16 +65,16 @@
       "description": "5398 parsed versions by precedence (per version)",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 107.1,
-          "opsPerSec": 9336482
+          "nsPerOp": 100.6,
+          "opsPerSec": 9944361
         },
         "Semver": {
-          "nsPerOp": 161.4,
-          "opsPerSec": 6194312
+          "nsPerOp": 161.8,
+          "opsPerSec": 6182104
         },
         "SemanticVersioning": {
-          "nsPerOp": 788.1,
-          "opsPerSec": 1268846
+          "nsPerOp": 778.1,
+          "opsPerSec": 1285257
         }
       }
     },
@@ -84,16 +84,16 @@
       "description": "1996 real dependency ranges",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 376.6,
-          "opsPerSec": 2655482
+          "nsPerOp": 329.7,
+          "opsPerSec": 3032640
         },
         "Semver": {
-          "nsPerOp": 784.1,
-          "opsPerSec": 1275395
+          "nsPerOp": 711.5,
+          "opsPerSec": 1405478
         },
         "SemanticVersioning": {
-          "nsPerOp": 22395.1,
-          "opsPerSec": 44653
+          "nsPerOp": 18153.5,
+          "opsPerSec": 55086
         }
       }
     },
@@ -103,16 +103,16 @@
       "description": "15604 version \u00D7 range checks",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 6.9,
-          "opsPerSec": 144675311
+          "nsPerOp": 7.5,
+          "opsPerSec": 133988447
         },
         "Semver": {
-          "nsPerOp": 9.2,
-          "opsPerSec": 108570834
+          "nsPerOp": 9.6,
+          "opsPerSec": 103992481
         },
         "SemanticVersioning": {
-          "nsPerOp": 83.5,
-          "opsPerSec": 11975049
+          "nsPerOp": 74.9,
+          "opsPerSec": 13343280
         }
       }
     },
@@ -122,16 +122,16 @@
       "description": "116 max-satisfying lookups against a package\u0027s versions",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 1417.2,
-          "opsPerSec": 705631
+          "nsPerOp": 1438.4,
+          "opsPerSec": 695199
         },
         "Semver": {
-          "nsPerOp": 1929.7,
-          "opsPerSec": 518214
+          "nsPerOp": 2020.4,
+          "opsPerSec": 494961
         },
         "SemanticVersioning": {
-          "nsPerOp": 33864.5,
-          "opsPerSec": 29529
+          "nsPerOp": 32332.9,
+          "opsPerSec": 30928
         }
       }
     }

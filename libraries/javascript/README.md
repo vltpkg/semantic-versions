@@ -105,11 +105,11 @@ Also on [semver.xyz/libraries](https://semver.xyz/libraries/).
 
 | Operation | `semantic-versions@1.0.1` | `semver@7.8.5` | semantic-versions vs semver |
 | --- | ---: | ---: | --- |
-| Parse a version | **102 ns** | 296 ns | **2.9× faster** |
-| Sort versions | **677 ns** | 4.51 µs | **6.7× faster** |
-| Parse a range | **5.33 µs** | 6.83 µs | **1.3× faster** |
-| satisfies(version, range) | **409 ns** | 1.02 µs | **2.5× faster** |
-| Resolve a range | **15.7 µs** | 54.5 µs | **3.5× faster** |
+| Parse a version | **109 ns** | 277 ns | **2.5× faster** |
+| Sort versions | **409 ns** | 4.41 µs | **11× faster** |
+| Parse a range | **5.73 µs** | 6.77 µs | **1.2× faster** |
+| satisfies(version, range) | **449 ns** | 993 ns | **2.2× faster** |
+| Resolve a range | **16.7 µs** | 54.8 µs | **3.3× faster** |
 
 <sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. Node.js 22.23.5 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x64 · 2026-11-20.</sub>
 

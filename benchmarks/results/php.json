@@ -46,16 +46,16 @@
             "description": "5398 published versions",
             "results": {
                 "semantic-versions": {
-                    "nsPerOp": 434.1,
-                    "opsPerSec": 2303459
+                    "nsPerOp": 439.9,
+                    "opsPerSec": 2273027
                 },
                 "composer/semver": {
-                    "nsPerOp": 1030,
-                    "opsPerSec": 970850
+                    "nsPerOp": 1000.4,
+                    "opsPerSec": 999558
                 },
                 "z4kn4fein/php-semver": {
-                    "nsPerOp": 789.2,
-                    "opsPerSec": 1267095
+                    "nsPerOp": 754.7,
+                    "opsPerSec": 1325038
                 }
             }
         },
@@ -65,16 +65,16 @@
             "description": "5398 parsed versions by precedence (per version)",
             "results": {
                 "semantic-versions": {
-                    "nsPerOp": 1956.3,
-                    "opsPerSec": 511178
+                    "nsPerOp": 1987.5,
+                    "opsPerSec": 503136
                 },
                 "composer/semver": {
-                    "nsPerOp": 1977.5,
-                    "opsPerSec": 505688
+                    "nsPerOp": 1936,
+                    "opsPerSec": 516541
                 },
                 "z4kn4fein/php-semver": {
-                    "nsPerOp": 2635.8,
-                    "opsPerSec": 379395
+                    "nsPerOp": 2607,
+                    "opsPerSec": 383580
                 }
             }
         },
@@ -84,16 +84,16 @@
             "description": "797 real dependency ranges",
             "results": {
                 "semantic-versions": {
-                    "nsPerOp": 2688.3,
-                    "opsPerSec": 371987
+                    "nsPerOp": 2767.8,
+                    "opsPerSec": 361295
                 },
                 "composer/semver": {
-                    "nsPerOp": 2922.4,
-                    "opsPerSec": 342181
+                    "nsPerOp": 2846.2,
+                    "opsPerSec": 351345
                 },
                 "z4kn4fein/php-semver": {
-                    "nsPerOp": 4465.6,
-                    "opsPerSec": 223935
+                    "nsPerOp": 3259,
+                    "opsPerSec": 306846
                 }
             }
         },
@@ -103,16 +103,16 @@
             "description": "13654 version × range checks",
             "results": {
                 "semantic-versions": {
-                    "nsPerOp": 211.4,
-                    "opsPerSec": 4729784
+                    "nsPerOp": 205.3,
+                    "opsPerSec": 4871212
                 },
                 "composer/semver": {
-                    "nsPerOp": 739.8,
-                    "opsPerSec": 1351738
+                    "nsPerOp": 740.9,
+                    "opsPerSec": 1349737
                 },
                 "z4kn4fein/php-semver": {
-                    "nsPerOp": 633.8,
-                    "opsPerSec": 1577761
+                    "nsPerOp": 601.4,
+                    "opsPerSec": 1662803
                 }
             }
         },
@@ -122,16 +122,16 @@
             "description": "103 max-satisfying lookups against a package's versions",
             "results": {
                 "semantic-versions": {
-                    "nsPerOp": 32211.6,
-                    "opsPerSec": 31045
+                    "nsPerOp": 33375.3,
+                    "opsPerSec": 29962
                 },
                 "composer/semver": {
-                    "nsPerOp": 92648.4,
-                    "opsPerSec": 10793
+                    "nsPerOp": 124092.3,
+                    "opsPerSec": 8059
                 },
                 "z4kn4fein/php-semver": {
-                    "nsPerOp": 65764.3,
-                    "opsPerSec": 15206
+                    "nsPerOp": 86715.1,
+                    "opsPerSec": 11532
                 }
             }
         }

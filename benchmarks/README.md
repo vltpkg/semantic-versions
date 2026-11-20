@@ -8,14 +8,14 @@ libraries people use today, in each language:
 
 | Language | Package | Conformance | Compared with | Speed vs. it |
 | --- | --- | :---: | --- | ---: |
-| [JavaScript](../libraries/javascript) | `semantic-versions` (npm) | 476/476 | `semver` 396/476 | 1.3–6.7× |
-| [Rust](../libraries/rust) | `semantic-versions` (crates.io) | 476/476 | `nodejs-semver` 366/476 | 0.8–1.3× |
-| [Python](../libraries/python) | `semantic-versions` (PyPI) | 476/476 | `node-semver` 366/476 | 1.5–15× |
-| [Go](../libraries/go) | `semver.xyz/go` (pkg.go.dev) | 476/476 | `Masterminds/semver` 348/436 | 2.6–23× |
-| [Ruby](../libraries/ruby) | `semantic-versions` (RubyGems) | 476/476 | `semantic_range` 366/476 | 1.4–22× |
-| [Java](../libraries/java) | `xyz.semver:semantic-versions` (Maven Central) | 476/476 | `semver4j` 356/436 | 7.8–22× |
-| [.NET](../libraries/dotnet) | `SemanticVersions` (NuGet) | 476/476 | `Semver` 365/436 | 1.3–12× |
-| [PHP](../libraries/php) | `vltpkg/semantic-versions` (Packagist) | 476/476 | `composer/semver` 282/436 | 1.0–3.5× |
+| [JavaScript](../libraries/javascript) | `semantic-versions` (npm) | 476/476 | `semver` 396/476 | 1.2–11× |
+| [Rust](../libraries/rust) | `semantic-versions` (crates.io) | 476/476 | `nodejs-semver` 366/476 | 0.9–1.3× |
+| [Python](../libraries/python) | `semantic-versions` (PyPI) | 476/476 | `node-semver` 366/476 | 1.5–17× |
+| [Go](../libraries/go) | `semver.xyz/go` (pkg.go.dev) | 476/476 | `Masterminds/semver` 348/436 | 2.8–23× |
+| [Ruby](../libraries/ruby) | `semantic-versions` (RubyGems) | 476/476 | `semantic_range` 366/476 | 1.7–20× |
+| [Java](../libraries/java) | `xyz.semver:semantic-versions` (Maven Central) | 476/476 | `semver4j` 356/436 | 9.2–26× |
+| [.NET](../libraries/dotnet) | `SemanticVersions` (NuGet) | 476/476 | `Semver` 365/436 | 1.3–10× |
+| [PHP](../libraries/php) | `vltpkg/semantic-versions` (Packagist) | 476/476 | `composer/semver` 282/436 | 1.0–3.7× |
 
 <!-- languages:end -->
 
@@ -79,11 +79,11 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 
 | Operation | `semantic-versions@1.0.1` | `semver@7.8.5` | semantic-versions vs semver |
 | --- | ---: | ---: | --- |
-| Parse a version | **102 ns** | 296 ns | **2.9× faster** |
-| Sort versions | **677 ns** | 4.51 µs | **6.7× faster** |
-| Parse a range | **5.33 µs** | 6.83 µs | **1.3× faster** |
-| satisfies(version, range) | **409 ns** | 1.02 µs | **2.5× faster** |
-| Resolve a range | **15.7 µs** | 54.5 µs | **3.5× faster** |
+| Parse a version | **109 ns** | 277 ns | **2.5× faster** |
+| Sort versions | **409 ns** | 4.41 µs | **11× faster** |
+| Parse a range | **5.73 µs** | 6.77 µs | **1.2× faster** |
+| satisfies(version, range) | **449 ns** | 993 ns | **2.2× faster** |
+| Resolve a range | **16.7 µs** | 54.8 µs | **3.3× faster** |
 
 <sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. Node.js 22.23.5 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x64 · 2026-11-20.</sub>
 
@@ -111,11 +111,11 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 
 | Operation | `semantic-versions@1.0.0` | `nodejs-semver@7.0.0` | `semver@1.0.28` | semantic-versions vs nodejs-semver |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **24.8 ns** | 29.0 ns | 23.6 ns | **1.2× faster** |
-| Sort versions | **149 ns** | 119 ns | 127 ns | 1.26× slower |
-| Parse a range | **246 ns** | 314 ns | — | **1.3× faster** |
-| Range::test(version) | **6.8 ns** | 9.1 ns | — | **1.3× faster** |
-| Resolve a range | **1.29 µs** | 1.57 µs | — | **1.2× faster** |
+| Parse a version | **24.8 ns** | 27.6 ns | 26.0 ns | **1.1× faster** |
+| Sort versions | **132 ns** | 118 ns | 142 ns | 1.12× slower |
+| Parse a range | **231 ns** | 308 ns | — | **1.3× faster** |
+| Range::test(version) | **7.4 ns** | 9.4 ns | — | **1.3× faster** |
+| Resolve a range | **1.24 µs** | 1.54 µs | — | **1.2× faster** |
 
 <sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. rustc 1.97.0 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x86_64 · 2026-11-19. `semver`: Cargo's requirement syntax (bare versions mean ^, comparators are comma-separated, no || or hyphen ranges), so it is compared on versions only.</sub>
 
@@ -143,11 +143,11 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 
 | Operation | `semantic-versions@1.0.0` | `node-semver@0.9.1` | `semver@3.1.2` | semantic-versions vs node-semver |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **1.19 µs** | 1.76 µs | 1.67 µs | **1.5× faster** |
-| Sort versions | **803 ns** | 11.9 µs | 6.32 µs | **15× faster** |
-| Parse a range | **5.04 µs** | 18.8 µs | — | **3.7× faster** |
-| range.test(version) | **302 ns** | 1.95 µs | — | **6.4× faster** |
-| Resolve a range | **37.3 µs** | 251.6 µs | — | **6.7× faster** |
+| Parse a version | **1.05 µs** | 1.60 µs | 1.64 µs | **1.5× faster** |
+| Sort versions | **645 ns** | 11.1 µs | 7.04 µs | **17× faster** |
+| Parse a range | **4.15 µs** | 15.5 µs | — | **3.7× faster** |
+| range.test(version) | **229 ns** | 2.01 µs | — | **8.8× faster** |
+| Resolve a range | **47.5 µs** | 319.8 µs | — | **6.7× faster** |
 
 <sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. CPython 3.13.18 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x86_64 · 2026-11-19. `semver`: python-semver has no npm-style ranges (only single comparisons such as >=1.2.3), so it is compared on versions only.</sub>
 
@@ -175,11 +175,11 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 
 | Operation | `semantic-versions@1.0.0` | `Masterminds/semver@3.5.0` | `blang/semver@4.0.0` | semantic-versions vs Masterminds/semver |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **29.7 ns** | 591 ns | 170 ns | **20× faster** |
-| Sort versions | **192 ns** | 492 ns | 248 ns | **2.6× faster** |
-| Parse a range | **371 ns** | 6.77 µs | — | **18× faster** |
-| Range.Test(version) | **27.3 ns** | 636 ns | — | **23× faster** |
-| Resolve a range | **4.24 µs** | 91.1 µs | — | **21× faster** |
+| Parse a version | **31.1 ns** | 602 ns | 173 ns | **19× faster** |
+| Sort versions | **203 ns** | 558 ns | 262 ns | **2.8× faster** |
+| Parse a range | **388 ns** | 6.91 µs | — | **18× faster** |
+| Range.Test(version) | **28.4 ns** | 647 ns | — | **23× faster** |
+| Resolve a range | **4.26 µs** | 95.5 µs | — | **22× faster** |
 
 <sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. go1.24.7 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux amd64 · 2026-11-19. `Masterminds/semver`: NewVersion is lenient by design (it accepts v1.2 and coerces it), which is why it fails the strict-parsing cases. `blang/semver`: Its range syntax has no ^, ~ or x-ranges, so it is compared on versions only.</sub>
 
@@ -207,11 +207,11 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 
 | Operation | `semantic-versions@1.0.0` | `semantic_range@3.1.1` | `Gem::Version@3.5.22` | semantic-versions vs semantic_range |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **1.40 µs** | 1.93 µs | 1.00 µs | **1.4× faster** |
-| Sort versions | **2.00 µs** | 23.2 µs | 4.38 µs | **12× faster** |
-| Parse a range | **7.25 µs** | 29.5 µs | — | **4.1× faster** |
-| range.test(version) | **373 ns** | 8.11 µs | — | **22× faster** |
-| Resolve a range | **66.6 µs** | 1.13 ms | — | **17× faster** |
+| Parse a version | **1.36 µs** | 2.25 µs | 1.23 µs | **1.7× faster** |
+| Sort versions | **2.56 µs** | 23.6 µs | 4.40 µs | **9.2× faster** |
+| Parse a range | **8.48 µs** | 31.2 µs | — | **3.7× faster** |
+| range.test(version) | **376 ns** | 7.38 µs | — | **20× faster** |
+| Resolve a range | **60.4 µs** | 1.04 ms | — | **17× faster** |
 
 <sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. ruby 3.3.6 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x86_64 · 2026-11-19. `Gem::Version`: Parsing is timed without Gem::Version.new's per-string cache, and Gem::Version defers splitting into segments until the first comparison (part of its sort time). RubyGems' own requirement syntax (~> 1.2, comma-separated comparators, no ^, || or x-ranges) and lenient versions (1.2 is accepted), so it is compared on versions only.</sub>
 
@@ -239,11 +239,11 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 
 | Operation | `semantic-versions@1.0.0` | `semver4j@6.0.0` | `java-semver@0.10.2` | semantic-versions vs semver4j |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **44.9 ns** | 607 ns | 329 ns | **14× faster** |
-| Sort versions | **140 ns** | 1.09 µs | 141 ns | **7.8× faster** |
-| Parse a range | **264 ns** | 5.83 µs | — | **22× faster** |
-| range.test(version) | **8.2 ns** | 72.7 ns | — | **8.9× faster** |
-| Resolve a range | **1.21 µs** | 14.3 µs | — | **12× faster** |
+| Parse a version | **42.5 ns** | 611 ns | 319 ns | **14× faster** |
+| Sort versions | **134 ns** | 1.24 µs | 157 ns | **9.3× faster** |
+| Parse a range | **248 ns** | 6.47 µs | — | **26× faster** |
+| range.test(version) | **7.7 ns** | 70.7 ns | — | **9.2× faster** |
+| Resolve a range | **1.18 µs** | 15.5 µs | — | **13× faster** |
 
 <sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. OpenJDK 21 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux amd64 · 2026-11-19. `java-semver`: Its range expressions use their own syntax (& and | operators), so it is compared on versions only.</sub>
 
@@ -271,11 +271,11 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 
 | Operation | `semantic-versions@1.0.0` | `Semver@3.0.0` | `SemanticVersioning@3.0.0` | semantic-versions vs Semver |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **30.2 ns** | 349 ns | 598 ns | **12× faster** |
-| Sort versions | **107 ns** | 161 ns | 788 ns | **1.5× faster** |
-| Parse a range | **377 ns** | 784 ns | 22.4 µs | **2.1× faster** |
-| range.Test(version) | **6.9 ns** | 9.2 ns | 83.5 ns | **1.3× faster** |
-| Resolve a range | **1.42 µs** | 1.93 µs | 33.9 µs | **1.4× faster** |
+| Parse a version | **36.6 ns** | 373 ns | 594 ns | **10× faster** |
+| Sort versions | **101 ns** | 162 ns | 778 ns | **1.6× faster** |
+| Parse a range | **330 ns** | 712 ns | 18.2 µs | **2.2× faster** |
+| range.Test(version) | **7.5 ns** | 9.6 ns | 74.9 ns | **1.3× faster** |
+| Resolve a range | **1.44 µs** | 2.02 µs | 32.3 µs | **1.4× faster** |
 
 <sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. .NET 10.0.15 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x64 · 2026-11-19. `Semver`: Compared by precedence (ComparePrecedence), which ignores builds as SemVer 2.0.0 specifies.</sub>
 
@@ -303,11 +303,11 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 
 | Operation | `semantic-versions@1.0.0` | `composer/semver@3.6.0` | `z4kn4fein/php-semver@3.0.0` | semantic-versions vs composer/semver |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **434 ns** | 1.03 µs | 789 ns | **2.4× faster** |
-| Sort versions | **1.96 µs** | 1.98 µs | 2.64 µs | about the same |
-| Parse a range | **2.69 µs** | 2.92 µs | 4.47 µs | **1.1× faster** |
-| range->test(version) | **211 ns** | 740 ns | 634 ns | **3.5× faster** |
-| Resolve a range | **32.2 µs** | 92.6 µs | 65.8 µs | **2.9× faster** |
+| Parse a version | **440 ns** | 1.00 µs | 755 ns | **2.3× faster** |
+| Sort versions | **1.99 µs** | 1.94 µs | 2.61 µs | about the same |
+| Parse a range | **2.77 µs** | 2.85 µs | 3.26 µs | about the same |
+| range->test(version) | **205 ns** | 741 ns | 601 ns | **3.6× faster** |
+| Resolve a range | **33.4 µs** | 124.1 µs | 86.7 µs | **3.7× faster** |
 
 <sub>Median time per operation (lower is better) on 5,398 published versions and 797 dependency ranges from the npm registry. PHP 8.3.6 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x86_64 · 2026-11-20. `composer/semver`: Composer's model differs by design: versions normalize to four parts with stability flags (1.0.0-rc.1 becomes 1.0.0.0-RC1), builds are dropped, and pre-release names outside alpha, beta, RC and patch are rejected. Versions are scored on parsing to the same value.</sub>
 

@@ -178,16 +178,16 @@
       "description": "5398 published versions",
       "results": {
         "Masterminds/semver": {
-          "nsPerOp": 591,
-          "opsPerSec": 1692016
+          "nsPerOp": 601.9,
+          "opsPerSec": 1661362
         },
         "blang/semver": {
-          "nsPerOp": 169.8,
-          "opsPerSec": 5890993
+          "nsPerOp": 172.5,
+          "opsPerSec": 5795625
         },
         "semantic-versions": {
-          "nsPerOp": 29.7,
-          "opsPerSec": 33631467
+          "nsPerOp": 31.1,
+          "opsPerSec": 32155519
         }
       }
     },
@@ -197,16 +197,16 @@
       "description": "5398 parsed versions by precedence (per version)",
       "results": {
         "Masterminds/semver": {
-          "nsPerOp": 491.5,
-          "opsPerSec": 2034546
+          "nsPerOp": 558.3,
+          "opsPerSec": 1791229
         },
         "blang/semver": {
-          "nsPerOp": 248.1,
-          "opsPerSec": 4030055
+          "nsPerOp": 261.8,
+          "opsPerSec": 3819916
         },
         "semantic-versions": {
-          "nsPerOp": 191.6,
-          "opsPerSec": 5219405
+          "nsPerOp": 202.5,
+          "opsPerSec": 4938183
         }
       }
     },
@@ -216,12 +216,12 @@
       "description": "1996 real dependency ranges",
       "results": {
         "Masterminds/semver": {
-          "nsPerOp": 6769.1,
-          "opsPerSec": 147730
+          "nsPerOp": 6912.1,
+          "opsPerSec": 144674
         },
         "semantic-versions": {
-          "nsPerOp": 370.7,
-          "opsPerSec": 2697894
+          "nsPerOp": 387.5,
+          "opsPerSec": 2580388
         }
       }
     },
@@ -231,12 +231,12 @@
       "description": "15604 version × range checks",
       "results": {
         "Masterminds/semver": {
-          "nsPerOp": 636.4,
-          "opsPerSec": 1571249
+          "nsPerOp": 647.2,
+          "opsPerSec": 1545177
         },
         "semantic-versions": {
-          "nsPerOp": 27.3,
-          "opsPerSec": 36655660
+          "nsPerOp": 28.4,
+          "opsPerSec": 35234123
         }
       }
     },
@@ -246,12 +246,12 @@
       "description": "116 max-satisfying lookups against a package's versions",
       "results": {
         "Masterminds/semver": {
-          "nsPerOp": 91122.1,
-          "opsPerSec": 10974
+          "nsPerOp": 95463.8,
+          "opsPerSec": 10475
         },
         "semantic-versions": {
-          "nsPerOp": 4238.8,
-          "opsPerSec": 235915
+          "nsPerOp": 4259.9,
+          "opsPerSec": 234745
         }
       }
     }

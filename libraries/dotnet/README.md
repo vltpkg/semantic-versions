@@ -68,11 +68,11 @@ All implementations: [semver.xyz/libraries](https://semver.xyz/libraries/).
 
 | Operation | `semantic-versions@1.0.0` | `Semver@3.0.0` | `SemanticVersioning@3.0.0` | semantic-versions vs Semver |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **30.2 ns** | 349 ns | 598 ns | **12× faster** |
-| Sort versions | **107 ns** | 161 ns | 788 ns | **1.5× faster** |
-| Parse a range | **377 ns** | 784 ns | 22.4 µs | **2.1× faster** |
-| range.Test(version) | **6.9 ns** | 9.2 ns | 83.5 ns | **1.3× faster** |
-| Resolve a range | **1.42 µs** | 1.93 µs | 33.9 µs | **1.4× faster** |
+| Parse a version | **36.6 ns** | 373 ns | 594 ns | **10× faster** |
+| Sort versions | **101 ns** | 162 ns | 778 ns | **1.6× faster** |
+| Parse a range | **330 ns** | 712 ns | 18.2 µs | **2.2× faster** |
+| range.Test(version) | **7.5 ns** | 9.6 ns | 74.9 ns | **1.3× faster** |
+| Resolve a range | **1.44 µs** | 2.02 µs | 32.3 µs | **1.4× faster** |
 
 <sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. .NET 10.0.15 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x64 · 2026-11-19. `Semver`: Compared by precedence (ComparePrecedence), which ignores builds as SemVer 2.0.0 specifies.</sub>
 

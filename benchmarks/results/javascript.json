@@ -39,12 +39,12 @@
       "description": "5,398 published versions",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 102.3,
-          "opsPerSec": 9775614
+          "nsPerOp": 108.8,
+          "opsPerSec": 9189263
         },
         "semver": {
-          "nsPerOp": 295.8,
-          "opsPerSec": 3380819
+          "nsPerOp": 277.3,
+          "opsPerSec": 3605677
         }
       }
     },
@@ -54,12 +54,12 @@
       "description": "5,398 versions by precedence (per version)",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 676.6,
-          "opsPerSec": 1477967
+          "nsPerOp": 409.2,
+          "opsPerSec": 2443565
         },
         "semver": {
-          "nsPerOp": 4505.6,
-          "opsPerSec": 221948
+          "nsPerOp": 4405.8,
+          "opsPerSec": 226973
         }
       }
     },
@@ -69,12 +69,12 @@
       "description": "1,996 real dependency ranges",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 5334.7,
-          "opsPerSec": 187453
+          "nsPerOp": 5728.8,
+          "opsPerSec": 174558
         },
         "semver": {
-          "nsPerOp": 6825.5,
-          "opsPerSec": 146510
+          "nsPerOp": 6765.3,
+          "opsPerSec": 147813
         }
       }
     },
@@ -84,12 +84,12 @@
       "description": "15,604 version × range checks",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 408.7,
-          "opsPerSec": 2446696
+          "nsPerOp": 449.1,
+          "opsPerSec": 2226755
         },
         "semver": {
-          "nsPerOp": 1019.8,
-          "opsPerSec": 980584
+          "nsPerOp": 993.1,
+          "opsPerSec": 1006923
         }
       }
     },
@@ -99,12 +99,12 @@
       "description": "116 maxSatisfying lookups against a package's versions",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 15676.1,
-          "opsPerSec": 63791
+          "nsPerOp": 16678.9,
+          "opsPerSec": 59956
         },
         "semver": {
-          "nsPerOp": 54499.6,
-          "opsPerSec": 18349
+          "nsPerOp": 54768.7,
+          "opsPerSec": 18259
         }
       }
     }

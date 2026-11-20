@@ -177,16 +177,16 @@
       "label": "Parse a version",
       "results": {
         "nodejs-semver": {
-          "nsPerOp": 29.0,
-          "opsPerSec": 34438328.0
+          "nsPerOp": 27.6,
+          "opsPerSec": 36183971.0
         },
         "semantic-versions": {
           "nsPerOp": 24.8,
-          "opsPerSec": 40368606.0
+          "opsPerSec": 40346921.0
         },
         "semver": {
-          "nsPerOp": 23.6,
-          "opsPerSec": 42367189.0
+          "nsPerOp": 26.0,
+          "opsPerSec": 38526558.0
         }
       }
     },
@@ -196,16 +196,16 @@
       "label": "Sort versions",
       "results": {
         "nodejs-semver": {
-          "nsPerOp": 118.5,
-          "opsPerSec": 8441298.0
+          "nsPerOp": 117.9,
+          "opsPerSec": 8483517.0
         },
         "semantic-versions": {
-          "nsPerOp": 149.2,
-          "opsPerSec": 6703938.0
+          "nsPerOp": 131.6,
+          "opsPerSec": 7600447.0
         },
         "semver": {
-          "nsPerOp": 126.7,
-          "opsPerSec": 7894538.0
+          "nsPerOp": 141.9,
+          "opsPerSec": 7047869.0
         }
       }
     },
@@ -215,12 +215,12 @@
       "label": "Parse a range",
       "results": {
         "nodejs-semver": {
-          "nsPerOp": 313.5,
-          "opsPerSec": 3189947.0
+          "nsPerOp": 307.9,
+          "opsPerSec": 3248022.0
         },
         "semantic-versions": {
-          "nsPerOp": 245.8,
-          "opsPerSec": 4069014.0
+          "nsPerOp": 230.8,
+          "opsPerSec": 4332669.0
         }
       }
     },
@@ -230,12 +230,12 @@
       "label": "Range::test(version)",
       "results": {
         "nodejs-semver": {
-          "nsPerOp": 9.1,
-          "opsPerSec": 110071301.0
+          "nsPerOp": 9.4,
+          "opsPerSec": 105871577.0
         },
         "semantic-versions": {
-          "nsPerOp": 6.8,
-          "opsPerSec": 146123452.0
+          "nsPerOp": 7.4,
+          "opsPerSec": 134670596.0
         }
       }
     },
@@ -245,12 +245,12 @@
       "label": "Resolve a range",
       "results": {
         "nodejs-semver": {
-          "nsPerOp": 1567.0,
-          "opsPerSec": 638165.0
+          "nsPerOp": 1542.6,
+          "opsPerSec": 648273.0
         },
         "semantic-versions": {
-          "nsPerOp": 1292.1,
-          "opsPerSec": 773944.0
+          "nsPerOp": 1244.0,
+          "opsPerSec": 803826.0
         }
       }
     }

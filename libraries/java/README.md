@@ -79,11 +79,11 @@ All implementations: [semver.xyz/libraries](https://semver.xyz/libraries/).
 
 | Operation | `semantic-versions@1.0.0` | `semver4j@6.0.0` | `java-semver@0.10.2` | semantic-versions vs semver4j |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **44.9 ns** | 607 ns | 329 ns | **14× faster** |
-| Sort versions | **140 ns** | 1.09 µs | 141 ns | **7.8× faster** |
-| Parse a range | **264 ns** | 5.83 µs | — | **22× faster** |
-| range.test(version) | **8.2 ns** | 72.7 ns | — | **8.9× faster** |
-| Resolve a range | **1.21 µs** | 14.3 µs | — | **12× faster** |
+| Parse a version | **42.5 ns** | 611 ns | 319 ns | **14× faster** |
+| Sort versions | **134 ns** | 1.24 µs | 157 ns | **9.3× faster** |
+| Parse a range | **248 ns** | 6.47 µs | — | **26× faster** |
+| range.test(version) | **7.7 ns** | 70.7 ns | — | **9.2× faster** |
+| Resolve a range | **1.18 µs** | 15.5 µs | — | **13× faster** |
 
 <sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. OpenJDK 21 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux amd64 · 2026-11-19. `java-semver`: Its range expressions use their own syntax (& and | operators), so it is compared on versions only.</sub>
 

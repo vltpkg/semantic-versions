@@ -73,11 +73,11 @@ dependency ranges from the npm registry. Method and raw results:
 
 | Operation | `semantic-versions@1.0.0` | `nodejs-semver@7.0.0` | `semver@1.0.28` | semantic-versions vs nodejs-semver |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **24.8 ns** | 29.0 ns | 23.6 ns | **1.2× faster** |
-| Sort versions | **149 ns** | 119 ns | 127 ns | 1.26× slower |
-| Parse a range | **246 ns** | 314 ns | — | **1.3× faster** |
-| Range::test(version) | **6.8 ns** | 9.1 ns | — | **1.3× faster** |
-| Resolve a range | **1.29 µs** | 1.57 µs | — | **1.2× faster** |
+| Parse a version | **24.8 ns** | 27.6 ns | 26.0 ns | **1.1× faster** |
+| Sort versions | **132 ns** | 118 ns | 142 ns | 1.12× slower |
+| Parse a range | **231 ns** | 308 ns | — | **1.3× faster** |
+| Range::test(version) | **7.4 ns** | 9.4 ns | — | **1.3× faster** |
+| Resolve a range | **1.24 µs** | 1.54 µs | — | **1.2× faster** |
 
 <sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. rustc 1.97.0 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x86_64 · 2026-11-19. `semver`: Cargo's requirement syntax (bare versions mean ^, comparators are comma-separated, no || or hyphen ranges), so it is compared on versions only.</sub>
 

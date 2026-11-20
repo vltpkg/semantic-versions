@@ -33,14 +33,14 @@ Every implementation passes the same [conformance suite](conformance) and is
 
 | Language | Package | Conformance | Compared with | Speed vs. it |
 | --- | --- | :---: | --- | ---: |
-| [JavaScript](libraries/javascript) | `semantic-versions` (npm) | 476/476 | `semver` 396/476 | 1.3–6.7× |
-| [Rust](libraries/rust) | `semantic-versions` (crates.io) | 476/476 | `nodejs-semver` 366/476 | 0.8–1.3× |
-| [Python](libraries/python) | `semantic-versions` (PyPI) | 476/476 | `node-semver` 366/476 | 1.5–15× |
-| [Go](libraries/go) | `semver.xyz/go` (pkg.go.dev) | 476/476 | `Masterminds/semver` 348/436 | 2.6–23× |
-| [Ruby](libraries/ruby) | `semantic-versions` (RubyGems) | 476/476 | `semantic_range` 366/476 | 1.4–22× |
-| [Java](libraries/java) | `xyz.semver:semantic-versions` (Maven Central) | 476/476 | `semver4j` 356/436 | 7.8–22× |
-| [.NET](libraries/dotnet) | `SemanticVersions` (NuGet) | 476/476 | `Semver` 365/436 | 1.3–12× |
-| [PHP](libraries/php) | `vltpkg/semantic-versions` (Packagist) | 476/476 | `composer/semver` 282/436 | 1.0–3.5× |
+| [JavaScript](libraries/javascript) | `semantic-versions` (npm) | 476/476 | `semver` 396/476 | 1.2–11× |
+| [Rust](libraries/rust) | `semantic-versions` (crates.io) | 476/476 | `nodejs-semver` 366/476 | 0.9–1.3× |
+| [Python](libraries/python) | `semantic-versions` (PyPI) | 476/476 | `node-semver` 366/476 | 1.5–17× |
+| [Go](libraries/go) | `semver.xyz/go` (pkg.go.dev) | 476/476 | `Masterminds/semver` 348/436 | 2.8–23× |
+| [Ruby](libraries/ruby) | `semantic-versions` (RubyGems) | 476/476 | `semantic_range` 366/476 | 1.7–20× |
+| [Java](libraries/java) | `xyz.semver:semantic-versions` (Maven Central) | 476/476 | `semver4j` 356/436 | 9.2–26× |
+| [.NET](libraries/dotnet) | `SemanticVersions` (NuGet) | 476/476 | `Semver` 365/436 | 1.3–10× |
+| [PHP](libraries/php) | `vltpkg/semantic-versions` (Packagist) | 476/476 | `composer/semver` 282/436 | 1.0–3.7× |
 
 <!-- languages:end -->
 

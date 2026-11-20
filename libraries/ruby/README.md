@@ -71,11 +71,11 @@ All implementations: [semver.xyz/libraries](https://semver.xyz/libraries/).
 
 | Operation | `semantic-versions@1.0.0` | `semantic_range@3.1.1` | `Gem::Version@3.5.22` | semantic-versions vs semantic_range |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **1.40 µs** | 1.93 µs | 1.00 µs | **1.4× faster** |
-| Sort versions | **2.00 µs** | 23.2 µs | 4.38 µs | **12× faster** |
-| Parse a range | **7.25 µs** | 29.5 µs | — | **4.1× faster** |
-| range.test(version) | **373 ns** | 8.11 µs | — | **22× faster** |
-| Resolve a range | **66.6 µs** | 1.13 ms | — | **17× faster** |
+| Parse a version | **1.36 µs** | 2.25 µs | 1.23 µs | **1.7× faster** |
+| Sort versions | **2.56 µs** | 23.6 µs | 4.40 µs | **9.2× faster** |
+| Parse a range | **8.48 µs** | 31.2 µs | — | **3.7× faster** |
+| range.test(version) | **376 ns** | 7.38 µs | — | **20× faster** |
+| Resolve a range | **60.4 µs** | 1.04 ms | — | **17× faster** |
 
 <sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. ruby 3.3.6 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x86_64 · 2026-11-19. `Gem::Version`: Parsing is timed without Gem::Version.new's per-string cache, and Gem::Version defers splitting into segments until the first comparison (part of its sort time). RubyGems' own requirement syntax (~> 1.2, comma-separated comparators, no ^, || or x-ranges) and lenient versions (1.2 is accepted), so it is compared on versions only.</sub>
 
