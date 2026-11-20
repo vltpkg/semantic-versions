@@ -1,3 +1,4 @@
+import { PageActions } from "@/components/page-actions";
 import type { Metadata } from "next";
 import { SITE } from "@/lib/site";
 
@@ -42,11 +43,15 @@ export default function Page() {
         </h1>
         <p className="lead">
           Everything on this site answers in text. Start from <a href="/llms.txt">llms.txt</a>, read any page as
-          Markdown, or ask a page for its graph: what it shows, what can be done there, and where to go next. The
-          graph is <a href="https://www.affordances.sh" target="_blank" rel="noopener">Affordances</a>, and its
-          actions run the same reference parser the <a href="/selector/">range selector</a> does, so an agent can test
-          a range, desugar it or order versions by precedence with one request.
+          Markdown, or ask a page for its graph: what it shows, what can be done there, and where to go next. The graph
+          is{" "}
+          <a href="https://www.affordances.sh" target="_blank" rel="noopener">
+            Affordances
+          </a>
+          , and its actions run the same reference parser the <a href="/selector/">range selector</a> does, so an agent
+          can test a range, desugar it or order versions by precedence with one request.
         </p>
+        <PageActions path="/agents/" />
       </section>
 
       <section className="wrap">
@@ -75,9 +80,8 @@ export default function Page() {
             <h3>The Affordances graph</h3>
             <p>
               Ask any page with <code>Accept: application/vnd.affordances+json</code>. The selector&rsquo;s graph has{" "}
-              <code>select</code>, <code>desugar</code>, <code>parse</code>, <code>compare</code> and{" "}
-              <code>bump</code>; the spec&rsquo;s has <code>readSection</code>; the grammars&rsquo; has{" "}
-              <code>readGrammar</code>.
+              <code>select</code>, <code>desugar</code>, <code>parse</code>, <code>compare</code> and <code>bump</code>;
+              the spec&rsquo;s has <code>readSection</code>; the grammars&rsquo; has <code>readGrammar</code>.
             </p>
             <div className="card-arrow">Site index →</div>
           </a>
@@ -115,9 +119,9 @@ export default function Page() {
           <p className="eyebrow">What an agent can rely on</p>
           <p>
             Every action is <code>public</code> and <code>readOnly</code>: nothing here changes state, needs a session
-            or asks for confirmation. The graphs and the Markdown are generated from the same sources as the pages
-            (<code>spec/SPEC.md</code>, the extension Markdown, <code>benchmarks/results</code>), so they never
-            disagree with what a person sees. Where a page and its Markdown could differ, the Markdown governs; the
+            or asks for confirmation. The graphs and the Markdown are generated from the same sources as the pages (
+            <code>spec/SPEC.md</code>, the extension Markdown, <code>benchmarks/results</code>), so they never disagree
+            with what a person sees. Where a page and its Markdown could differ, the Markdown governs; the
             specification&rsquo;s text is normative.
           </p>
         </div>

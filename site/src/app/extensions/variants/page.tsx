@@ -1,3 +1,4 @@
+import { PageActions } from "@/components/page-actions";
 import type { Metadata, Viewport } from "next";
 import { Bnf } from "@/components/bnf";
 import { VariantsScript } from "@/components/interactive";
@@ -67,6 +68,7 @@ export default function Page() {
             </a>
           </div>
         </div>
+        <PageActions path="/extensions/variants/" />
       </section>
       {/* ─────────────────────────── Why ─────────────────────────── */}
       <section className="wrap why">

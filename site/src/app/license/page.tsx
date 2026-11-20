@@ -1,3 +1,4 @@
+import { PageActions } from "@/components/page-actions";
 import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ export default function Page() {
           work, the same license the original Semantic Versioning spec has always used. The reference parser is
           separately licensed as open source.
         </p>
+        <PageActions path="/license/" />
       </section>
       <section className="wrap">
         <div className="license-grid">

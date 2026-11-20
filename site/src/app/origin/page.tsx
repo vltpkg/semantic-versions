@@ -1,3 +1,4 @@
+import { PageActions } from "@/components/page-actions";
 import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
@@ -25,6 +26,7 @@ export default function Page() {
           consequential mistake happened between two release candidates in 2013, and we still live with it today. Here
           is the paper trail, from the first commit of semver.org to the proposal that never landed.
         </p>
+        <PageActions path="/origin/" />
       </section>
       <section className="timeline">
         <div className="tl-item reveal">

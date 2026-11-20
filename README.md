@@ -166,7 +166,10 @@ reference parser, the spec's `readSection` returns one section, and the
 grammars' `readGrammar` returns a BNF; all are public and read-only.
 `/.well-known/affordances.json` is the site index, `/mcp` is the site as an
 MCP server (streamable HTTP, the same two tools as `npx @affordances/mcp`),
-and [`/agents/`](https://semver.xyz/agents/) explains it to agents. `@affordances/next` regenerates `site/.affordances/manifest.ts`
+and [`/agents/`](https://semver.xyz/agents/) explains it to agents. Every
+document page carries a Copy page / Open in menu (`site/src/components/page-actions.tsx`,
+built on `@affordances/md/react/client`) that copies the page's Markdown twin
+or opens it in Claude, ChatGPT or Claude Code. `@affordances/next` regenerates `site/.affordances/manifest.ts`
 (gitignored) from those files on every build.
 
 The [range selector](https://semver.xyz/selector/) imports the `semantic-versions`

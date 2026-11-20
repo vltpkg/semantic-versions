@@ -1,3 +1,4 @@
+import { PageActions } from "@/components/page-actions";
 import type { Metadata, Viewport } from "next";
 import { SpecBody, SpecToc } from "@/components/spec";
 
@@ -30,6 +31,10 @@ export default function Page() {
             Suggest an edit
           </a>
         </p>
+        <PageActions
+          path="/spec/"
+          claudeCode="Read the Semantic Versions specification. Before changing anything, ask me which project to work in:"
+        />
       </section>
       <div className="doc-layout">
         <aside className="toc reveal" aria-label="Table of contents">

@@ -1,3 +1,4 @@
+import { PageActions } from "@/components/page-actions";
 import type { Metadata, Viewport } from "next";
 import { Bnf } from "@/components/bnf";
 import { IntegrityScript } from "@/components/interactive";
@@ -66,6 +67,7 @@ export default function Page() {
             </a>
           </div>
         </div>
+        <PageActions path="/extensions/integrity/" />
       </section>
       {/* ─────────────────────────── Why ─────────────────────────── */}
       <section className="wrap why">

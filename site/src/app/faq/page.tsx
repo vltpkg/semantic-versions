@@ -1,3 +1,4 @@
+import { PageActions } from "@/components/page-actions";
 import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
@@ -31,6 +32,7 @@ export default function Page() {
           deliberately didn't, and how the spec fits alongside the rest of the ecosystem. The normative text is the{" "}
           <a href="/spec/">specification</a>.
         </p>
+        <PageActions path="/faq/" />
       </section>
       <div className="doc-layout">
         <aside className="toc reveal" aria-label="Questions">

@@ -1,3 +1,4 @@
+import { PageActions } from "@/components/page-actions";
 import type { Metadata, Viewport } from "next";
 import { CasesCount, LanguagesCount, LibrariesOverview, LibraryCards, LibrarySections } from "@/components/benchmarks";
 
@@ -37,6 +38,11 @@ export default function Page() {
           , give identical answers on every version and range in the benchmark corpus, and are timed against the
           libraries they replace on real versions and ranges from the npm registry.
         </p>
+        <PageActions
+          path="/libraries/"
+          prompt="Read this page from semver.xyz, which lists the Semantic Versions libraries for JavaScript, Rust, Python, Go, Ruby, Java, .NET and PHP with their install commands, and help me pick and use the one for my project:"
+          claudeCode="Read this page from semver.xyz, which lists the Semantic Versions libraries and their install commands. Ask me which project to work in, then add the library for that project's language and show me how to parse, compare and match versions with it:"
+        />
       </section>
       <section className="wrap">
         <div className="section-head left reveal">

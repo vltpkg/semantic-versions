@@ -1,3 +1,4 @@
+import { PageActions } from "@/components/page-actions";
 import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
@@ -30,6 +31,7 @@ export default function Page() {
           a whole resolved graph whose every node is one of those identities. Read them in order and each one is a term
           in the next.
         </p>
+        <PageActions path="/extensions/" />
       </section>
       <section className="wrap">
         <div className="ext-grid">

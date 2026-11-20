@@ -1,3 +1,4 @@
+import { PageActions } from "@/components/page-actions";
 import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
@@ -49,6 +50,7 @@ export default function Page() {
             See what changes vs 2.0.0
           </a>
         </div>
+        <PageActions path="/proposal/" />
       </section>
       <section className="wrap">
         <div className="section-head left reveal">

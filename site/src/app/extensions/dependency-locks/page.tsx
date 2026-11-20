@@ -1,3 +1,4 @@
+import { PageActions } from "@/components/page-actions";
 import type { Metadata, Viewport } from "next";
 import { LockGeneratorScript } from "@/components/interactive";
 
@@ -80,6 +81,7 @@ export default function Page() {
             claim of package-manager support today.
           </p>
         </div>
+        <PageActions path="/extensions/dependency-locks/" />
       </section>
       {/* ───────────────────────── Why ───────────────────────────── */}
       <section className="wrap why">

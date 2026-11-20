@@ -1,3 +1,4 @@
+import { PageActions } from "@/components/page-actions";
 import type { Metadata, Viewport } from "next";
 import { Bnf } from "@/components/bnf";
 
@@ -31,6 +32,7 @@ export default function Page() {
           </a>{" "}
           is also available for quick validation.
         </p>
+        <PageActions path="/grammar/" />
       </section>
       <div className="doc-layout">
         <aside className="toc reveal" aria-label="Table of contents">
