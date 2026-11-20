@@ -10,21 +10,46 @@
 ;   1.2.0+win32.x64     ->  one exact artifact
 ; The fixed axes MUST appear in order (os, then arch, then abi); any fixed axis
 ; may be omitted only if every later fixed axis is also omitted, so a variant is
-; always a PREFIX of the axis sequence. Feature tags follow the fixed axes.
+; always a PREFIX of the axis sequence. An omitted axis is no constraint.
+; "wasm32" stands alone as the whole platform: a WebAssembly build is not tied
+; to an operating system.
+;
+; Qualifiers follow the fixed axes. A floor ("glibc.2.28", "musl.1.2",
+; "osv.11.0", "napi.8") means "this value or later"; an exact tag ("node.127",
+; "electron.123") must match the target exactly; any other identifier is a
+; feature tag ("avx2", "cuda"). Floors are plain numeric identifiers, so they
+; compare numerically under the core precedence rules.
+;
+; Target matching (which variant suits a machine) is defined in the extension:
+; a variant applies when every coordinate it states is satisfied by the target,
+; and the most specific applicable variant of the highest applicable release
+; wins.
 
-<variant build> ::= <os> ( "." <arch> ( "." <abi> )? )? <features>
+<variant build> ::= <platform> ( "." <qualifier> )*
 
-<features> ::= ""
-             | "." <feature> <features>
+<platform>      ::= <os> ( "." <arch> ( "." <abi> )? )?
+                  | "wasm32"
 
-<os> ::= "linux" | "darwin" | "win32" | "freebsd" | "openbsd"
-       | "android" | "sunos" | "aix"
+<os>            ::= "linux" | "darwin" | "win32" | "freebsd" | "openbsd"
+                  | "android" | "sunos" | "aix"
 
-<arch> ::= "x64" | "arm64" | "arm" | "ia32" | "ppc64" | "s390x"
-         | "riscv64" | "loong64" | "wasm32"
+<arch>          ::= "x64" | "arm64" | "arm" | "ia32" | "ppc64" | "s390x"
+                  | "riscv64" | "loong64"
 
-<abi> ::= "glibc" | "musl" | "msvc"
+; "arm" is ARMv7, what process.arch reports for ARMv6 and ARMv7 alike.
+
+<abi>           ::= "glibc" <floor version>?
+                  | "musl" <floor version>?
+                  | "msvc"
+
+<qualifier>     ::= <floor> | <exact tag> | <feature>
+
+<floor>         ::= ( "osv" | "napi" ) <floor version>
+
+<floor version> ::= "." <numeric identifier> ( "." <numeric identifier> )?
+
+<exact tag>     ::= ( "node" | "electron" ) "." <numeric identifier>
 
 ; A feature tag is any build identifier (see VERSION.bnf). Lowercase is
 ; conventional; tags SHOULD be sorted for a canonical form.
-<feature> ::= <build identifier>
+<feature>       ::= <build identifier>
