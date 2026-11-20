@@ -63,19 +63,27 @@ const appendChannel = (desugared, build) =>
     ? desugared.trim().split(/\s+/).filter(Boolean).map((tok) => `${tok}+${build}`).join(' ')
     : desugared
 
-// ~, ~> — allow patch-level changes when a minor is given, minor-level otherwise.
-// `~>` is an alias for `~` (matching the shared LONETILDE grammar `~>?`).
+// ~ — allow patch-level changes when a minor is given, minor-level otherwise.
+// ~> — the pessimistic operator with its RubyGems meaning: drop the last
+// supplied part and allow up to the next value of the part before it. With one
+// or three parts that equals the tilde; with two parts (`~>1.2`) it reaches the
+// next major where the tilde stops at the next minor. A trailing x is not a
+// supplied part, so `~>1.2.x` is `~>1.2`.
 const replaceTildes = (comp) =>
   comp.trim().split(/\s+/).map((c) => replaceTilde(c)).join(' ')
 
 const replaceTilde = (comp) =>
-  comp.replace(TILDE, (_, M, m, p, pr, build) =>
-    appendChannel(tildeDesugar(M, m, p, pr), build))
+  comp.replace(TILDE, (_, op, M, m, p, pr, build) =>
+    appendChannel(tildeDesugar(M, m, p, pr, op === '~>'), build))
 
-const tildeDesugar = (M, m, p, pr) => {
+const tildeDesugar = (M, m, p, pr, approximate) => {
   if (isX(M)) return ''
   if (isX(m)) return `>=${M}.0.0 <${+M + 1}.0.0-0`
-  if (isX(p)) return `>=${M}.${m}.0 <${M}.${+m + 1}.0-0`
+  if (isX(p)) {
+    return approximate
+      ? `>=${M}.${m}.0 <${+M + 1}.0.0-0`
+      : `>=${M}.${m}.0 <${M}.${+m + 1}.0-0`
+  }
   if (pr) return `>=${M}.${m}.${p}-${pr} <${M}.${+m + 1}.0-0`
   return `>=${M}.${m}.${p} <${M}.${+m + 1}.0-0`
 }
@@ -170,27 +178,27 @@ const replaceGTE0 = (comp) => comp.trim().replace(GTE0, '')
 // `1.2.3 - 2.3.4` => `>=1.2.3 <=2.3.4` (with partial-version handling).
 const hyphenReplace = (
   $0,
-  from, fM, fm, fp, fpr,
-  fb,
-  to, tM, tm, tp, tpr
+  from, fM, fm, fp, fpr, fb,
+  to, tM, tm, tp, tpr, tb
 ) => {
-  // A hyphen range is a numeric span between two endpoints, so any build
-  // metadata on either endpoint is dropped (a channel would be ambiguous across
-  // two versions). Endpoints are reconstructed from parts rather than reusing
-  // the raw match, which would otherwise carry the build through. A pre-release
-  // on an endpoint is kept: it both sets the numeric bound and declares that
-  // endpoint's pre-release channel (see `testSet`).
+  // Each endpoint keeps its own labels: a pre-release sets the numeric bound
+  // and declares that endpoint's pre-release channel, and a build declares that
+  // endpoint's build channel (see `testSet`), exactly as on a comparator.
+  // Endpoints are reconstructed from parts so a partial endpoint (`1.2`) gets
+  // its zeroes and its exclusive ceiling.
   if (isX(fM)) from = ''
   else if (isX(fm)) from = `>=${fM}.0.0`
   else if (isX(fp)) from = `>=${fM}.${fm}.0`
   else if (fpr) from = `>=${fM}.${fm}.${fp}-${fpr}`
   else from = `>=${fM}.${fm}.${fp}`
+  if (from && fb) from += `+${fb}`
 
   if (isX(tM)) to = ''
   else if (isX(tm)) to = `<${+tM + 1}.0.0-0`
   else if (isX(tp)) to = `<${tM}.${+tm + 1}.0-0`
   else if (tpr) to = `<=${tM}.${tm}.${tp}-${tpr}`
   else to = `<=${tM}.${tm}.${tp}`
+  if (to && tb) to += `+${tb}`
 
   return `${from} ${to}`.trim()
 }
@@ -356,7 +364,7 @@ class Range {
     if (/\s/.test(range)) {
       range = range.replace(HYPHENRANGE, hyphenReplace)
       range = range.replace(COMPARATORTRIM_G, '$1$2$3')
-      range = range.replace(TILDETRIM_G, '$1~')
+      range = range.replace(TILDETRIM_G, '$1$2')
       range = range.replace(CARETTRIM_G, '$1^')
       range = range.split(/\s+/).join(' ')
     }

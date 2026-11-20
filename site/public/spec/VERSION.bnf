@@ -27,6 +27,9 @@
 <pre-release identifier> ::= <alphanumeric identifier>
                            | <numeric identifier>
 
+; A build identifier made only of digits may have leading zeroes, but then it
+; is not a <numeric identifier>: it compares as text, so "+001" and "+1" are
+; different builds (spec: Precedence, 5).
 <build identifier> ::= <alphanumeric identifier>
                      | <digits>
 

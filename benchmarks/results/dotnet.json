@@ -4,7 +4,7 @@
   "baseline": "Semver",
   "environment": {
     "runtime": ".NET 10.0.15",
-    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
     "platform": "linux x64",
     "date": "2026-11-19"
   },
@@ -46,16 +46,16 @@
       "description": "5398 published versions",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 31.9,
-          "opsPerSec": 31354777
+          "nsPerOp": 30.2,
+          "opsPerSec": 33151707
         },
         "Semver": {
-          "nsPerOp": 310.7,
-          "opsPerSec": 3218409
+          "nsPerOp": 348.8,
+          "opsPerSec": 2867258
         },
         "SemanticVersioning": {
-          "nsPerOp": 520.8,
-          "opsPerSec": 1920100
+          "nsPerOp": 598.2,
+          "opsPerSec": 1671662
         }
       }
     },
@@ -65,16 +65,16 @@
       "description": "5398 parsed versions by precedence (per version)",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 89.4,
-          "opsPerSec": 11180211
+          "nsPerOp": 107.1,
+          "opsPerSec": 9336482
         },
         "Semver": {
-          "nsPerOp": 135.2,
-          "opsPerSec": 7393903
+          "nsPerOp": 161.4,
+          "opsPerSec": 6194312
         },
         "SemanticVersioning": {
-          "nsPerOp": 694.5,
-          "opsPerSec": 1439787
+          "nsPerOp": 788.1,
+          "opsPerSec": 1268846
         }
       }
     },
@@ -84,16 +84,16 @@
       "description": "1996 real dependency ranges",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 334.7,
-          "opsPerSec": 2987316
+          "nsPerOp": 376.6,
+          "opsPerSec": 2655482
         },
         "Semver": {
-          "nsPerOp": 646.2,
-          "opsPerSec": 1547404
+          "nsPerOp": 784.1,
+          "opsPerSec": 1275395
         },
         "SemanticVersioning": {
-          "nsPerOp": 19097.7,
-          "opsPerSec": 52362
+          "nsPerOp": 22395.1,
+          "opsPerSec": 44653
         }
       }
     },
@@ -103,16 +103,16 @@
       "description": "15604 version \u00D7 range checks",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 6,
-          "opsPerSec": 167477851
+          "nsPerOp": 6.9,
+          "opsPerSec": 144675311
         },
         "Semver": {
-          "nsPerOp": 7.8,
-          "opsPerSec": 127648502
+          "nsPerOp": 9.2,
+          "opsPerSec": 108570834
         },
         "SemanticVersioning": {
-          "nsPerOp": 68.6,
-          "opsPerSec": 14569427
+          "nsPerOp": 83.5,
+          "opsPerSec": 11975049
         }
       }
     },
@@ -122,16 +122,16 @@
       "description": "116 max-satisfying lookups against a package\u0027s versions",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 1208.9,
-          "opsPerSec": 827222
+          "nsPerOp": 1417.2,
+          "opsPerSec": 705631
         },
         "Semver": {
-          "nsPerOp": 1639.1,
-          "opsPerSec": 610095
+          "nsPerOp": 1929.7,
+          "opsPerSec": 518214
         },
         "SemanticVersioning": {
-          "nsPerOp": 27109.9,
-          "opsPerSec": 36887
+          "nsPerOp": 33864.5,
+          "opsPerSec": 29529
         }
       }
     }
@@ -139,16 +139,16 @@
   "conformance": {
     "semantic-versions": {
       "approximate": {
-        "passed": 17,
-        "total": 17
+        "passed": 26,
+        "total": 26
       },
       "build-channels": {
-        "passed": 24,
-        "total": 24
+        "passed": 41,
+        "total": 41
       },
       "build-precedence": {
-        "passed": 10,
-        "total": 10
+        "passed": 16,
+        "total": 16
       },
       "context": {
         "passed": 15,
@@ -171,8 +171,8 @@
         "total": 14
       },
       "ranges": {
-        "passed": 199,
-        "total": 199
+        "passed": 196,
+        "total": 196
       },
       "strict": {
         "passed": 11,
@@ -181,16 +181,16 @@
     },
     "Semver": {
       "approximate": {
-        "passed": 13,
-        "total": 13
+        "passed": 15,
+        "total": 19
       },
       "build-channels": {
-        "passed": 12,
-        "total": 22
+        "passed": 19,
+        "total": 36
       },
       "build-precedence": {
         "passed": 1,
-        "total": 10
+        "total": 16
       },
       "context": {
         "passed": 3,
@@ -213,8 +213,8 @@
         "total": 13
       },
       "ranges": {
-        "passed": 172,
-        "total": 172
+        "passed": 169,
+        "total": 169
       },
       "strict": {
         "passed": 11,
@@ -223,16 +223,16 @@
     },
     "SemanticVersioning": {
       "approximate": {
-        "passed": 7,
-        "total": 13
+        "passed": 9,
+        "total": 19
       },
       "build-channels": {
-        "passed": 12,
-        "total": 22
+        "passed": 19,
+        "total": 36
       },
       "build-precedence": {
         "passed": 1,
-        "total": 10
+        "total": 16
       },
       "context": {
         "passed": 3,
@@ -255,8 +255,8 @@
         "total": 13
       },
       "ranges": {
-        "passed": 172,
-        "total": 172
+        "passed": 169,
+        "total": 169
       },
       "strict": {
         "passed": 7,

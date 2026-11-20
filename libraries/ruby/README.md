@@ -33,7 +33,7 @@ SV.satisfies?("1.4.0", "^1.2.3")             # => true
 SV.satisfies?("1.0.0-rc.1", "^1.0.0-rc")     # => true: pre-release channel
 SV.satisfies?("1.0.0-beta", "^1.0.0-rc")     # => false: a different channel
 SV.satisfies?("1.4.2+win.x64", "^1.0.0+win") # => true: build channel
-SV.valid_range("~>1.2")                      # => ">=1.2.0 <1.3.0-0"
+SV.valid_range("~>1.2")                      # => ">=1.2.0 <2.0.0-0"
 
 # Contexts scope a version or range to an identity. Ranges work with case/when.
 case SV.parse("npm:react@18.2.0")
@@ -71,13 +71,13 @@ All implementations: [semver.xyz/libraries](https://semver.xyz/libraries/).
 
 | Operation | `semantic-versions@1.0.0` | `semantic_range@3.1.1` | `Gem::Version@3.5.22` | semantic-versions vs semantic_range |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **1.15 µs** | 1.79 µs | 1.00 µs | **1.6× faster** |
-| Sort versions | **2.12 µs** | 18.9 µs | 3.67 µs | **8.9× faster** |
-| Parse a range | **5.92 µs** | 23.8 µs | — | **4.0× faster** |
-| range.test(version) | **314 ns** | 6.15 µs | — | **20× faster** |
-| Resolve a range | **54.4 µs** | 885.3 µs | — | **16× faster** |
+| Parse a version | **1.40 µs** | 1.93 µs | 1.00 µs | **1.4× faster** |
+| Sort versions | **2.00 µs** | 23.2 µs | 4.38 µs | **12× faster** |
+| Parse a range | **7.25 µs** | 29.5 µs | — | **4.1× faster** |
+| range.test(version) | **373 ns** | 8.11 µs | — | **22× faster** |
+| Resolve a range | **66.6 µs** | 1.13 ms | — | **17× faster** |
 
-<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. ruby 3.3.6 · Intel(R) Xeon(R) Processor @ 2.30GHz · linux x86_64 · 2026-11-19. `Gem::Version`: Parsing is timed without Gem::Version.new's per-string cache, and Gem::Version defers splitting into segments until the first comparison (part of its sort time). RubyGems' own requirement syntax (~> 1.2, comma-separated comparators, no ^, || or x-ranges) and lenient versions (1.2 is accepted), so it is compared on versions only.</sub>
+<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. ruby 3.3.6 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x86_64 · 2026-11-19. `Gem::Version`: Parsing is timed without Gem::Version.new's per-string cache, and Gem::Version defers splitting into segments until the first comparison (part of its sort time). RubyGems' own requirement syntax (~> 1.2, comma-separated comparators, no ^, || or x-ranges) and lenient versions (1.2 is accepted), so it is compared on versions only.</sub>
 
 ### Conformance
 
@@ -86,14 +86,14 @@ All implementations: [semver.xyz/libraries](https://semver.xyz/libraries/).
 | Version grammar <br><sub>Valid and invalid versions per the BNF</sub> | ✓ 81/81 | ◐ 80/81 | ◐ 37/81 |
 | No coercion <br><sub>Rejects `v1.2.3`, `=1.2.3`, `1.2.3pre`, …</sub> | ✓ 11/11 | ◐ 10/11 | ◐ 9/11 |
 | Precedence <br><sub>Major, minor, patch and pre-release ordering</sub> | ✓ 32/32 | ✓ 32/32 | ◐ 24/32 |
-| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 10/10 | ◐ 1/10 | ◐ 1/10 |
-| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 199/199 | ◐ 174/199 | ◐ 104/172 |
-| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 17/17 | ◐ 13/17 | ◐ 12/13 |
+| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 16/16 | ◐ 1/16 | ◐ 1/16 |
+| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 196/196 | ◐ 171/196 | ◐ 104/169 |
+| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 26/26 | ◐ 15/26 | ✓ 19/19 |
 | Pre-release channels <br><sub>`^1.0.0-rc` admits `rc.*`, never `beta`</sub> | ✓ 44/44 | ◐ 33/44 | ◐ 32/44 |
 | Pre-release wildcards <br><sub>`X.Y.Z-*` and `*-*` opt in explicitly</sub> | ✓ 14/14 | ◐ 2/14 | ◐ 2/13 |
-| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 24/24 | ◐ 12/24 | ◐ 12/22 |
+| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 41/41 | ◐ 19/41 | ◐ 19/36 |
 | Contexts <br><sub>`npm:react@18.2.0`, `npm:react@^18`</sub> | ✓ 15/15 | ◐ 3/15 | ◐ 3/15 |
-| **All cases** | **447/447** | **360/447** | **236/413** |
+| **All cases** | **476/476** | **366/476** | **250/436** |
 
 <sub>Cases from the shared conformance suite in [`conformance/`](https://github.com/vltpkg/semantic-versions/tree/main/conformance), drawn from the specification. ✓ all pass · ◐ some pass · ✗ none pass.</sub>
 

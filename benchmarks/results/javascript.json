@@ -4,16 +4,16 @@
   "baseline": "semver",
   "environment": {
     "runtime": "Node.js 22.23.5",
-    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
     "platform": "linux x64",
-    "date": "2026-11-19"
+    "date": "2026-11-20"
   },
   "libraries": {
     "semantic-versions": {
       "version": "1.0.1"
     },
     "semver": {
-      "version": "7.8.6"
+      "version": "7.8.5"
     }
   },
   "corpus": {
@@ -39,12 +39,12 @@
       "description": "5,398 published versions",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 78.3,
-          "opsPerSec": 12777450
+          "nsPerOp": 102.3,
+          "opsPerSec": 9775614
         },
         "semver": {
-          "nsPerOp": 231.4,
-          "opsPerSec": 4321916
+          "nsPerOp": 295.8,
+          "opsPerSec": 3380819
         }
       }
     },
@@ -54,12 +54,12 @@
       "description": "5,398 versions by precedence (per version)",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 350.3,
-          "opsPerSec": 2854604
+          "nsPerOp": 676.6,
+          "opsPerSec": 1477967
         },
         "semver": {
-          "nsPerOp": 3582.6,
-          "opsPerSec": 279129
+          "nsPerOp": 4505.6,
+          "opsPerSec": 221948
         }
       }
     },
@@ -69,27 +69,27 @@
       "description": "1,996 real dependency ranges",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 4222.1,
-          "opsPerSec": 236851
+          "nsPerOp": 5334.7,
+          "opsPerSec": 187453
         },
         "semver": {
-          "nsPerOp": 5607.3,
-          "opsPerSec": 178339
+          "nsPerOp": 6825.5,
+          "opsPerSec": 146510
         }
       }
     },
     {
       "id": "satisfies",
       "label": "satisfies(version, range)",
-      "description": "15,604 version \u00d7 range checks",
+      "description": "15,604 version × range checks",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 414.2,
-          "opsPerSec": 2414553
+          "nsPerOp": 408.7,
+          "opsPerSec": 2446696
         },
         "semver": {
-          "nsPerOp": 836.5,
-          "opsPerSec": 1195393
+          "nsPerOp": 1019.8,
+          "opsPerSec": 980584
         }
       }
     },
@@ -99,12 +99,12 @@
       "description": "116 maxSatisfying lookups against a package's versions",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 14473.9,
-          "opsPerSec": 69090
+          "nsPerOp": 15676.1,
+          "opsPerSec": 63791
         },
         "semver": {
-          "nsPerOp": 45949.2,
-          "opsPerSec": 21763
+          "nsPerOp": 54499.6,
+          "opsPerSec": 18349
         }
       }
     }
@@ -128,24 +128,24 @@
         "total": 32
       },
       "build-precedence": {
-        "passed": 10,
-        "total": 10
+        "passed": 16,
+        "total": 16
       },
       "ranges": {
-        "passed": 199,
-        "total": 199
+        "passed": 196,
+        "total": 196
       },
       "build-channels": {
-        "passed": 24,
-        "total": 24
+        "passed": 41,
+        "total": 41
       },
       "prerelease-channels": {
         "passed": 44,
         "total": 44
       },
       "approximate": {
-        "passed": 17,
-        "total": 17
+        "passed": 26,
+        "total": 26
       },
       "prerelease-wildcards": {
         "passed": 14,
@@ -171,23 +171,23 @@
       },
       "build-precedence": {
         "passed": 1,
-        "total": 10
+        "total": 16
       },
       "ranges": {
-        "passed": 199,
-        "total": 199
+        "passed": 196,
+        "total": 196
       },
       "build-channels": {
-        "passed": 12,
-        "total": 24
+        "passed": 19,
+        "total": 41
       },
       "prerelease-channels": {
         "passed": 33,
         "total": 44
       },
       "approximate": {
-        "passed": 17,
-        "total": 17
+        "passed": 19,
+        "total": 26
       },
       "prerelease-wildcards": {
         "passed": 2,

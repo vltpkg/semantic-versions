@@ -19,6 +19,7 @@
 <simple>       ::= <primitive>
                  | <partial>
                  | <tilde>
+                 | <approximate>
                  | <caret>
                  | <star pre>
 
@@ -26,7 +27,14 @@
 
 <operator>     ::= "<" | ">" | ">=" | "<=" | "="
 
-<tilde>        ::= "~" [ ">" ] <partial>
+<tilde>        ::= "~" <partial>
+
+; The pessimistic operator keeps its RubyGems meaning: drop the last supplied
+; part and allow up to the next value of the part before it. One or three parts
+; equal the tilde; two parts reach the next major.
+;   ~>1.2    ->  >=1.2.0 <2.0.0-0     (~1.2 is >=1.2.0 <1.3.0-0)
+;   ~>1.2.3  ->  >=1.2.3 <1.3.0-0
+<approximate>  ::= "~>" <partial>
 
 <caret>        ::= "^" <partial>
 
@@ -53,7 +61,7 @@
 ; ignores build metadata on both sides; a candidate then satisfies the channel
 ; iff its own build identifiers begin with the channel's (prefix match). A
 ; <tilde>/<caret> channel applies to every comparator it desugars to; a <hyphen>
-; range spans two endpoints and ignores their build metadata.
+; range keeps each endpoint's build as that endpoint's channel.
 ;   ^1.0.0+win  ->  >=1.0.0+win <2.0.0-0+win   (the "win" channel within ^1.0.0)
 ;
 ; Pre-release channels: a "- <pre-release>" on a <primitive>, <tilde> or <caret>
@@ -61,7 +69,7 @@
 ; matched as a PREFIX. Stable versions are unaffected; a pre-release is admitted
 ; only if some comparator declares a matching channel on its tuple. Pre-releases
 ; are excluded by default because they rank BELOW their release (the mirror of
-; build, which ranks at/above and is therefore included by default).
+; build, which ranks above and is therefore included by default).
 ;   ^1.0.0-rc   ->  >=1.0.0-rc <2.0.0-0        (the "rc" channel of 1.0.0; not beta)
 ;   ^1.0.0-*    ->  >=1.0.0-0 <2.0.0-0         (any pre-release of the 1.0.0 tuple)
 ;   *-*                                        (any pre-release, any tuple)

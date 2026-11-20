@@ -311,7 +311,14 @@ public final class Range {
         }
     }
 
-    private static void tilde(Partial p, List<Comparator> out) {
+    /**
+     * {@code ~} allows patch-level changes when a minor is given, minor-level
+     * otherwise. With {@code approximate}, {@code ~>} keeps its RubyGems
+     * meaning: drop the last supplied part and allow up to the next value of
+     * the part before it, so two parts reach the next major. A trailing x is
+     * not a supplied part.
+     */
+    private static void tilde(Partial p, boolean approximate, List<Comparator> out) {
         if (p.major == X) {
             out.add(Comparator.ANY);
             return;
@@ -323,7 +330,7 @@ public final class Range {
             out.add(Comparator.of(Op.LT, v(m + 1, 0, 0, "0")));
         } else if (p.patch == X) {
             out.add(Comparator.of(Op.GTE, v(m, mi, 0)));
-            out.add(Comparator.of(Op.LT, v(m, mi + 1, 0, "0")));
+            out.add(Comparator.of(Op.LT, approximate ? v(m + 1, 0, 0, "0") : v(m, mi + 1, 0, "0")));
         } else {
             out.add(Comparator.of(Op.GTE, v(m, mi, p.patch, p.pre)));
             out.add(Comparator.of(Op.LT, v(m, mi + 1, 0, "0")));
@@ -381,16 +388,24 @@ public final class Range {
     }
 
     /** {@code <partial> - <partial>}: an inclusive span; builds on either endpoint are ignored. */
+    /**
+     * {@code a - b}. Each endpoint keeps its own labels: a pre-release as that
+     * endpoint's pre-release channel and a build as its build channel.
+     */
     private static void hyphen(Partial a, Partial b, List<Comparator> out) {
         int from = out.size();
         if (a.major != X) {
             Version lo = a.minor == X ? v(a.major, 0, 0) : a.patch == X ? v(a.major, a.minor, 0) : v(a.major, a.minor, a.patch, a.pre);
+            int at = out.size();
             out.add(Comparator.of(Op.GTE, lo));
+            withChannel(out, at, a.build);
         }
         if (b.major != X) {
+            int at = out.size();
             if (b.minor == X) out.add(Comparator.of(Op.LT, v(b.major + 1, 0, 0, "0")));
             else if (b.patch == X) out.add(Comparator.of(Op.LT, v(b.major, b.minor + 1, 0, "0")));
             else out.add(Comparator.of(Op.LTE, v(b.major, b.minor, b.patch, b.pre)));
+            withChannel(out, at, b.build);
         }
         if (out.size() == from) out.add(Comparator.ANY);
     }
@@ -436,7 +451,8 @@ public final class Range {
             return;
         }
         if (c == '~') {
-            tilde(partial(tok.startsWith("~>") ? tok.substring(2) : tok.substring(1)), out);
+            boolean approximate = tok.startsWith("~>");
+            tilde(partial(tok.substring(approximate ? 2 : 1)), approximate, out);
             return;
         }
         Op op = Op.EQ;

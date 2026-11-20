@@ -2,13 +2,18 @@ const includes = [
   ['1.0.0 - 2.0.0', '1.2.3'],
   ['^1.2.3+build', '1.2.3'],
   ['^1.2.3+build', '1.3.0'],
-  ['1.2.3-pre+asdf - 2.4.3-pre+asdf', '1.2.3'],
+  // A hyphen endpoint keeps its build as that endpoint's channel, so a
+  // build-less candidate is outside the `asdf` channel.
+  ['1.2.3-pre+asdf - 2.4.3-pre+asdf', '1.2.3-pre+asdf'],
   ['1.2.3pre+asdf - 2.4.3-pre+asdf', '1.2.3'],
   ['1.2.3-pre+asdf - 2.4.3pre+asdf', '1.2.3'],
   ['1.2.3pre+asdf - 2.4.3pre+asdf', '1.2.3'],
-  ['1.2.3-pre+asdf - 2.4.3-pre+asdf', '1.2.3-pre.2'],
-  ['1.2.3-pre+asdf - 2.4.3-pre+asdf', '2.4.3-alpha'],
-  ['1.2.3+asdf - 2.4.3+asdf', '1.2.3'],
+  ['1.2.3-pre+asdf - 2.4.3-pre+asdf', '1.2.3-pre.2+asdf'],
+  ['1.2.3+asdf - 2.4.3+asdf', '1.2.3+asdf'],
+  ['1.2.3+asdf - 2.4.3+asdf', '2.0.0+asdf.7'],
+  ['1.2.3+win - 2.0.0', '1.5.0+win.x64'],
+  ['~>1.2', '1.9.9'], // RubyGems meaning: >=1.2.0 <2.0.0
+  ['~>0.2', '0.9.0'],
   ['1.0.0', '1.0.0'],
   ['>=*', '0.2.4'],
   ['', '1.0.0'],
@@ -119,6 +124,14 @@ const includes = [
 ]
 
 const excludes = [
+  ['1.2.3-pre+asdf - 2.4.3-pre+asdf', '1.2.3'], // outside the asdf build channel
+  ['1.2.3-pre+asdf - 2.4.3-pre+asdf', '1.2.3-pre.2'],
+  ['1.2.3-pre+asdf - 2.4.3-pre+asdf', '2.4.3-alpha'],
+  ['1.2.3+asdf - 2.4.3+asdf', '1.2.3'],
+  ['1.2.3+win - 2.0.0', '1.5.0+linux'],
+  ['1.2.3+win - 2.0.0', '1.5.0'],
+  ['~>1.2', '2.0.0'],
+  ['~>1.2', '1.1.9'],
   ['1.0.0 - 2.0.0', '2.2.3'],
   ['1.2.3+asdf - 2.4.3+asdf', '1.2.3-pre.2'],
   ['1.2.3+asdf - 2.4.3+asdf', '2.4.3-alpha'],

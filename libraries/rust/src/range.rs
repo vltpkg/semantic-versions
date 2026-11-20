@@ -351,7 +351,12 @@ fn with_channel(mut comps: Vec<Comparator>, channel: &Identifiers) -> Vec<Compar
     comps
 }
 
-fn tilde(p: Partial) -> Vec<Comparator> {
+/// `~` allows patch-level changes when a minor is given, minor-level otherwise.
+/// `~>` (`approximate`) is the pessimistic operator with its RubyGems meaning:
+/// drop the last supplied part and allow up to the next value of the part
+/// before it, so with two parts it reaches the next major where `~` stops at
+/// the next minor. A trailing x is not a supplied part.
+fn tilde(p: Partial, approximate: bool) -> Vec<Comparator> {
     let Partial {
         major,
         minor,
@@ -369,9 +374,14 @@ fn tilde(p: Partial) -> Vec<Comparator> {
             Comparator::new(Op::Lt, ver(m + 1, 0, 0, zero())),
         ]
     } else if patch.is_x() {
+        let ceiling = if approximate {
+            ver(m + 1, 0, 0, zero())
+        } else {
+            ver(m, mi + 1, 0, zero())
+        };
         vec![
             Comparator::new(Op::Gte, ver(m, mi, 0, none())),
-            Comparator::new(Op::Lt, ver(m, mi + 1, 0, zero())),
+            Comparator::new(Op::Lt, ceiling),
         ]
     } else {
         vec![
@@ -484,8 +494,9 @@ fn xrange(op: Op, p: Partial) -> Vec<Comparator> {
     )]
 }
 
-/// `<partial> - <partial>`: an inclusive span. Builds on either endpoint are
-/// ignored; a pre-release on an endpoint is kept as that endpoint's channel.
+/// `<partial> - <partial>`: an inclusive span. Each endpoint keeps its own
+/// labels: a pre-release as that endpoint's pre-release channel and a build as
+/// that endpoint's build channel, exactly as on a comparator.
 fn hyphen(from: Partial, to: Partial) -> Vec<Comparator> {
     let mut out = Vec::new();
     if !from.major.is_x() {
@@ -496,19 +507,20 @@ fn hyphen(from: Partial, to: Partial) -> Vec<Comparator> {
         } else {
             ver(from.major.n(), from.minor.n(), from.patch.n(), from.pre)
         };
-        out.push(Comparator::new(Op::Gte, v));
+        out.push(Comparator::new(Op::Gte, v.with_build(from.build)));
     }
     if !to.major.is_x() {
-        out.push(if to.minor.is_x() {
-            Comparator::new(Op::Lt, ver(to.major.n() + 1, 0, 0, zero()))
+        let (op, v) = if to.minor.is_x() {
+            (Op::Lt, ver(to.major.n() + 1, 0, 0, zero()))
         } else if to.patch.is_x() {
-            Comparator::new(Op::Lt, ver(to.major.n(), to.minor.n() + 1, 0, zero()))
+            (Op::Lt, ver(to.major.n(), to.minor.n() + 1, 0, zero()))
         } else {
-            Comparator::new(
+            (
                 Op::Lte,
                 ver(to.major.n(), to.minor.n(), to.patch.n(), to.pre),
             )
-        });
+        };
+        out.push(Comparator::new(op, v.with_build(to.build)));
     }
     if out.is_empty() {
         out.push(Comparator::any());
@@ -543,8 +555,11 @@ fn comparator_token(tok: &str, input: &str) -> Result<Vec<Comparator>, Error> {
     if let Some(rest) = tok.strip_prefix('^') {
         return Ok(caret(partial(rest, input)?));
     }
-    if let Some(rest) = tok.strip_prefix("~>").or_else(|| tok.strip_prefix('~')) {
-        return Ok(tilde(partial(rest, input)?));
+    if let Some(rest) = tok.strip_prefix("~>") {
+        return Ok(tilde(partial(rest, input)?, true));
+    }
+    if let Some(rest) = tok.strip_prefix('~') {
+        return Ok(tilde(partial(rest, input)?, false));
     }
     let (op, rest) = if let Some(r) = tok.strip_prefix(">=") {
         (Op::Gte, r)

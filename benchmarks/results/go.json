@@ -3,16 +3,16 @@
   "conformance": {
     "Masterminds/semver": {
       "approximate": {
-        "passed": 13,
-        "total": 13
+        "passed": 15,
+        "total": 19
       },
       "build-channels": {
-        "passed": 12,
-        "total": 22
+        "passed": 19,
+        "total": 36
       },
       "build-precedence": {
         "passed": 1,
-        "total": 10
+        "total": 16
       },
       "context": {
         "passed": 3,
@@ -35,8 +35,8 @@
         "total": 13
       },
       "ranges": {
-        "passed": 167,
-        "total": 172
+        "passed": 164,
+        "total": 169
       },
       "strict": {
         "passed": 10,
@@ -45,16 +45,16 @@
     },
     "blang/semver": {
       "approximate": {
-        "passed": 7,
-        "total": 13
+        "passed": 9,
+        "total": 19
       },
       "build-channels": {
-        "passed": 14,
-        "total": 22
+        "passed": 21,
+        "total": 36
       },
       "build-precedence": {
         "passed": 1,
-        "total": 10
+        "total": 16
       },
       "context": {
         "passed": 3,
@@ -78,7 +78,7 @@
       },
       "ranges": {
         "passed": 114,
-        "total": 172
+        "total": 169
       },
       "strict": {
         "passed": 11,
@@ -87,16 +87,16 @@
     },
     "semantic-versions": {
       "approximate": {
-        "passed": 17,
-        "total": 17
+        "passed": 26,
+        "total": 26
       },
       "build-channels": {
-        "passed": 24,
-        "total": 24
+        "passed": 41,
+        "total": 41
       },
       "build-precedence": {
-        "passed": 10,
-        "total": 10
+        "passed": 16,
+        "total": 16
       },
       "context": {
         "passed": 15,
@@ -119,8 +119,8 @@
         "total": 14
       },
       "ranges": {
-        "passed": 199,
-        "total": 199
+        "passed": 196,
+        "total": 196
       },
       "strict": {
         "passed": 11,
@@ -149,7 +149,7 @@
     }
   },
   "environment": {
-    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
     "date": "2026-11-19",
     "platform": "linux amd64",
     "runtime": "go1.24.7"
@@ -178,16 +178,16 @@
       "description": "5398 published versions",
       "results": {
         "Masterminds/semver": {
-          "nsPerOp": 528.8,
-          "opsPerSec": 1891227
+          "nsPerOp": 591,
+          "opsPerSec": 1692016
         },
         "blang/semver": {
-          "nsPerOp": 151,
-          "opsPerSec": 6621999
+          "nsPerOp": 169.8,
+          "opsPerSec": 5890993
         },
         "semantic-versions": {
-          "nsPerOp": 28,
-          "opsPerSec": 35777894
+          "nsPerOp": 29.7,
+          "opsPerSec": 33631467
         }
       }
     },
@@ -197,16 +197,16 @@
       "description": "5398 parsed versions by precedence (per version)",
       "results": {
         "Masterminds/semver": {
-          "nsPerOp": 443.9,
-          "opsPerSec": 2252865
+          "nsPerOp": 491.5,
+          "opsPerSec": 2034546
         },
         "blang/semver": {
-          "nsPerOp": 233.2,
-          "opsPerSec": 4288858
+          "nsPerOp": 248.1,
+          "opsPerSec": 4030055
         },
         "semantic-versions": {
-          "nsPerOp": 174.7,
-          "opsPerSec": 5725316
+          "nsPerOp": 191.6,
+          "opsPerSec": 5219405
         }
       }
     },
@@ -216,12 +216,12 @@
       "description": "1996 real dependency ranges",
       "results": {
         "Masterminds/semver": {
-          "nsPerOp": 5487.2,
-          "opsPerSec": 182241
+          "nsPerOp": 6769.1,
+          "opsPerSec": 147730
         },
         "semantic-versions": {
-          "nsPerOp": 356.5,
-          "opsPerSec": 2804993
+          "nsPerOp": 370.7,
+          "opsPerSec": 2697894
         }
       }
     },
@@ -231,12 +231,12 @@
       "description": "15604 version × range checks",
       "results": {
         "Masterminds/semver": {
-          "nsPerOp": 578.7,
-          "opsPerSec": 1727931
+          "nsPerOp": 636.4,
+          "opsPerSec": 1571249
         },
         "semantic-versions": {
-          "nsPerOp": 23.7,
-          "opsPerSec": 42139144
+          "nsPerOp": 27.3,
+          "opsPerSec": 36655660
         }
       }
     },
@@ -246,12 +246,12 @@
       "description": "116 max-satisfying lookups against a package's versions",
       "results": {
         "Masterminds/semver": {
-          "nsPerOp": 76046.5,
-          "opsPerSec": 13150
+          "nsPerOp": 91122.1,
+          "opsPerSec": 10974
         },
         "semantic-versions": {
-          "nsPerOp": 3672,
-          "opsPerSec": 272329
+          "nsPerOp": 4238.8,
+          "opsPerSec": 235915
         }
       }
     }

@@ -54,8 +54,10 @@ Check(Versions.RSort(vs)[0] == "2.0.0", "RSort");
 Check(Versions.ValidRange(">=0.0.0") == "*", "ValidRange any");
 Check(SemanticRange.Parse("npm:react@^18").Test(SemanticVersion.Parse("npm:react@18.2.0")), "context match");
 Check(!SemanticRange.Parse("npm:react@^18").Test(SemanticVersion.Parse("18.2.0")), "context mismatch");
-Check(SemanticVersion.Parse("1.0.0+001").Equals(SemanticVersion.Parse("1.0.0+1"))
-    && SemanticVersion.Parse("1.0.0+001").GetHashCode() == SemanticVersion.Parse("1.0.0+1").GetHashCode(), "Equals/GetHashCode");
+Check(!SemanticVersion.Parse("1.0.0+001").Equals(SemanticVersion.Parse("1.0.0+1"))
+    && SemanticVersion.Parse("1.0.0+1") < SemanticVersion.Parse("1.0.0+001")
+    && SemanticVersion.Parse("1.0.0+1.a").Equals(SemanticVersion.Parse("1.0.0+1.a"))
+    && SemanticVersion.Parse("1.0.0+1.a").GetHashCode() == SemanticVersion.Parse("1.0.0+1.a").GetHashCode(), "Equals/GetHashCode");
 Check(!SemanticVersion.TryParse("1.2", out _), "1.2 rejected");
 
 foreach (var f in failures) Console.Error.WriteLine("FAIL " + f);

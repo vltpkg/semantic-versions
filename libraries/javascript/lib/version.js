@@ -130,18 +130,27 @@ const validPatch = (patch) => {
   return patch
 }
 
-// A cheap first-character check avoids running the numeric regex on
-// alphanumeric identifiers.
-const isNumeric = (id) => typeof id === 'number' || (id.charCodeAt(0) <= 57 && NUMERIC.test(id))
+// A numeric identifier is `0` or digits with no leading zero. Pre-release
+// identifiers are parsed to numbers already; a build identifier stays a string,
+// and one with a leading zero (`001`) is NOT numeric: it compares as text, so
+// `+001` and `+1` are different builds. A cheap first-character check avoids
+// running the regex on alphanumeric identifiers.
+const isNumeric = (id) =>
+  typeof id === 'number' ||
+  (id.charCodeAt(0) <= 57 && NUMERIC.test(id) && (id.length === 1 || id.charCodeAt(0) !== 48))
 
 const compareNumbers = (a, b) => (a === b ? 0 : a < b ? -1 : 1)
+
+// Two numeric strings compare by length, then by text: exact for any size.
+const compareNumericStrings = (a, b) =>
+  a.length === b.length ? (a === b ? 0 : a < b ? -1 : 1) : a.length < b.length ? -1 : 1
 
 const compareIdentifiers = (a, b) => {
   const one = isNumeric(a)
   const two = isNumeric(b)
   if (one && two) {
-    a = +a
-    b = +b
+    if (typeof a === 'number' && typeof b === 'number') return compareNumbers(a, b)
+    return compareNumericStrings(String(a), String(b))
   }
   return a === b ? 0 : (one && !two) ? -1 : (two && !one) ? 1 : a < b ? -1 : 1
 }

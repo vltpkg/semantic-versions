@@ -70,12 +70,14 @@ const XRANGE = re(EX_XRANGE)
 
 // Tilde ranges.
 // Meaning is "reasonably at or greater than"
-const EX_LONETILDE = '(?:~>?)'
+// `~` is the tilde; `~>` is the approximate (pessimistic) operator, which
+// differs from the tilde for two-part versions, so the operator is captured.
+const EX_LONETILDE = '(~>?)'
 const LONETILDE = re(EX_LONETILDE)
 const EX_TILDE = `^${EX_LONETILDE}${EX_XRANGEPLAIN}$`
 const TILDE = re(EX_TILDE)
 
-// match tilde whitespace `~ 1.2.3`
+// match tilde whitespace `~ 1.2.3`, `~> 1.2`
 const EX_TILDETRIM = `(\\s*)${EX_LONETILDE}\\s+`
 const TILDETRIM = re(EX_TILDETRIM)
 

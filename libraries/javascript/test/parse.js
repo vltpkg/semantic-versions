@@ -55,7 +55,11 @@ test('build participates in precedence', t => {
 })
 
 test('ranges & channels', t => {
-  t.equal(validRange('~>1.2'), '>=1.2.0 <1.3.0-0', 'approximate operator desugars')
+  t.equal(validRange('~>1.2'), '>=1.2.0 <2.0.0-0', 'approximate operator keeps its RubyGems meaning')
+  t.equal(validRange('~>1.2.3'), '>=1.2.3 <1.3.0-0', 'three parts: the same as a tilde')
+  t.equal(validRange('~> 1.2'), '>=1.2.0 <2.0.0-0', 'whitespace after ~> is tolerated')
+  t.equal(validRange('1.2.3+win - 2.0.0'), '>=1.2.3+win <=2.0.0', 'a hyphen endpoint keeps its build channel')
+  t.equal(compare('1.0.0+1', '1.0.0+001'), -1, 'a leading-zero build identifier compares as text')
   t.ok(satisfies('1.4.0', '^1.2.3'))
   t.notOk(satisfies('2.0.0', '^1.2.3'))
   t.ok(satisfies('1.0.0-rc.1', '^1.0.0-rc'), 'pre-release channel admits its own train')

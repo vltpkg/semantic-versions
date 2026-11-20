@@ -4,15 +4,16 @@ use std::fmt;
 /// One pre-release or build identifier, borrowed from its version.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Identifier<'a> {
-    /// All digits, compared numerically.
+    /// `0`, or digits with no leading zero: compared numerically.
     Numeric(&'a str),
-    /// Contains a letter or hyphen, compared in ASCII order.
+    /// Anything else, including all-digit identifiers with a leading zero
+    /// (which a build may carry): compared in ASCII order.
     AlphaNumeric(&'a str),
 }
 
 impl<'a> Identifier<'a> {
     pub(crate) fn new(s: &'a str) -> Self {
-        if s.bytes().all(|c| c.is_ascii_digit()) {
+        if is_numeric(s.as_bytes()) {
             Identifier::Numeric(s)
         } else {
             Identifier::AlphaNumeric(s)
@@ -42,14 +43,12 @@ impl fmt::Display for Identifier<'_> {
 }
 
 impl Ord for Identifier<'_> {
-    /// Numeric identifiers compare numerically (ignoring leading zeroes, which
-    /// builds may carry) and sort before alphanumeric ones, which compare in
-    /// ASCII order.
+    /// Numeric identifiers compare numerically and sort before alphanumeric
+    /// ones, which compare in ASCII order. A leading-zero identifier is
+    /// alphanumeric, so `+001` and `+1` are different builds.
     fn cmp(&self, other: &Self) -> Ordering {
         match (self, other) {
             (Identifier::Numeric(a), Identifier::Numeric(b)) => {
-                let a = a.trim_start_matches('0');
-                let b = b.trim_start_matches('0');
                 a.len()
                     .cmp(&b.len())
                     .then_with(|| a.as_bytes().cmp(b.as_bytes()))
@@ -71,25 +70,20 @@ impl PartialOrd for Identifier<'_> {
 
 /// Compare two identifiers given as bytes (always ASCII).
 #[inline]
+/// A numeric identifier is `0` or digits with no leading zero; a leading-zero
+/// identifier (which a build may carry) compares as text.
+#[inline]
+fn is_numeric(s: &[u8]) -> bool {
+    s.iter().all(u8::is_ascii_digit) && (s.len() == 1 || s[0] != b'0')
+}
+
 fn cmp_id_bytes(a: &[u8], b: &[u8]) -> Ordering {
-    let da = a.iter().all(u8::is_ascii_digit);
-    let db = b.iter().all(u8::is_ascii_digit);
-    match (da, db) {
-        (true, true) => {
-            let a = trim_zeros(a);
-            let b = trim_zeros(b);
-            a.len().cmp(&b.len()).then_with(|| a.cmp(b))
-        }
+    match (is_numeric(a), is_numeric(b)) {
+        (true, true) => a.len().cmp(&b.len()).then_with(|| a.cmp(b)),
         (true, false) => Ordering::Less,
         (false, true) => Ordering::Greater,
         (false, false) => a.cmp(b),
     }
-}
-
-#[inline]
-fn trim_zeros(s: &[u8]) -> &[u8] {
-    let n = s.iter().take_while(|&&c| c == b'0').count();
-    &s[n..]
 }
 
 const INLINE: usize = 22;

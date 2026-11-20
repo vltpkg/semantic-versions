@@ -152,18 +152,10 @@ public sealed class SemanticVersion : IComparable<SemanticVersion>, IEquatable<S
     public override bool Equals(object? obj) => obj is SemanticVersion v && Equals(v);
 
     /// <inheritdoc />
-    public override int GetHashCode() => HashCode.Combine(Major, Minor, Patch, NormalizedHash(Prerelease), NormalizedHash(Build));
-
-    private static int NormalizedHash(string ids)
-    {
-        var h = new HashCode();
-        foreach (var id in ids.Split('.'))
-        {
-            var t = id.Length > 1 && id.All(Scan.IsDigit) ? id.TrimStart('0') : id;
-            h.Add(t.Length == 0 ? "0" : t, StringComparer.Ordinal);
-        }
-        return h.ToHashCode();
-    }
+    public override int GetHashCode() =>
+        // Two versions are equal only when every identifier is identical (a
+        // leading-zero build identifier compares as text), so the strings hash.
+        HashCode.Combine(Major, Minor, Patch, Prerelease, Build);
 
     /// <summary>Precedence operators.</summary>
     public static bool operator <(SemanticVersion a, SemanticVersion b) => a.CompareTo(b) < 0;

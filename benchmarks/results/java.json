@@ -3,7 +3,7 @@
   "subject": "semantic-versions",
   "baseline": "semver4j",
   "environment": {
-    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
     "date": "2026-11-19",
     "platform": "linux amd64",
     "runtime": "OpenJDK 21"
@@ -46,16 +46,16 @@
       "description": "5398 published versions",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 34.6,
-          "opsPerSec": 28930991
+          "nsPerOp": 44.9,
+          "opsPerSec": 22281608
         },
         "semver4j": {
-          "nsPerOp": 495.2,
-          "opsPerSec": 2019582
+          "nsPerOp": 606.5,
+          "opsPerSec": 1648724
         },
         "java-semver": {
-          "nsPerOp": 270.5,
-          "opsPerSec": 3696791
+          "nsPerOp": 329.2,
+          "opsPerSec": 3037418
         }
       }
     },
@@ -65,16 +65,16 @@
       "description": "5398 parsed versions by precedence (per version)",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 110.7,
-          "opsPerSec": 9032315
+          "nsPerOp": 139.8,
+          "opsPerSec": 7152847
         },
         "semver4j": {
-          "nsPerOp": 1024,
-          "opsPerSec": 976568
+          "nsPerOp": 1092.5,
+          "opsPerSec": 915372
         },
         "java-semver": {
-          "nsPerOp": 129.6,
-          "opsPerSec": 7715554
+          "nsPerOp": 140.6,
+          "opsPerSec": 7113266
         }
       }
     },
@@ -84,12 +84,12 @@
       "description": "1996 real dependency ranges",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 205.1,
-          "opsPerSec": 4875964
+          "nsPerOp": 263.8,
+          "opsPerSec": 3791175
         },
         "semver4j": {
-          "nsPerOp": 5029.5,
-          "opsPerSec": 198826
+          "nsPerOp": 5830.1,
+          "opsPerSec": 171525
         }
       }
     },
@@ -99,12 +99,12 @@
       "description": "15604 version × range checks",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 6.2,
-          "opsPerSec": 160740147
+          "nsPerOp": 8.2,
+          "opsPerSec": 121392777
         },
         "semver4j": {
-          "nsPerOp": 60.8,
-          "opsPerSec": 16447812
+          "nsPerOp": 72.7,
+          "opsPerSec": 13753986
         }
       }
     },
@@ -114,12 +114,12 @@
       "description": "116 max-satisfying lookups against a package's versions",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 984.5,
-          "opsPerSec": 1015771
+          "nsPerOp": 1209.6,
+          "opsPerSec": 826690
         },
         "semver4j": {
-          "nsPerOp": 13321,
-          "opsPerSec": 75069
+          "nsPerOp": 14331.1,
+          "opsPerSec": 69778
         }
       }
     }
@@ -127,128 +127,128 @@
   "conformance": {
     "semantic-versions": {
       "approximate": {
-        "total": 17,
-        "passed": 17
+        "passed": 26,
+        "total": 26
       },
       "build-channels": {
-        "total": 24,
-        "passed": 24
+        "passed": 41,
+        "total": 41
       },
       "build-precedence": {
-        "total": 10,
-        "passed": 10
+        "passed": 16,
+        "total": 16
       },
       "context": {
-        "total": 15,
-        "passed": 15
+        "passed": 15,
+        "total": 15
       },
       "parse": {
-        "total": 81,
-        "passed": 81
+        "passed": 81,
+        "total": 81
       },
       "precedence": {
-        "total": 32,
-        "passed": 32
+        "passed": 32,
+        "total": 32
       },
       "prerelease-channels": {
-        "total": 44,
-        "passed": 44
+        "passed": 44,
+        "total": 44
       },
       "prerelease-wildcards": {
-        "total": 14,
-        "passed": 14
+        "passed": 14,
+        "total": 14
       },
       "ranges": {
-        "total": 199,
-        "passed": 199
+        "passed": 196,
+        "total": 196
       },
       "strict": {
-        "total": 11,
-        "passed": 11
+        "passed": 11,
+        "total": 11
       }
     },
     "semver4j": {
       "approximate": {
-        "total": 13,
-        "passed": 13
+        "passed": 15,
+        "total": 19
       },
       "build-channels": {
-        "total": 22,
-        "passed": 12
+        "passed": 19,
+        "total": 36
       },
       "build-precedence": {
-        "total": 10,
-        "passed": 1
+        "passed": 1,
+        "total": 16
       },
       "context": {
-        "total": 15,
-        "passed": 3
+        "passed": 3,
+        "total": 15
       },
       "parse": {
-        "total": 81,
-        "passed": 81
+        "passed": 81,
+        "total": 81
       },
       "precedence": {
-        "total": 32,
-        "passed": 31
+        "passed": 31,
+        "total": 32
       },
       "prerelease-channels": {
-        "total": 44,
-        "passed": 33
+        "passed": 33,
+        "total": 44
       },
       "prerelease-wildcards": {
-        "total": 13,
-        "passed": 2
+        "passed": 2,
+        "total": 13
       },
       "ranges": {
-        "total": 172,
-        "passed": 164
+        "passed": 161,
+        "total": 169
       },
       "strict": {
-        "total": 11,
-        "passed": 10
+        "passed": 10,
+        "total": 11
       }
     },
     "java-semver": {
       "approximate": {
-        "total": 13,
-        "passed": 7
+        "passed": 9,
+        "total": 19
       },
       "build-channels": {
-        "total": 22,
-        "passed": 14
+        "passed": 21,
+        "total": 36
       },
       "build-precedence": {
-        "total": 10,
-        "passed": 10
+        "passed": 13,
+        "total": 16
       },
       "context": {
-        "total": 15,
-        "passed": 3
+        "passed": 3,
+        "total": 15
       },
       "parse": {
-        "total": 81,
-        "passed": 81
+        "passed": 81,
+        "total": 81
       },
       "precedence": {
-        "total": 32,
-        "passed": 32
+        "passed": 32,
+        "total": 32
       },
       "prerelease-channels": {
-        "total": 44,
-        "passed": 26
+        "passed": 26,
+        "total": 44
       },
       "prerelease-wildcards": {
-        "total": 13,
-        "passed": 2
+        "passed": 2,
+        "total": 13
       },
       "ranges": {
-        "total": 172,
-        "passed": 124
+        "passed": 124,
+        "total": 169
       },
       "strict": {
-        "total": 11,
-        "passed": 11
+        "passed": 11,
+        "total": 11
       }
     }
   },

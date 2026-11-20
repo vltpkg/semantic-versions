@@ -83,19 +83,22 @@ internal static class Scan
         }
     }
 
-    private static bool AllDigits(ReadOnlySpan<char> s)
+    /// <summary>
+    /// "0" or digits with no leading zero. A build identifier with a leading
+    /// zero ("001") is not numeric: it compares as text, so "+001" and "+1"
+    /// are different builds.
+    /// </summary>
+    private static bool IsNumeric(ReadOnlySpan<char> s)
     {
         foreach (char c in s) if (!IsDigit(c)) return false;
-        return true;
+        return s.Length == 1 || s[0] != '0';
     }
 
     private static int CompareOne(ReadOnlySpan<char> a, ReadOnlySpan<char> b)
     {
-        bool da = AllDigits(a), db = AllDigits(b);
+        bool da = IsNumeric(a), db = IsNumeric(b);
         if (da && db)
         {
-            a = a.TrimStart('0');
-            b = b.TrimStart('0');
             if (a.Length != b.Length) return a.Length < b.Length ? -1 : 1;
         }
         else if (da) return -1;

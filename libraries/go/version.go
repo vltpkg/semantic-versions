@@ -211,23 +211,25 @@ func compareIdentifiers(a, b string) int {
 	}
 }
 
-func allDigits(s string) bool {
+// isNumeric reports whether an identifier is "0" or digits with no leading
+// zero. A build identifier with a leading zero ("001") is not numeric: it
+// compares as text, so "+001" and "+1" are different builds.
+func isNumeric(s string) bool {
 	for i := 0; i < len(s); i++ {
 		if s[i]-'0' > 9 {
 			return false
 		}
 	}
-	return true
+	return len(s) == 1 || s[0] != '0'
 }
 
 func compareIdentifier(a, b string) int {
 	if a == b {
 		return 0
 	}
-	da, db := allDigits(a), allDigits(b)
+	da, db := isNumeric(a), isNumeric(b)
 	switch {
 	case da && db:
-		a, b = strings.TrimLeft(a, "0"), strings.TrimLeft(b, "0")
 		if len(a) != len(b) {
 			return cmpUint(uint64(len(a)), uint64(len(b)))
 		}

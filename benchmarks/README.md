@@ -8,14 +8,14 @@ libraries people use today, in each language:
 
 | Language | Package | Conformance | Compared with | Speed vs. it |
 | --- | --- | :---: | --- | ---: |
-| [JavaScript](../libraries/javascript) | `semantic-versions` (npm) | 447/447 | `semver` 390/447 | 1.3–10× |
-| [Rust](../libraries/rust) | `semantic-versions` (crates.io) | 447/447 | `nodejs-semver` 357/447 | 0.9–1.6× |
-| [Python](../libraries/python) | `semantic-versions` (PyPI) | 447/447 | `node-semver` 360/447 | 1.6–15× |
-| [Go](../libraries/go) | `semver.xyz/go` (pkg.go.dev) | 447/447 | `Masterminds/semver` 342/413 | 2.5–24× |
-| [Ruby](../libraries/ruby) | `semantic-versions` (RubyGems) | 447/447 | `semantic_range` 360/447 | 1.6–20× |
-| [Java](../libraries/java) | `xyz.semver:semantic-versions` (Maven Central) | 447/447 | `semver4j` 350/413 | 9.3–25× |
-| [.NET](../libraries/dotnet) | `SemanticVersions` (NuGet) | 447/447 | `Semver` 359/413 | 1.3–9.7× |
-| [PHP](../libraries/php) | `vltpkg/semantic-versions` (Packagist) | 447/447 | `composer/semver` 273/413 | 1.1–3.8× |
+| [JavaScript](../libraries/javascript) | `semantic-versions` (npm) | 476/476 | `semver` 396/476 | 1.3–6.7× |
+| [Rust](../libraries/rust) | `semantic-versions` (crates.io) | 476/476 | `nodejs-semver` 366/476 | 0.8–1.3× |
+| [Python](../libraries/python) | `semantic-versions` (PyPI) | 476/476 | `node-semver` 366/476 | 1.5–15× |
+| [Go](../libraries/go) | `semver.xyz/go` (pkg.go.dev) | 476/476 | `Masterminds/semver` 348/436 | 2.6–23× |
+| [Ruby](../libraries/ruby) | `semantic-versions` (RubyGems) | 476/476 | `semantic_range` 366/476 | 1.4–22× |
+| [Java](../libraries/java) | `xyz.semver:semantic-versions` (Maven Central) | 476/476 | `semver4j` 356/436 | 7.8–22× |
+| [.NET](../libraries/dotnet) | `SemanticVersions` (NuGet) | 476/476 | `Semver` 365/436 | 1.3–12× |
+| [PHP](../libraries/php) | `vltpkg/semantic-versions` (Packagist) | 476/476 | `composer/semver` 282/436 | 1.0–3.5× |
 
 <!-- languages:end -->
 
@@ -77,15 +77,15 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 
 ### Speed
 
-| Operation | `semantic-versions@1.0.1` | `semver@7.8.6` | semantic-versions vs semver |
+| Operation | `semantic-versions@1.0.1` | `semver@7.8.5` | semantic-versions vs semver |
 | --- | ---: | ---: | --- |
-| Parse a version | **78.3 ns** | 231 ns | **3.0× faster** |
-| Sort versions | **350 ns** | 3.58 µs | **10× faster** |
-| Parse a range | **4.22 µs** | 5.61 µs | **1.3× faster** |
-| satisfies(version, range) | **414 ns** | 837 ns | **2.0× faster** |
-| Resolve a range | **14.5 µs** | 45.9 µs | **3.2× faster** |
+| Parse a version | **102 ns** | 296 ns | **2.9× faster** |
+| Sort versions | **677 ns** | 4.51 µs | **6.7× faster** |
+| Parse a range | **5.33 µs** | 6.83 µs | **1.3× faster** |
+| satisfies(version, range) | **409 ns** | 1.02 µs | **2.5× faster** |
+| Resolve a range | **15.7 µs** | 54.5 µs | **3.5× faster** |
 
-<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. Node.js 22.23.5 · Intel(R) Xeon(R) Processor @ 2.30GHz · linux x64 · 2026-11-19.</sub>
+<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. Node.js 22.23.5 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x64 · 2026-11-20.</sub>
 
 ### Conformance
 
@@ -94,14 +94,14 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 | Version grammar <br><sub>Valid and invalid versions per the BNF</sub> | ✓ 81/81 | ✓ 81/81 |
 | No coercion <br><sub>Rejects `v1.2.3`, `=1.2.3`, `1.2.3pre`, …</sub> | ✓ 11/11 | ◐ 10/11 |
 | Precedence <br><sub>Major, minor, patch and pre-release ordering</sub> | ✓ 32/32 | ✓ 32/32 |
-| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 10/10 | ◐ 1/10 |
-| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 199/199 | ✓ 199/199 |
-| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 17/17 | ✓ 17/17 |
+| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 16/16 | ◐ 1/16 |
+| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 196/196 | ✓ 196/196 |
+| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 26/26 | ◐ 19/26 |
 | Pre-release channels <br><sub>`^1.0.0-rc` admits `rc.*`, never `beta`</sub> | ✓ 44/44 | ◐ 33/44 |
 | Pre-release wildcards <br><sub>`X.Y.Z-*` and `*-*` opt in explicitly</sub> | ✓ 14/14 | ◐ 2/14 |
-| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 24/24 | ◐ 12/24 |
+| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 41/41 | ◐ 19/41 |
 | Contexts <br><sub>`npm:react@18.2.0`, `npm:react@^18`</sub> | ✓ 15/15 | ◐ 3/15 |
-| **All cases** | **447/447** | **390/447** |
+| **All cases** | **476/476** | **396/476** |
 
 <sub>Cases from the shared conformance suite in [`conformance/`](https://github.com/vltpkg/semantic-versions/tree/main/conformance), drawn from the specification. ✓ all pass · ◐ some pass · ✗ none pass.</sub>
 
@@ -111,13 +111,13 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 
 | Operation | `semantic-versions@1.0.0` | `nodejs-semver@7.0.0` | `semver@1.0.28` | semantic-versions vs nodejs-semver |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **21.7 ns** | 26.3 ns | 21.4 ns | **1.2× faster** |
-| Sort versions | **117 ns** | 102 ns | 117 ns | 1.15× slower |
-| Parse a range | **208 ns** | 270 ns | — | **1.3× faster** |
-| Range::test(version) | **5.5 ns** | 8.7 ns | — | **1.6× faster** |
-| Resolve a range | **1.03 µs** | 1.32 µs | — | **1.3× faster** |
+| Parse a version | **24.8 ns** | 29.0 ns | 23.6 ns | **1.2× faster** |
+| Sort versions | **149 ns** | 119 ns | 127 ns | 1.26× slower |
+| Parse a range | **246 ns** | 314 ns | — | **1.3× faster** |
+| Range::test(version) | **6.8 ns** | 9.1 ns | — | **1.3× faster** |
+| Resolve a range | **1.29 µs** | 1.57 µs | — | **1.2× faster** |
 
-<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. rustc 1.97.0 · Intel(R) Xeon(R) Processor @ 2.30GHz · linux x86_64 · 2026-11-19. `semver`: Cargo's requirement syntax (bare versions mean ^, comparators are comma-separated, no || or hyphen ranges), so it is compared on versions only.</sub>
+<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. rustc 1.97.0 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x86_64 · 2026-11-19. `semver`: Cargo's requirement syntax (bare versions mean ^, comparators are comma-separated, no || or hyphen ranges), so it is compared on versions only.</sub>
 
 ### Conformance
 
@@ -126,14 +126,14 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 | Version grammar <br><sub>Valid and invalid versions per the BNF</sub> | ✓ 81/81 | ◐ 59/81 | ✓ 81/81 |
 | No coercion <br><sub>Rejects `v1.2.3`, `=1.2.3`, `1.2.3pre`, …</sub> | ✓ 11/11 | ◐ 3/11 | ✓ 11/11 |
 | Precedence <br><sub>Major, minor, patch and pre-release ordering</sub> | ✓ 32/32 | ✓ 32/32 | ✓ 32/32 |
-| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 10/10 | ◐ 1/10 | ✓ 10/10 |
-| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 199/199 | ◐ 195/199 | ◐ 134/172 |
-| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 17/17 | ✓ 17/17 | ◐ 7/13 |
+| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 16/16 | ◐ 1/16 | ◐ 15/16 |
+| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 196/196 | ◐ 192/196 | ◐ 134/169 |
+| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 26/26 | ◐ 19/26 | ◐ 9/19 |
 | Pre-release channels <br><sub>`^1.0.0-rc` admits `rc.*`, never `beta`</sub> | ✓ 44/44 | ◐ 33/44 | ◐ 34/44 |
 | Pre-release wildcards <br><sub>`X.Y.Z-*` and `*-*` opt in explicitly</sub> | ✓ 14/14 | ◐ 2/14 | ◐ 2/13 |
-| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 24/24 | ◐ 12/24 | ◐ 12/22 |
+| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 41/41 | ◐ 22/41 | ◐ 19/36 |
 | Contexts <br><sub>`npm:react@18.2.0`, `npm:react@^18`</sub> | ✓ 15/15 | ◐ 3/15 | ◐ 3/15 |
-| **All cases** | **447/447** | **357/447** | **326/413** |
+| **All cases** | **476/476** | **366/476** | **340/436** |
 
 <sub>Cases from the shared conformance suite in [`conformance/`](https://github.com/vltpkg/semantic-versions/tree/main/conformance), drawn from the specification. ✓ all pass · ◐ some pass · ✗ none pass.</sub>
 
@@ -143,13 +143,13 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 
 | Operation | `semantic-versions@1.0.0` | `node-semver@0.9.1` | `semver@3.1.2` | semantic-versions vs node-semver |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **920 ns** | 1.44 µs | 1.38 µs | **1.6× faster** |
-| Sort versions | **657 ns** | 9.90 µs | 5.89 µs | **15× faster** |
-| Parse a range | **4.30 µs** | 16.0 µs | — | **3.7× faster** |
-| range.test(version) | **247 ns** | 1.76 µs | — | **7.1× faster** |
-| Resolve a range | **39.9 µs** | 267.3 µs | — | **6.7× faster** |
+| Parse a version | **1.19 µs** | 1.76 µs | 1.67 µs | **1.5× faster** |
+| Sort versions | **803 ns** | 11.9 µs | 6.32 µs | **15× faster** |
+| Parse a range | **5.04 µs** | 18.8 µs | — | **3.7× faster** |
+| range.test(version) | **302 ns** | 1.95 µs | — | **6.4× faster** |
+| Resolve a range | **37.3 µs** | 251.6 µs | — | **6.7× faster** |
 
-<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. CPython 3.13.18 · Intel(R) Xeon(R) Processor @ 2.30GHz · linux x86_64 · 2026-11-19. `semver`: python-semver has no npm-style ranges (only single comparisons such as >=1.2.3), so it is compared on versions only.</sub>
+<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. CPython 3.13.18 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x86_64 · 2026-11-19. `semver`: python-semver has no npm-style ranges (only single comparisons such as >=1.2.3), so it is compared on versions only.</sub>
 
 ### Conformance
 
@@ -158,14 +158,14 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 | Version grammar <br><sub>Valid and invalid versions per the BNF</sub> | ✓ 81/81 | ◐ 80/81 | ◐ 80/81 |
 | No coercion <br><sub>Rejects `v1.2.3`, `=1.2.3`, `1.2.3pre`, …</sub> | ✓ 11/11 | ◐ 10/11 | ✓ 7/7 |
 | Precedence <br><sub>Major, minor, patch and pre-release ordering</sub> | ✓ 32/32 | ✓ 32/32 | ✓ 32/32 |
-| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 10/10 | ◐ 1/10 | ◐ 1/10 |
-| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 199/199 | ◐ 174/199 | — n/a |
-| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 17/17 | ◐ 13/17 | — n/a |
+| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 16/16 | ◐ 1/16 | ◐ 1/16 |
+| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 196/196 | ◐ 171/196 | — n/a |
+| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 26/26 | ◐ 15/26 | — n/a |
 | Pre-release channels <br><sub>`^1.0.0-rc` admits `rc.*`, never `beta`</sub> | ✓ 44/44 | ◐ 33/44 | — n/a |
 | Pre-release wildcards <br><sub>`X.Y.Z-*` and `*-*` opt in explicitly</sub> | ✓ 14/14 | ◐ 2/14 | — n/a |
-| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 24/24 | ◐ 12/24 | — n/a |
+| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 41/41 | ◐ 19/41 | — n/a |
 | Contexts <br><sub>`npm:react@18.2.0`, `npm:react@^18`</sub> | ✓ 15/15 | ◐ 3/15 | ✗ 0/8 |
-| **All cases** | **447/447** | **360/447** | **120/138** |
+| **All cases** | **476/476** | **366/476** | **120/144** |
 
 <sub>Cases from the shared conformance suite in [`conformance/`](https://github.com/vltpkg/semantic-versions/tree/main/conformance), drawn from the specification. ✓ all pass · ◐ some pass · ✗ none pass.</sub>
 
@@ -175,13 +175,13 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 
 | Operation | `semantic-versions@1.0.0` | `Masterminds/semver@3.5.0` | `blang/semver@4.0.0` | semantic-versions vs Masterminds/semver |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **28.0 ns** | 529 ns | 151 ns | **19× faster** |
-| Sort versions | **175 ns** | 444 ns | 233 ns | **2.5× faster** |
-| Parse a range | **357 ns** | 5.49 µs | — | **15× faster** |
-| Range.Test(version) | **23.7 ns** | 579 ns | — | **24× faster** |
-| Resolve a range | **3.67 µs** | 76.0 µs | — | **21× faster** |
+| Parse a version | **29.7 ns** | 591 ns | 170 ns | **20× faster** |
+| Sort versions | **192 ns** | 492 ns | 248 ns | **2.6× faster** |
+| Parse a range | **371 ns** | 6.77 µs | — | **18× faster** |
+| Range.Test(version) | **27.3 ns** | 636 ns | — | **23× faster** |
+| Resolve a range | **4.24 µs** | 91.1 µs | — | **21× faster** |
 
-<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. go1.24.7 · Intel(R) Xeon(R) Processor @ 2.30GHz · linux amd64 · 2026-11-19. `Masterminds/semver`: NewVersion is lenient by design (it accepts v1.2 and coerces it), which is why it fails the strict-parsing cases. `blang/semver`: Its range syntax has no ^, ~ or x-ranges, so it is compared on versions only.</sub>
+<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. go1.24.7 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux amd64 · 2026-11-19. `Masterminds/semver`: NewVersion is lenient by design (it accepts v1.2 and coerces it), which is why it fails the strict-parsing cases. `blang/semver`: Its range syntax has no ^, ~ or x-ranges, so it is compared on versions only.</sub>
 
 ### Conformance
 
@@ -190,14 +190,14 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 | Version grammar <br><sub>Valid and invalid versions per the BNF</sub> | ✓ 81/81 | ◐ 74/81 | ✓ 81/81 |
 | No coercion <br><sub>Rejects `v1.2.3`, `=1.2.3`, `1.2.3pre`, …</sub> | ✓ 11/11 | ◐ 10/11 | ✓ 11/11 |
 | Precedence <br><sub>Major, minor, patch and pre-release ordering</sub> | ✓ 32/32 | ✓ 32/32 | ✓ 32/32 |
-| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 10/10 | ◐ 1/10 | ◐ 1/10 |
-| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 199/199 | ◐ 167/172 | ◐ 114/172 |
-| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 17/17 | ✓ 13/13 | ◐ 7/13 |
+| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 16/16 | ◐ 1/16 | ◐ 1/16 |
+| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 196/196 | ◐ 164/169 | ◐ 114/169 |
+| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 26/26 | ◐ 15/19 | ◐ 9/19 |
 | Pre-release channels <br><sub>`^1.0.0-rc` admits `rc.*`, never `beta`</sub> | ✓ 44/44 | ◐ 28/44 | ◐ 29/44 |
 | Pre-release wildcards <br><sub>`X.Y.Z-*` and `*-*` opt in explicitly</sub> | ✓ 14/14 | ◐ 2/13 | ◐ 2/13 |
-| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 24/24 | ◐ 12/22 | ◐ 14/22 |
+| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 41/41 | ◐ 19/36 | ◐ 21/36 |
 | Contexts <br><sub>`npm:react@18.2.0`, `npm:react@^18`</sub> | ✓ 15/15 | ◐ 3/15 | ◐ 3/15 |
-| **All cases** | **447/447** | **342/413** | **294/413** |
+| **All cases** | **476/476** | **348/436** | **303/436** |
 
 <sub>Cases from the shared conformance suite in [`conformance/`](https://github.com/vltpkg/semantic-versions/tree/main/conformance), drawn from the specification. ✓ all pass · ◐ some pass · ✗ none pass.</sub>
 
@@ -207,13 +207,13 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 
 | Operation | `semantic-versions@1.0.0` | `semantic_range@3.1.1` | `Gem::Version@3.5.22` | semantic-versions vs semantic_range |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **1.15 µs** | 1.79 µs | 1.00 µs | **1.6× faster** |
-| Sort versions | **2.12 µs** | 18.9 µs | 3.67 µs | **8.9× faster** |
-| Parse a range | **5.92 µs** | 23.8 µs | — | **4.0× faster** |
-| range.test(version) | **314 ns** | 6.15 µs | — | **20× faster** |
-| Resolve a range | **54.4 µs** | 885.3 µs | — | **16× faster** |
+| Parse a version | **1.40 µs** | 1.93 µs | 1.00 µs | **1.4× faster** |
+| Sort versions | **2.00 µs** | 23.2 µs | 4.38 µs | **12× faster** |
+| Parse a range | **7.25 µs** | 29.5 µs | — | **4.1× faster** |
+| range.test(version) | **373 ns** | 8.11 µs | — | **22× faster** |
+| Resolve a range | **66.6 µs** | 1.13 ms | — | **17× faster** |
 
-<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. ruby 3.3.6 · Intel(R) Xeon(R) Processor @ 2.30GHz · linux x86_64 · 2026-11-19. `Gem::Version`: Parsing is timed without Gem::Version.new's per-string cache, and Gem::Version defers splitting into segments until the first comparison (part of its sort time). RubyGems' own requirement syntax (~> 1.2, comma-separated comparators, no ^, || or x-ranges) and lenient versions (1.2 is accepted), so it is compared on versions only.</sub>
+<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. ruby 3.3.6 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x86_64 · 2026-11-19. `Gem::Version`: Parsing is timed without Gem::Version.new's per-string cache, and Gem::Version defers splitting into segments until the first comparison (part of its sort time). RubyGems' own requirement syntax (~> 1.2, comma-separated comparators, no ^, || or x-ranges) and lenient versions (1.2 is accepted), so it is compared on versions only.</sub>
 
 ### Conformance
 
@@ -222,14 +222,14 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 | Version grammar <br><sub>Valid and invalid versions per the BNF</sub> | ✓ 81/81 | ◐ 80/81 | ◐ 37/81 |
 | No coercion <br><sub>Rejects `v1.2.3`, `=1.2.3`, `1.2.3pre`, …</sub> | ✓ 11/11 | ◐ 10/11 | ◐ 9/11 |
 | Precedence <br><sub>Major, minor, patch and pre-release ordering</sub> | ✓ 32/32 | ✓ 32/32 | ◐ 24/32 |
-| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 10/10 | ◐ 1/10 | ◐ 1/10 |
-| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 199/199 | ◐ 174/199 | ◐ 104/172 |
-| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 17/17 | ◐ 13/17 | ◐ 12/13 |
+| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 16/16 | ◐ 1/16 | ◐ 1/16 |
+| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 196/196 | ◐ 171/196 | ◐ 104/169 |
+| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 26/26 | ◐ 15/26 | ✓ 19/19 |
 | Pre-release channels <br><sub>`^1.0.0-rc` admits `rc.*`, never `beta`</sub> | ✓ 44/44 | ◐ 33/44 | ◐ 32/44 |
 | Pre-release wildcards <br><sub>`X.Y.Z-*` and `*-*` opt in explicitly</sub> | ✓ 14/14 | ◐ 2/14 | ◐ 2/13 |
-| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 24/24 | ◐ 12/24 | ◐ 12/22 |
+| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 41/41 | ◐ 19/41 | ◐ 19/36 |
 | Contexts <br><sub>`npm:react@18.2.0`, `npm:react@^18`</sub> | ✓ 15/15 | ◐ 3/15 | ◐ 3/15 |
-| **All cases** | **447/447** | **360/447** | **236/413** |
+| **All cases** | **476/476** | **366/476** | **250/436** |
 
 <sub>Cases from the shared conformance suite in [`conformance/`](https://github.com/vltpkg/semantic-versions/tree/main/conformance), drawn from the specification. ✓ all pass · ◐ some pass · ✗ none pass.</sub>
 
@@ -239,13 +239,13 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 
 | Operation | `semantic-versions@1.0.0` | `semver4j@6.0.0` | `java-semver@0.10.2` | semantic-versions vs semver4j |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **34.6 ns** | 495 ns | 271 ns | **14× faster** |
-| Sort versions | **111 ns** | 1.02 µs | 130 ns | **9.3× faster** |
-| Parse a range | **205 ns** | 5.03 µs | — | **25× faster** |
-| range.test(version) | **6.2 ns** | 60.8 ns | — | **9.8× faster** |
-| Resolve a range | **985 ns** | 13.3 µs | — | **14× faster** |
+| Parse a version | **44.9 ns** | 607 ns | 329 ns | **14× faster** |
+| Sort versions | **140 ns** | 1.09 µs | 141 ns | **7.8× faster** |
+| Parse a range | **264 ns** | 5.83 µs | — | **22× faster** |
+| range.test(version) | **8.2 ns** | 72.7 ns | — | **8.9× faster** |
+| Resolve a range | **1.21 µs** | 14.3 µs | — | **12× faster** |
 
-<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. OpenJDK 21 · Intel(R) Xeon(R) Processor @ 2.30GHz · linux amd64 · 2026-11-19. `java-semver`: Its range expressions use their own syntax (& and | operators), so it is compared on versions only.</sub>
+<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. OpenJDK 21 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux amd64 · 2026-11-19. `java-semver`: Its range expressions use their own syntax (& and | operators), so it is compared on versions only.</sub>
 
 ### Conformance
 
@@ -254,14 +254,14 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 | Version grammar <br><sub>Valid and invalid versions per the BNF</sub> | ✓ 81/81 | ✓ 81/81 | ✓ 81/81 |
 | No coercion <br><sub>Rejects `v1.2.3`, `=1.2.3`, `1.2.3pre`, …</sub> | ✓ 11/11 | ◐ 10/11 | ✓ 11/11 |
 | Precedence <br><sub>Major, minor, patch and pre-release ordering</sub> | ✓ 32/32 | ◐ 31/32 | ✓ 32/32 |
-| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 10/10 | ◐ 1/10 | ✓ 10/10 |
-| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 199/199 | ◐ 164/172 | ◐ 124/172 |
-| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 17/17 | ✓ 13/13 | ◐ 7/13 |
+| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 16/16 | ◐ 1/16 | ◐ 13/16 |
+| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 196/196 | ◐ 161/169 | ◐ 124/169 |
+| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 26/26 | ◐ 15/19 | ◐ 9/19 |
 | Pre-release channels <br><sub>`^1.0.0-rc` admits `rc.*`, never `beta`</sub> | ✓ 44/44 | ◐ 33/44 | ◐ 26/44 |
 | Pre-release wildcards <br><sub>`X.Y.Z-*` and `*-*` opt in explicitly</sub> | ✓ 14/14 | ◐ 2/13 | ◐ 2/13 |
-| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 24/24 | ◐ 12/22 | ◐ 14/22 |
+| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 41/41 | ◐ 19/36 | ◐ 21/36 |
 | Contexts <br><sub>`npm:react@18.2.0`, `npm:react@^18`</sub> | ✓ 15/15 | ◐ 3/15 | ◐ 3/15 |
-| **All cases** | **447/447** | **350/413** | **310/413** |
+| **All cases** | **476/476** | **356/436** | **322/436** |
 
 <sub>Cases from the shared conformance suite in [`conformance/`](https://github.com/vltpkg/semantic-versions/tree/main/conformance), drawn from the specification. ✓ all pass · ◐ some pass · ✗ none pass.</sub>
 
@@ -271,13 +271,13 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 
 | Operation | `semantic-versions@1.0.0` | `Semver@3.0.0` | `SemanticVersioning@3.0.0` | semantic-versions vs Semver |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **31.9 ns** | 311 ns | 521 ns | **9.7× faster** |
-| Sort versions | **89.4 ns** | 135 ns | 695 ns | **1.5× faster** |
-| Parse a range | **335 ns** | 646 ns | 19.1 µs | **1.9× faster** |
-| range.Test(version) | **6.0 ns** | 7.8 ns | 68.6 ns | **1.3× faster** |
-| Resolve a range | **1.21 µs** | 1.64 µs | 27.1 µs | **1.4× faster** |
+| Parse a version | **30.2 ns** | 349 ns | 598 ns | **12× faster** |
+| Sort versions | **107 ns** | 161 ns | 788 ns | **1.5× faster** |
+| Parse a range | **377 ns** | 784 ns | 22.4 µs | **2.1× faster** |
+| range.Test(version) | **6.9 ns** | 9.2 ns | 83.5 ns | **1.3× faster** |
+| Resolve a range | **1.42 µs** | 1.93 µs | 33.9 µs | **1.4× faster** |
 
-<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. .NET 10.0.15 · Intel(R) Xeon(R) Processor @ 2.30GHz · linux x64 · 2026-11-19. `Semver`: Compared by precedence (ComparePrecedence), which ignores builds as SemVer 2.0.0 specifies.</sub>
+<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. .NET 10.0.15 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x64 · 2026-11-19. `Semver`: Compared by precedence (ComparePrecedence), which ignores builds as SemVer 2.0.0 specifies.</sub>
 
 ### Conformance
 
@@ -286,14 +286,14 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 | Version grammar <br><sub>Valid and invalid versions per the BNF</sub> | ✓ 81/81 | ◐ 80/81 | ◐ 57/81 |
 | No coercion <br><sub>Rejects `v1.2.3`, `=1.2.3`, `1.2.3pre`, …</sub> | ✓ 11/11 | ✓ 11/11 | ◐ 7/11 |
 | Precedence <br><sub>Major, minor, patch and pre-release ordering</sub> | ✓ 32/32 | ✓ 32/32 | ✓ 32/32 |
-| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 10/10 | ◐ 1/10 | ◐ 1/10 |
-| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 199/199 | ✓ 172/172 | ✓ 172/172 |
-| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 17/17 | ✓ 13/13 | ◐ 7/13 |
+| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 16/16 | ◐ 1/16 | ◐ 1/16 |
+| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 196/196 | ✓ 169/169 | ✓ 169/169 |
+| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 26/26 | ◐ 15/19 | ◐ 9/19 |
 | Pre-release channels <br><sub>`^1.0.0-rc` admits `rc.*`, never `beta`</sub> | ✓ 44/44 | ◐ 33/44 | ◐ 33/44 |
 | Pre-release wildcards <br><sub>`X.Y.Z-*` and `*-*` opt in explicitly</sub> | ✓ 14/14 | ◐ 2/13 | ◐ 2/13 |
-| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 24/24 | ◐ 12/22 | ◐ 12/22 |
+| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 41/41 | ◐ 19/36 | ◐ 19/36 |
 | Contexts <br><sub>`npm:react@18.2.0`, `npm:react@^18`</sub> | ✓ 15/15 | ◐ 3/15 | ◐ 3/15 |
-| **All cases** | **447/447** | **359/413** | **326/413** |
+| **All cases** | **476/476** | **365/436** | **332/436** |
 
 <sub>Cases from the shared conformance suite in [`conformance/`](https://github.com/vltpkg/semantic-versions/tree/main/conformance), drawn from the specification. ✓ all pass · ◐ some pass · ✗ none pass.</sub>
 
@@ -303,13 +303,13 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 
 | Operation | `semantic-versions@1.0.0` | `composer/semver@3.6.0` | `z4kn4fein/php-semver@3.0.0` | semantic-versions vs composer/semver |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **354 ns** | 819 ns | 664 ns | **2.3× faster** |
-| Sort versions | **1.55 µs** | 1.63 µs | 2.16 µs | **1.1× faster** |
-| Parse a range | **2.23 µs** | 2.40 µs | 3.65 µs | **1.1× faster** |
-| range->test(version) | **169 ns** | 621 ns | 474 ns | **3.7× faster** |
-| Resolve a range | **26.7 µs** | 101.9 µs | 71.0 µs | **3.8× faster** |
+| Parse a version | **434 ns** | 1.03 µs | 789 ns | **2.4× faster** |
+| Sort versions | **1.96 µs** | 1.98 µs | 2.64 µs | about the same |
+| Parse a range | **2.69 µs** | 2.92 µs | 4.47 µs | **1.1× faster** |
+| range->test(version) | **211 ns** | 740 ns | 634 ns | **3.5× faster** |
+| Resolve a range | **32.2 µs** | 92.6 µs | 65.8 µs | **2.9× faster** |
 
-<sub>Median time per operation (lower is better) on 5,398 published versions and 797 dependency ranges from the npm registry. PHP 8.3.6 · Intel(R) Xeon(R) Processor @ 2.30GHz · linux x86_64 · 2026-11-19. `composer/semver`: Composer's model differs by design: versions normalize to four parts with stability flags (1.0.0-rc.1 becomes 1.0.0.0-RC1), builds are dropped, and pre-release names outside alpha, beta, RC and patch are rejected. Versions are scored on parsing to the same value.</sub>
+<sub>Median time per operation (lower is better) on 5,398 published versions and 797 dependency ranges from the npm registry. PHP 8.3.6 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x86_64 · 2026-11-20. `composer/semver`: Composer's model differs by design: versions normalize to four parts with stability flags (1.0.0-rc.1 becomes 1.0.0.0-RC1), builds are dropped, and pre-release names outside alpha, beta, RC and patch are rejected. Versions are scored on parsing to the same value.</sub>
 
 ### Conformance
 
@@ -318,14 +318,14 @@ tables with `node benchmarks/report.mjs`; the site reads the JSON at build time.
 | Version grammar <br><sub>Valid and invalid versions per the BNF</sub> | ✓ 81/81 | ◐ 57/81 | ◐ 80/81 |
 | No coercion <br><sub>Rejects `v1.2.3`, `=1.2.3`, `1.2.3pre`, …</sub> | ✓ 11/11 | ◐ 8/11 | ✓ 11/11 |
 | Precedence <br><sub>Major, minor, patch and pre-release ordering</sub> | ✓ 32/32 | ◐ 18/32 | ✓ 32/32 |
-| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 10/10 | ◐ 1/10 | ◐ 1/10 |
-| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 199/199 | ◐ 139/172 | ◐ 164/172 |
-| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 17/17 | ◐ 7/13 | ✓ 13/13 |
+| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 16/16 | ◐ 1/16 | ◐ 1/16 |
+| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 196/196 | ◐ 138/169 | ◐ 161/169 |
+| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 26/26 | ◐ 9/19 | ◐ 15/19 |
 | Pre-release channels <br><sub>`^1.0.0-rc` admits `rc.*`, never `beta`</sub> | ✓ 44/44 | ◐ 26/44 | ◐ 19/44 |
 | Pre-release wildcards <br><sub>`X.Y.Z-*` and `*-*` opt in explicitly</sub> | ✓ 14/14 | ◐ 2/13 | ◐ 2/13 |
-| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 24/24 | ◐ 12/22 | ◐ 12/22 |
+| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 41/41 | ◐ 20/36 | ◐ 19/36 |
 | Contexts <br><sub>`npm:react@18.2.0`, `npm:react@^18`</sub> | ✓ 15/15 | ◐ 3/15 | ◐ 3/15 |
-| **All cases** | **447/447** | **273/413** | **337/413** |
+| **All cases** | **476/476** | **282/436** | **343/436** |
 
 <sub>Cases from the shared conformance suite in [`conformance/`](https://github.com/vltpkg/semantic-versions/tree/main/conformance), drawn from the specification. ✓ all pass · ◐ some pass · ✗ none pass.</sub>
 

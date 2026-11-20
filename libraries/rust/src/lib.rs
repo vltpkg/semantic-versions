@@ -26,7 +26,7 @@
 //! assert!(satisfies("1.0.0-rc.1", "^1.0.0-rc"));
 //! assert!(!satisfies("1.0.0-beta", "^1.0.0-rc"));
 //! assert!(satisfies("1.4.2+win.x64", "^1.0.0+win"));
-//! assert_eq!(valid_range("~>1.2").as_deref(), Some(">=1.2.0 <1.3.0-0"));
+//! assert_eq!(valid_range("~>1.2").as_deref(), Some(">=1.2.0 <2.0.0-0"));
 //!
 //! let r = Range::parse("npm:react@^18").unwrap();
 //! assert!(r.test(&"npm:react@18.2.0".parse().unwrap()));

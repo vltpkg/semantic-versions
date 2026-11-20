@@ -162,7 +162,13 @@ final class Range implements \Stringable
         }, $comps);
     }
 
-    private static function tilde(array $p): array
+    /**
+     * `~` allows patch-level changes when a minor is given, minor-level
+     * otherwise. With $approximate, `~>` keeps its RubyGems meaning: drop the
+     * last supplied part and allow up to the next value of the part before it,
+     * so two parts reach the next major. A trailing x is not a supplied part.
+     */
+    private static function tilde(array $p, bool $approximate = false): array
     {
         [$m, $mi, $pa, $pre, $build] = $p;
         if ($m === null) {
@@ -170,7 +176,7 @@ final class Range implements \Stringable
         }
         $out = match (true) {
             $mi === null => [Comparator::of('>=', self::v($m, 0, 0)), Comparator::of('<', self::v($m + 1, 0, 0, '0'))],
-            $pa === null => [Comparator::of('>=', self::v($m, $mi, 0)), Comparator::of('<', self::v($m, $mi + 1, 0, '0'))],
+            $pa === null => [Comparator::of('>=', self::v($m, $mi, 0)), Comparator::of('<', $approximate ? self::v($m + 1, 0, 0, '0') : self::v($m, $mi + 1, 0, '0'))],
             default => [Comparator::of('>=', self::v($m, $mi, $pa, $pre)), Comparator::of('<', self::v($m, $mi + 1, 0, '0'))],
         };
         return self::withChannel($out, $build);
@@ -220,17 +226,22 @@ final class Range implements \Stringable
         return [Comparator::of($op, new Version($m, $mi, $pa, $pre, $build))];
     }
 
+    /**
+     * `a - b`. Each endpoint keeps its own labels: a pre-release as that
+     * endpoint's pre-release channel and a build as its build channel.
+     */
     private static function hyphen(array $a, array $b): array
     {
         $out = [];
         if ($a[0] !== null) {
             $lo = $a[1] === null ? self::v($a[0], 0, 0) : ($a[2] === null ? self::v($a[0], $a[1], 0) : self::v($a[0], $a[1], $a[2], $a[3]));
-            $out[] = Comparator::of('>=', $lo);
+            $out = self::withChannel([Comparator::of('>=', $lo)], $a[4]);
         }
         if ($b[0] !== null) {
-            $out[] = $b[1] === null ? Comparator::of('<', self::v($b[0] + 1, 0, 0, '0'))
+            $hi = $b[1] === null ? Comparator::of('<', self::v($b[0] + 1, 0, 0, '0'))
                 : ($b[2] === null ? Comparator::of('<', self::v($b[0], $b[1] + 1, 0, '0'))
                 : Comparator::of('<=', self::v($b[0], $b[1], $b[2], $b[3])));
+            $out = array_merge($out, self::withChannel([$hi], $b[4]));
         }
         return $out === [] ? [Comparator::any()] : $out;
     }
@@ -245,8 +256,9 @@ final class Range implements \Stringable
             return $p === null ? null : self::caret($p);
         }
         if ($tok[0] === '~') {
-            $p = self::partial(substr($tok, str_starts_with($tok, '~>') ? 2 : 1));
-            return $p === null ? null : self::tilde($p);
+            $approximate = str_starts_with($tok, '~>');
+            $p = self::partial(substr($tok, $approximate ? 2 : 1));
+            return $p === null ? null : self::tilde($p, $approximate);
         }
         foreach (['>=', '<=', '>', '<', '='] as $op) {
             if (str_starts_with($tok, $op)) {

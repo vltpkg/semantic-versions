@@ -485,7 +485,7 @@
       "input": "1.0.0+001",
       "valid": true,
       "version": "1.0.0+001",
-      "note": "build identifiers may have leading zeroes"
+      "note": "build identifiers may have leading zeroes; such an identifier compares as text, not as a number"
     },
     {
       "category": "context",

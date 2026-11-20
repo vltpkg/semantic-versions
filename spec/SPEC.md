@@ -99,7 +99,10 @@ Optional labels for a pre-release and build extend the format:
 11. A build **MAY** be denoted by appending a plus sign and a series of dot
     separated identifiers immediately following the patch or pre-release
     version. Identifiers **MUST** comprise only ASCII alphanumerics and hyphens
-    `[0-9A-Za-z-]` and **MUST NOT** be empty. Unlike "build metadata" in later
+    `[0-9A-Za-z-]` and **MUST NOT** be empty. A build identifier **MAY** have
+    leading zeroes, but then it is not numeric: it compares as text (see
+    [Precedence](#precedence), 5), so `+001` and `+1` are different builds
+    rather than the same number written twice. Unlike "build metadata" in later
     drafts of Semantic Versioning, a build **participates** in precedence; it is
     the antithesis of a pre-release. Two versions that differ only in the build
     therefore do **not** have the same precedence (see
@@ -138,9 +141,10 @@ Precedence refers to how versions are compared to each other when ordered.
    determined by comparing each dot separated identifier from left to right
    until a difference is found:
 
-   1. Identifiers consisting of only digits are compared numerically.
-   2. Identifiers with letters or hyphens are compared lexically in ASCII sort
-      order.
+   1. Numeric identifiers are compared numerically. An identifier is numeric
+      when it is `0` or consists of digits with no leading zero.
+   2. All other identifiers, including any with a leading zero, are compared
+      lexically in ASCII sort order.
    3. Numeric identifiers always have lower precedence than non-numeric
       identifiers.
    4. A larger set of pre-release (or build) fields has higher precedence than a
@@ -418,16 +422,22 @@ within those values, even if the major version is zero.
 
 ## Approximate ranges
 
-The pessimistic operator `~>` treats the last supplied digit as the beginning of
-a range and matches only within that value. It is an alias of the
-[tilde](#tilde-ranges-123-12-1) operator.
+The pessimistic operator `~>` is the range operator of RubyGems and Bundler,
+and it keeps their meaning here: drop the last supplied part, and allow
+anything up to the next value of the part before it. With one or three parts
+that is the same as the [tilde](#tilde-ranges-123-12-1); with two parts it
+reaches to the next major, where a tilde stops at the next minor.
 
-- `~>1` := `>=1.0.0 <2.0.0-0` (same as `^1.x`)
-- `~>1.2` := `>=1.2.0 <1.3.0-0` (same as `~1.2`)
+- `~>1` := `>=1.0.0 <2.0.0-0` (same as `~1`)
+- `~>1.2` := `>=1.2.0 <2.0.0-0` (where `~1.2` is `>=1.2.0 <1.3.0-0`)
+- `~>0.2` := `>=0.2.0 <1.0.0-0`
 - `~>1.2.3` := `>=1.2.3 <1.3.0-0` (same as `~1.2.3`)
 - `~>1.2.3-alpha.1` := `>=1.2.3-alpha.1 <1.3.0-0`: the `alpha.1`
   [channel](#pre-release-channels) on the `1.2.3` tuple (same as
   `~1.2.3-alpha.1`)
+
+An `x` or `*` in the last position is not a supplied part, so `~>1.2.x` is
+`~>1.2` and `~>1.x` is `~>1`.
 
 ## Pre-release channels
 
@@ -515,14 +525,17 @@ platform or architecture targets, content digests.
 4. A range with **no** build channel matches any build (and the build-less
    release); a channel excludes versions that carry no build.
 5. A tilde or caret carrying a channel **MUST** apply that channel to every
-   comparator it desugars to. A hyphen range spans two endpoints and **MUST**
-   ignore their builds.
+   comparator it desugars to. A hyphen range keeps each endpoint's build as
+   that endpoint's channel, exactly as it keeps each endpoint's pre-release.
 
 - `^1.0.0+win` := `>=1.0.0+win <2.0.0-0+win`: the `win` channel within `^1.0.0`,
   so it matches `1.4.2+win.x64`, not `1.4.2+linux.x64` or `1.4.2`.
 - `>=1.1.0+linux.x64`: the `linux.x64` variant at or above `1.1.0`.
 - `1.0.0+sha.a1b2c3`: pins the exact artifact (and any narrower build beneath
   it).
+- `1.2.3+win - 2.0.0` := `>=1.2.3+win <=2.0.0`: the `win` channel from
+  `1.2.3` up to and including `2.0.0`, since a version must satisfy both
+  comparators and the first carries the channel.
 - `^1.0.0`: no channel, so every variant of every release in range matches,
   build or not.
 

@@ -32,7 +32,7 @@ assert sv.satisfies("1.4.0", "^1.2.3")
 assert sv.satisfies("1.0.0-rc.1", "^1.0.0-rc")      # pre-release channel
 assert not sv.satisfies("1.0.0-beta", "^1.0.0-rc")  # a different channel
 assert sv.satisfies("1.4.2+win.x64", "^1.0.0+win")  # build channel
-assert sv.valid_range("~>1.2") == ">=1.2.0 <1.3.0-0"
+assert sv.valid_range("~>1.2") == ">=1.2.0 <2.0.0-0"
 
 # Contexts scope a version or range to an identity.
 react = sv.Range("npm:react@^18")
@@ -72,13 +72,13 @@ All implementations: [semver.xyz/libraries](https://semver.xyz/libraries/).
 
 | Operation | `semantic-versions@1.0.0` | `node-semver@0.9.1` | `semver@3.1.2` | semantic-versions vs node-semver |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **920 ns** | 1.44 µs | 1.38 µs | **1.6× faster** |
-| Sort versions | **657 ns** | 9.90 µs | 5.89 µs | **15× faster** |
-| Parse a range | **4.30 µs** | 16.0 µs | — | **3.7× faster** |
-| range.test(version) | **247 ns** | 1.76 µs | — | **7.1× faster** |
-| Resolve a range | **39.9 µs** | 267.3 µs | — | **6.7× faster** |
+| Parse a version | **1.19 µs** | 1.76 µs | 1.67 µs | **1.5× faster** |
+| Sort versions | **803 ns** | 11.9 µs | 6.32 µs | **15× faster** |
+| Parse a range | **5.04 µs** | 18.8 µs | — | **3.7× faster** |
+| range.test(version) | **302 ns** | 1.95 µs | — | **6.4× faster** |
+| Resolve a range | **37.3 µs** | 251.6 µs | — | **6.7× faster** |
 
-<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. CPython 3.13.18 · Intel(R) Xeon(R) Processor @ 2.30GHz · linux x86_64 · 2026-11-19. `semver`: python-semver has no npm-style ranges (only single comparisons such as >=1.2.3), so it is compared on versions only.</sub>
+<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. CPython 3.13.18 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x86_64 · 2026-11-19. `semver`: python-semver has no npm-style ranges (only single comparisons such as >=1.2.3), so it is compared on versions only.</sub>
 
 ### Conformance
 
@@ -87,14 +87,14 @@ All implementations: [semver.xyz/libraries](https://semver.xyz/libraries/).
 | Version grammar <br><sub>Valid and invalid versions per the BNF</sub> | ✓ 81/81 | ◐ 80/81 | ◐ 80/81 |
 | No coercion <br><sub>Rejects `v1.2.3`, `=1.2.3`, `1.2.3pre`, …</sub> | ✓ 11/11 | ◐ 10/11 | ✓ 7/7 |
 | Precedence <br><sub>Major, minor, patch and pre-release ordering</sub> | ✓ 32/32 | ✓ 32/32 | ✓ 32/32 |
-| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 10/10 | ◐ 1/10 | ◐ 1/10 |
-| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 199/199 | ◐ 174/199 | — n/a |
-| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 17/17 | ◐ 13/17 | — n/a |
+| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 16/16 | ◐ 1/16 | ◐ 1/16 |
+| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 196/196 | ◐ 171/196 | — n/a |
+| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 26/26 | ◐ 15/26 | — n/a |
 | Pre-release channels <br><sub>`^1.0.0-rc` admits `rc.*`, never `beta`</sub> | ✓ 44/44 | ◐ 33/44 | — n/a |
 | Pre-release wildcards <br><sub>`X.Y.Z-*` and `*-*` opt in explicitly</sub> | ✓ 14/14 | ◐ 2/14 | — n/a |
-| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 24/24 | ◐ 12/24 | — n/a |
+| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 41/41 | ◐ 19/41 | — n/a |
 | Contexts <br><sub>`npm:react@18.2.0`, `npm:react@^18`</sub> | ✓ 15/15 | ◐ 3/15 | ✗ 0/8 |
-| **All cases** | **447/447** | **360/447** | **120/138** |
+| **All cases** | **476/476** | **366/476** | **120/144** |
 
 <sub>Cases from the shared conformance suite in [`conformance/`](https://github.com/vltpkg/semantic-versions/tree/main/conformance), drawn from the specification. ✓ all pass · ◐ some pass · ✗ none pass.</sub>
 

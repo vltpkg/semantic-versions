@@ -64,8 +64,10 @@ public final class ConformanceTest {
         check("*".equals(SemanticVersions.validRange(">=0.0.0")), "validRange any");
         check(Range.parse("npm:react@^18").test(Version.parse("npm:react@18.2.0")), "context match");
         check(!Range.parse("npm:react@^18").test(Version.parse("18.2.0")), "context mismatch");
-        check(Version.parse("1.0.0+001").equals(Version.parse("1.0.0+1"))
-                && Version.parse("1.0.0+001").hashCode() == Version.parse("1.0.0+1").hashCode(), "equals/hashCode");
+        check(!Version.parse("1.0.0+001").equals(Version.parse("1.0.0+1"))
+                && Version.parse("1.0.0+1").compareTo(Version.parse("1.0.0+001")) < 0
+                && Version.parse("1.0.0+1.a").equals(Version.parse("1.0.0+1.a"))
+                && Version.parse("1.0.0+1.a").hashCode() == Version.parse("1.0.0+1.a").hashCode(), "equals/hashCode");
         try {
             Version.parse("1.2");
             check(false, "1.2 accepted");

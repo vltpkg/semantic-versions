@@ -46,9 +46,15 @@ module SemanticVersions
       pre.split(".").none? { |i| i.length >= 16 && i.match?(/\A\d+\z/) && i.to_i >= MAX_SAFE_INTEGER }
     end
 
+    # "0" or digits with no leading zero. A build identifier with a leading zero
+    # ("001") is not numeric: it compares as text, so "+001" and "+1" differ.
+    def numeric?(id)
+      id.match?(/\A(?:0|[1-9]\d*)\z/)
+    end
+
     # Numeric identifiers sort numerically and below alphanumeric ones.
     def ids_key(ids)
-      ids.split(".").map { |i| i.match?(/\A\d+\z/) ? [0, i.to_i] : [1, i] }
+      ids.split(".").map { |i| numeric?(i) ? [0, i.to_i] : [1, i] }
     end
 
     # Identifier-wise prefix: "rc" begins "rc.1" but not "rc1".
@@ -361,7 +367,11 @@ module SemanticVersions
       end
     end
 
-    def tilde(p)
+    # "~" allows patch-level changes when a minor is given, minor-level
+    # otherwise. "~>" keeps its RubyGems meaning: drop the last supplied part and
+    # allow up to the next value of the part before it, so two parts reach the
+    # next major. A trailing x is not a supplied part.
+    def tilde(p, approximate: false)
       return [ANY] if p.major.nil?
 
       m = p.major
@@ -369,7 +379,8 @@ module SemanticVersions
       out = if p.minor.nil?
               [cmp(">=", v(m, 0, 0)), cmp("<", v(m + 1, 0, 0, "0"))]
             elsif p.patch.nil?
-              [cmp(">=", v(m, mi, 0)), cmp("<", v(m, mi + 1, 0, "0"))]
+              upper = approximate ? v(m + 1, 0, 0, "0") : v(m, mi + 1, 0, "0")
+              [cmp(">=", v(m, mi, 0)), cmp("<", upper)]
             else
               [cmp(">=", v(m, mi, p.patch, p.pre)), cmp("<", v(m, mi + 1, 0, "0"))]
             end
@@ -419,6 +430,8 @@ module SemanticVersions
       [cmp(op, Version.new(m, mi, p.patch, p.pre, p.build))]
     end
 
+    # Each endpoint keeps its own labels: a pre-release as that endpoint's
+    # pre-release channel and a build as its build channel.
     def hyphen(a, b)
       out = []
       unless a.major.nil?
@@ -426,13 +439,14 @@ module SemanticVersions
                 elsif a.patch.nil? then v(a.major, a.minor, 0)
                 else v(a.major, a.minor, a.patch, a.pre)
                 end
-        out << cmp(">=", lower)
+        out.concat(with_channel([cmp(">=", lower)], a.build))
       end
       unless b.major.nil?
-        out << if b.minor.nil? then cmp("<", v(b.major + 1, 0, 0, "0"))
-               elsif b.patch.nil? then cmp("<", v(b.major, b.minor + 1, 0, "0"))
-               else cmp("<=", v(b.major, b.minor, b.patch, b.pre))
-               end
+        upper = if b.minor.nil? then cmp("<", v(b.major + 1, 0, 0, "0"))
+                elsif b.patch.nil? then cmp("<", v(b.major, b.minor + 1, 0, "0"))
+                else cmp("<=", v(b.major, b.minor, b.patch, b.pre))
+                end
+        out.concat(with_channel([upper], b.build))
       end
       out.empty? ? [ANY] : out
     end
@@ -440,7 +454,8 @@ module SemanticVersions
     def comparator_token(tok)
       return [ANY] if tok.empty? || tok == "*"
       return caret(partial(tok[1..])) if tok.start_with?("^")
-      return tilde(partial(tok.start_with?("~>") ? tok[2..] : tok[1..])) if tok.start_with?("~")
+      return tilde(partial(tok[2..]), approximate: true) if tok.start_with?("~>")
+      return tilde(partial(tok[1..])) if tok.start_with?("~")
 
       PREFIXES.each do |op|
         return xrange(op == "=" ? "" : op, partial(tok[op.length..])) if tok.start_with?(op)

@@ -301,7 +301,12 @@ func withChannel(comps []Comparator, channel string) []Comparator {
 	return comps
 }
 
-func tilde(p partial, out []Comparator) []Comparator {
+// tilde desugars "~" (patch-level changes when a minor is given, minor-level
+// otherwise) and, with approximate set, "~>": the pessimistic operator with
+// its RubyGems meaning, which drops the last supplied part and allows up to the
+// next value of the part before it, so two parts reach the next major. A
+// trailing x is not a supplied part.
+func tilde(p partial, approximate bool, out []Comparator) []Comparator {
 	if p.major == x {
 		return append(out, anyComparator)
 	}
@@ -311,7 +316,11 @@ func tilde(p partial, out []Comparator) []Comparator {
 	case p.minor == x:
 		c = []Comparator{newComparator(OpGte, ver(m, 0, 0, "")), newComparator(OpLt, ver(m+1, 0, 0, "0"))}
 	case p.patch == x:
-		c = []Comparator{newComparator(OpGte, ver(m, mi, 0, "")), newComparator(OpLt, ver(m, mi+1, 0, "0"))}
+		upper := ver(m, mi+1, 0, "0")
+		if approximate {
+			upper = ver(m+1, 0, 0, "0")
+		}
+		c = []Comparator{newComparator(OpGte, ver(m, mi, 0, "")), newComparator(OpLt, upper)}
 	default:
 		c = []Comparator{newComparator(OpGte, ver(m, mi, p.patch, p.pre)), newComparator(OpLt, ver(m, mi+1, 0, "0"))}
 	}
@@ -392,6 +401,8 @@ func xrange(op Op, p partial, out []Comparator) []Comparator {
 
 // hyphen desugars "<partial> - <partial>": an inclusive span. Builds on either
 // endpoint are ignored; a pre-release on an endpoint is kept.
+// hyphen desugars "a - b". Each endpoint keeps its own labels: a pre-release
+// as that endpoint's pre-release channel and a build as its build channel.
 func hyphen(a, b partial) []Comparator {
 	var out []Comparator
 	if a.major != x {
@@ -404,17 +415,19 @@ func hyphen(a, b partial) []Comparator {
 		default:
 			v = ver(a.major, a.minor, a.patch, a.pre)
 		}
-		out = append(out, newComparator(OpGte, v))
+		out = append(out, withChannel([]Comparator{newComparator(OpGte, v)}, a.build)...)
 	}
 	if b.major != x {
+		var c Comparator
 		switch {
 		case b.minor == x:
-			out = append(out, newComparator(OpLt, ver(b.major+1, 0, 0, "0")))
+			c = newComparator(OpLt, ver(b.major+1, 0, 0, "0"))
 		case b.patch == x:
-			out = append(out, newComparator(OpLt, ver(b.major, b.minor+1, 0, "0")))
+			c = newComparator(OpLt, ver(b.major, b.minor+1, 0, "0"))
 		default:
-			out = append(out, newComparator(OpLte, ver(b.major, b.minor, b.patch, b.pre)))
+			c = newComparator(OpLte, ver(b.major, b.minor, b.patch, b.pre))
 		}
+		out = append(out, withChannel([]Comparator{c}, b.build)...)
 	}
 	if len(out) == 0 {
 		out = append(out, anyComparator)
@@ -465,14 +478,15 @@ func comparatorToken(tok string, out []Comparator) ([]Comparator, error) {
 		return caret(p, out), nil
 	case '~':
 		rest = tok[1:]
-		if strings.HasPrefix(rest, ">") {
+		approximate := strings.HasPrefix(rest, ">")
+		if approximate {
 			rest = rest[1:]
 		}
 		p, err := parsePartial(rest)
 		if err != nil {
 			return out, err
 		}
-		return tilde(p, out), nil
+		return tilde(p, approximate, out), nil
 	case '>':
 		if strings.HasPrefix(tok, ">=") {
 			op, rest = OpGte, tok[2:]

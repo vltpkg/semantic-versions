@@ -191,21 +191,11 @@ public final class Version implements Comparable<Version> {
 
     @Override
     public int hashCode() {
+        // Two versions are equal only when every identifier is identical (a
+        // leading-zero build identifier compares as text), so the strings hash.
         int h = Long.hashCode(major) * 961 + Long.hashCode(minor) * 31 + Long.hashCode(patch);
-        h = h * 31 + normalizedHash(pre);
-        return h * 31 + normalizedHash(build);
-    }
-
-    private static int normalizedHash(String ids) {
-        int h = 0;
-        for (String id : ids.split("\\.", -1)) {
-            String t = id;
-            if (!t.isEmpty() && t.chars().allMatch(Identifiers::isDigitInt)) {
-                t = t.replaceFirst("^0+(?=.)", "");
-            }
-            h = h * 31 + t.hashCode();
-        }
-        return h;
+        h = h * 31 + pre.hashCode();
+        return h * 31 + build.hashCode();
     }
 
     @Override

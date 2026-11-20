@@ -287,7 +287,14 @@ public sealed class SemanticRange
         }
     }
 
-    private static void Tilde(Partial p, List<Comparator> output)
+    /// <summary>
+    /// <c>~</c> allows patch-level changes when a minor is given, minor-level
+    /// otherwise. With <paramref name="approximate"/>, <c>~&gt;</c> keeps its
+    /// RubyGems meaning: drop the last supplied part and allow up to the next
+    /// value of the part before it, so two parts reach the next major. A
+    /// trailing x is not a supplied part.
+    /// </summary>
+    private static void Tilde(Partial p, bool approximate, List<Comparator> output)
     {
         if (p.Major == X)
         {
@@ -304,7 +311,7 @@ public sealed class SemanticRange
         else if (p.Patch == X)
         {
             output.Add(Comparator.Of(Op.Gte, V(m, mi, 0)));
-            output.Add(Comparator.Of(Op.Lt, V(m, mi + 1, 0, "0")));
+            output.Add(Comparator.Of(Op.Lt, approximate ? V(m + 1, 0, 0, "0") : V(m, mi + 1, 0, "0")));
         }
         else
         {
@@ -380,19 +387,27 @@ public sealed class SemanticRange
     }
 
     /// <summary><c>&lt;partial&gt; - &lt;partial&gt;</c>: an inclusive span; builds on either endpoint are ignored.</summary>
+    /// <summary>
+    /// <c>a - b</c>. Each endpoint keeps its own labels: a pre-release as that
+    /// endpoint's pre-release channel and a build as its build channel.
+    /// </summary>
     private static void Hyphen(Partial a, Partial b, List<Comparator> output)
     {
         int from = output.Count;
         if (a.Major != X)
         {
             var lo = a.Minor == X ? V(a.Major, 0, 0) : a.Patch == X ? V(a.Major, a.Minor, 0) : V(a.Major, a.Minor, a.Patch, a.Pre);
+            int at = output.Count;
             output.Add(Comparator.Of(Op.Gte, lo));
+            WithChannel(output, at, a.Build);
         }
         if (b.Major != X)
         {
+            int at = output.Count;
             if (b.Minor == X) output.Add(Comparator.Of(Op.Lt, V(b.Major + 1, 0, 0, "0")));
             else if (b.Patch == X) output.Add(Comparator.Of(Op.Lt, V(b.Major, b.Minor + 1, 0, "0")));
             else output.Add(Comparator.Of(Op.Lte, V(b.Major, b.Minor, b.Patch, b.Pre)));
+            WithChannel(output, at, b.Build);
         }
         if (output.Count == from) output.Add(Comparator.Any);
     }
@@ -441,9 +456,10 @@ public sealed class SemanticRange
                 Caret(p.Value, output);
                 return true;
             case '~':
-                p = ParsePartial(tok.StartsWith("~>", StringComparison.Ordinal) ? tok[2..] : tok[1..]);
+                bool approximate = tok.StartsWith("~>", StringComparison.Ordinal);
+                p = ParsePartial(tok[(approximate ? 2 : 1)..]);
                 if (p is null) return false;
-                Tilde(p.Value, output);
+                Tilde(p.Value, approximate, output);
                 return true;
         }
         (Op op, string rest) =

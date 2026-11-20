@@ -3,16 +3,16 @@
   "conformance": {
     "nodejs-semver": {
       "approximate": {
-        "passed": 17,
-        "total": 17
+        "passed": 19,
+        "total": 26
       },
       "build-channels": {
-        "passed": 12,
-        "total": 24
+        "passed": 22,
+        "total": 41
       },
       "build-precedence": {
         "passed": 1,
-        "total": 10
+        "total": 16
       },
       "context": {
         "passed": 3,
@@ -35,8 +35,8 @@
         "total": 14
       },
       "ranges": {
-        "passed": 195,
-        "total": 199
+        "passed": 192,
+        "total": 196
       },
       "strict": {
         "passed": 3,
@@ -45,16 +45,16 @@
     },
     "semantic-versions": {
       "approximate": {
-        "passed": 17,
-        "total": 17
+        "passed": 26,
+        "total": 26
       },
       "build-channels": {
-        "passed": 24,
-        "total": 24
+        "passed": 41,
+        "total": 41
       },
       "build-precedence": {
-        "passed": 10,
-        "total": 10
+        "passed": 16,
+        "total": 16
       },
       "context": {
         "passed": 15,
@@ -77,8 +77,8 @@
         "total": 14
       },
       "ranges": {
-        "passed": 199,
-        "total": 199
+        "passed": 196,
+        "total": 196
       },
       "strict": {
         "passed": 11,
@@ -87,16 +87,16 @@
     },
     "semver": {
       "approximate": {
-        "passed": 7,
-        "total": 13
+        "passed": 9,
+        "total": 19
       },
       "build-channels": {
-        "passed": 12,
-        "total": 22
+        "passed": 19,
+        "total": 36
       },
       "build-precedence": {
-        "passed": 10,
-        "total": 10
+        "passed": 15,
+        "total": 16
       },
       "context": {
         "passed": 3,
@@ -120,7 +120,7 @@
       },
       "ranges": {
         "passed": 134,
-        "total": 172
+        "total": 169
       },
       "strict": {
         "passed": 11,
@@ -149,7 +149,7 @@
     }
   },
   "environment": {
-    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
     "date": "2026-11-19",
     "platform": "linux x86_64",
     "runtime": "rustc 1.97.0"
@@ -177,16 +177,16 @@
       "label": "Parse a version",
       "results": {
         "nodejs-semver": {
-          "nsPerOp": 26.3,
-          "opsPerSec": 38086735.0
+          "nsPerOp": 29.0,
+          "opsPerSec": 34438328.0
         },
         "semantic-versions": {
-          "nsPerOp": 21.7,
-          "opsPerSec": 46154291.0
+          "nsPerOp": 24.8,
+          "opsPerSec": 40368606.0
         },
         "semver": {
-          "nsPerOp": 21.4,
-          "opsPerSec": 46733234.0
+          "nsPerOp": 23.6,
+          "opsPerSec": 42367189.0
         }
       }
     },
@@ -196,16 +196,16 @@
       "label": "Sort versions",
       "results": {
         "nodejs-semver": {
-          "nsPerOp": 101.6,
-          "opsPerSec": 9839834.0
+          "nsPerOp": 118.5,
+          "opsPerSec": 8441298.0
         },
         "semantic-versions": {
-          "nsPerOp": 116.6,
-          "opsPerSec": 8574413.0
+          "nsPerOp": 149.2,
+          "opsPerSec": 6703938.0
         },
         "semver": {
-          "nsPerOp": 117.0,
-          "opsPerSec": 8545475.0
+          "nsPerOp": 126.7,
+          "opsPerSec": 7894538.0
         }
       }
     },
@@ -215,12 +215,12 @@
       "label": "Parse a range",
       "results": {
         "nodejs-semver": {
-          "nsPerOp": 269.9,
-          "opsPerSec": 3705119.0
+          "nsPerOp": 313.5,
+          "opsPerSec": 3189947.0
         },
         "semantic-versions": {
-          "nsPerOp": 207.9,
-          "opsPerSec": 4809928.0
+          "nsPerOp": 245.8,
+          "opsPerSec": 4069014.0
         }
       }
     },
@@ -230,12 +230,12 @@
       "label": "Range::test(version)",
       "results": {
         "nodejs-semver": {
-          "nsPerOp": 8.7,
-          "opsPerSec": 114591574.0
+          "nsPerOp": 9.1,
+          "opsPerSec": 110071301.0
         },
         "semantic-versions": {
-          "nsPerOp": 5.5,
-          "opsPerSec": 180183990.0
+          "nsPerOp": 6.8,
+          "opsPerSec": 146123452.0
         }
       }
     },
@@ -245,12 +245,12 @@
       "label": "Resolve a range",
       "results": {
         "nodejs-semver": {
-          "nsPerOp": 1325.0,
-          "opsPerSec": 754696.0
+          "nsPerOp": 1567.0,
+          "opsPerSec": 638165.0
         },
         "semantic-versions": {
-          "nsPerOp": 1032.5,
-          "opsPerSec": 968560.0
+          "nsPerOp": 1292.1,
+          "opsPerSec": 773944.0
         }
       }
     }

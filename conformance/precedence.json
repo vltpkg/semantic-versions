@@ -268,6 +268,48 @@
       "a": "npm:react@1.2.3",
       "b": "1.2.4",
       "expected": -1
+    },
+    {
+      "category": "build-precedence",
+      "a": "1.0.0+1",
+      "b": "1.0.0+001",
+      "expected": -1,
+      "note": "a build identifier with a leading zero is not numeric: it compares as text (numeric ranks below non-numeric)"
+    },
+    {
+      "category": "build-precedence",
+      "a": "1.0.0+001",
+      "b": "1.0.0+010",
+      "expected": -1,
+      "note": "a build identifier with a leading zero is not numeric: it compares as text"
+    },
+    {
+      "category": "build-precedence",
+      "a": "1.0.0+10",
+      "b": "1.0.0+01",
+      "expected": -1,
+      "note": "a build identifier with a leading zero is not numeric: it compares as text (numeric ranks below non-numeric)"
+    },
+    {
+      "category": "build-precedence",
+      "a": "1.0.0+0",
+      "b": "1.0.0+00",
+      "expected": -1,
+      "note": "a build identifier with a leading zero is not numeric: it compares as text"
+    },
+    {
+      "category": "build-precedence",
+      "a": "1.0.0+2",
+      "b": "1.0.0+10",
+      "expected": -1,
+      "note": "numeric build identifiers compare numerically"
+    },
+    {
+      "category": "build-precedence",
+      "a": "1.0.0-alpha+1",
+      "b": "1.0.0-alpha+001",
+      "expected": -1,
+      "note": "a build identifier with a leading zero is not numeric: it compares as text"
     }
   ]
 }

@@ -43,7 +43,7 @@ SemanticVersions.satisfies("1.4.0", "^1.2.3");             // true
 SemanticVersions.satisfies("1.0.0-rc.1", "^1.0.0-rc");     // true: pre-release channel
 SemanticVersions.satisfies("1.0.0-beta", "^1.0.0-rc");     // false: a different channel
 SemanticVersions.satisfies("1.4.2+win.x64", "^1.0.0+win"); // true: build channel
-SemanticVersions.validRange("~>1.2");                      // ">=1.2.0 <1.3.0-0"
+SemanticVersions.validRange("~>1.2");                      // ">=1.2.0 <2.0.0-0"
 
 // Contexts scope a version or range to an identity.
 Range react = Range.parse("npm:react@^18");
@@ -79,13 +79,13 @@ All implementations: [semver.xyz/libraries](https://semver.xyz/libraries/).
 
 | Operation | `semantic-versions@1.0.0` | `semver4j@6.0.0` | `java-semver@0.10.2` | semantic-versions vs semver4j |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **34.6 ns** | 495 ns | 271 ns | **14× faster** |
-| Sort versions | **111 ns** | 1.02 µs | 130 ns | **9.3× faster** |
-| Parse a range | **205 ns** | 5.03 µs | — | **25× faster** |
-| range.test(version) | **6.2 ns** | 60.8 ns | — | **9.8× faster** |
-| Resolve a range | **985 ns** | 13.3 µs | — | **14× faster** |
+| Parse a version | **44.9 ns** | 607 ns | 329 ns | **14× faster** |
+| Sort versions | **140 ns** | 1.09 µs | 141 ns | **7.8× faster** |
+| Parse a range | **264 ns** | 5.83 µs | — | **22× faster** |
+| range.test(version) | **8.2 ns** | 72.7 ns | — | **8.9× faster** |
+| Resolve a range | **1.21 µs** | 14.3 µs | — | **12× faster** |
 
-<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. OpenJDK 21 · Intel(R) Xeon(R) Processor @ 2.30GHz · linux amd64 · 2026-11-19. `java-semver`: Its range expressions use their own syntax (& and | operators), so it is compared on versions only.</sub>
+<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. OpenJDK 21 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux amd64 · 2026-11-19. `java-semver`: Its range expressions use their own syntax (& and | operators), so it is compared on versions only.</sub>
 
 ### Conformance
 
@@ -94,14 +94,14 @@ All implementations: [semver.xyz/libraries](https://semver.xyz/libraries/).
 | Version grammar <br><sub>Valid and invalid versions per the BNF</sub> | ✓ 81/81 | ✓ 81/81 | ✓ 81/81 |
 | No coercion <br><sub>Rejects `v1.2.3`, `=1.2.3`, `1.2.3pre`, …</sub> | ✓ 11/11 | ◐ 10/11 | ✓ 11/11 |
 | Precedence <br><sub>Major, minor, patch and pre-release ordering</sub> | ✓ 32/32 | ◐ 31/32 | ✓ 32/32 |
-| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 10/10 | ◐ 1/10 | ✓ 10/10 |
-| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 199/199 | ◐ 164/172 | ◐ 124/172 |
-| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 17/17 | ✓ 13/13 | ◐ 7/13 |
+| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 16/16 | ◐ 1/16 | ◐ 13/16 |
+| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 196/196 | ◐ 161/169 | ◐ 124/169 |
+| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 26/26 | ◐ 15/19 | ◐ 9/19 |
 | Pre-release channels <br><sub>`^1.0.0-rc` admits `rc.*`, never `beta`</sub> | ✓ 44/44 | ◐ 33/44 | ◐ 26/44 |
 | Pre-release wildcards <br><sub>`X.Y.Z-*` and `*-*` opt in explicitly</sub> | ✓ 14/14 | ◐ 2/13 | ◐ 2/13 |
-| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 24/24 | ◐ 12/22 | ◐ 14/22 |
+| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 41/41 | ◐ 19/36 | ◐ 21/36 |
 | Contexts <br><sub>`npm:react@18.2.0`, `npm:react@^18`</sub> | ✓ 15/15 | ◐ 3/15 | ◐ 3/15 |
-| **All cases** | **447/447** | **350/413** | **310/413** |
+| **All cases** | **476/476** | **356/436** | **322/436** |
 
 <sub>Cases from the shared conformance suite in [`conformance/`](https://github.com/vltpkg/semantic-versions/tree/main/conformance), drawn from the specification. ✓ all pass · ◐ some pass · ✗ none pass.</sub>
 

@@ -31,7 +31,7 @@ func Example() {
 	// true
 	// false
 	// true
-	// >=1.2.0 <1.3.0-0 true
+	// >=1.2.0 <2.0.0-0 true
 	// true false
 	// 1.9.0 true
 }

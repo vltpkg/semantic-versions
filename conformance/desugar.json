@@ -146,7 +146,8 @@
     {
       "category": "approximate",
       "input": "~>1.2",
-      "output": ">=1.2.0 <1.3.0-0"
+      "output": ">=1.2.0 <2.0.0-0",
+      "note": "~> keeps its RubyGems meaning: two parts reach the next major"
     },
     {
       "category": "approximate",
@@ -182,6 +183,41 @@
       "category": "build-channels",
       "input": "~1.2.3+win",
       "output": ">=1.2.3+win <1.3.0-0+win"
+    },
+    {
+      "category": "approximate",
+      "input": "~>0.2",
+      "output": ">=0.2.0 <1.0.0-0"
+    },
+    {
+      "category": "approximate",
+      "input": "~>1.2.x",
+      "output": ">=1.2.0 <2.0.0-0",
+      "note": "a trailing x is not a supplied part"
+    },
+    {
+      "category": "approximate",
+      "input": "~>1.x",
+      "output": ">=1.0.0 <2.0.0-0",
+      "note": "a trailing x is not a supplied part"
+    },
+    {
+      "category": "build-channels",
+      "input": "1.2.3+win - 2.0.0",
+      "output": ">=1.2.3+win <=2.0.0",
+      "note": "a hyphen endpoint keeps its build as that endpoint's channel"
+    },
+    {
+      "category": "build-channels",
+      "input": "1.2.3 - 2.0.0+linux",
+      "output": ">=1.2.3 <=2.0.0+linux",
+      "note": "a hyphen endpoint keeps its build as that endpoint's channel"
+    },
+    {
+      "category": "build-channels",
+      "input": "1.2.3+win - 2.0.0+linux",
+      "output": ">=1.2.3+win <=2.0.0+linux",
+      "note": "a hyphen endpoint keeps its build as that endpoint's channel"
     }
   ]
 }

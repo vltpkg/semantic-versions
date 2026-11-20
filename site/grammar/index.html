@@ -143,13 +143,16 @@
 &lt;simple&gt;       ::= &lt;primitive&gt;
                  | &lt;partial&gt;
                  | &lt;tilde&gt;
+                 | &lt;approximate&gt;
                  | &lt;caret&gt;
 
 &lt;primitive&gt;    ::= &lt;operator&gt; &lt;partial&gt;
 
 &lt;operator&gt;     ::= "&lt;" | "&gt;" | "&gt;=" | "&lt;=" | "="
 
-&lt;tilde&gt;        ::= "~" [ "&gt;" ] &lt;partial&gt;
+&lt;tilde&gt;        ::= "~" &lt;partial&gt;
+
+&lt;approximate&gt;  ::= "~&gt;" &lt;partial&gt;
 
 &lt;caret&gt;        ::= "^" &lt;partial&gt;
 

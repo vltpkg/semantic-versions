@@ -36,7 +36,7 @@ assert!(satisfies("1.4.0", "^1.2.3"));
 assert!(satisfies("1.0.0-rc.1", "^1.0.0-rc"));   // pre-release channel
 assert!(!satisfies("1.0.0-beta", "^1.0.0-rc"));  // a different channel
 assert!(satisfies("1.4.2+win.x64", "^1.0.0+win")); // build channel
-assert_eq!(valid_range("~>1.2").as_deref(), Some(">=1.2.0 <1.3.0-0"));
+assert_eq!(valid_range("~>1.2").as_deref(), Some(">=1.2.0 <2.0.0-0"));
 
 // Contexts scope a version or range to an identity.
 let range = Range::parse("npm:react@^18").unwrap();
@@ -73,13 +73,13 @@ dependency ranges from the npm registry. Method and raw results:
 
 | Operation | `semantic-versions@1.0.0` | `nodejs-semver@7.0.0` | `semver@1.0.28` | semantic-versions vs nodejs-semver |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **21.7 ns** | 26.3 ns | 21.4 ns | **1.2× faster** |
-| Sort versions | **117 ns** | 102 ns | 117 ns | 1.15× slower |
-| Parse a range | **208 ns** | 270 ns | — | **1.3× faster** |
-| Range::test(version) | **5.5 ns** | 8.7 ns | — | **1.6× faster** |
-| Resolve a range | **1.03 µs** | 1.32 µs | — | **1.3× faster** |
+| Parse a version | **24.8 ns** | 29.0 ns | 23.6 ns | **1.2× faster** |
+| Sort versions | **149 ns** | 119 ns | 127 ns | 1.26× slower |
+| Parse a range | **246 ns** | 314 ns | — | **1.3× faster** |
+| Range::test(version) | **6.8 ns** | 9.1 ns | — | **1.3× faster** |
+| Resolve a range | **1.29 µs** | 1.57 µs | — | **1.2× faster** |
 
-<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. rustc 1.97.0 · Intel(R) Xeon(R) Processor @ 2.30GHz · linux x86_64 · 2026-11-19. `semver`: Cargo's requirement syntax (bare versions mean ^, comparators are comma-separated, no || or hyphen ranges), so it is compared on versions only.</sub>
+<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. rustc 1.97.0 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x86_64 · 2026-11-19. `semver`: Cargo's requirement syntax (bare versions mean ^, comparators are comma-separated, no || or hyphen ranges), so it is compared on versions only.</sub>
 
 ### Conformance
 
@@ -88,14 +88,14 @@ dependency ranges from the npm registry. Method and raw results:
 | Version grammar <br><sub>Valid and invalid versions per the BNF</sub> | ✓ 81/81 | ◐ 59/81 | ✓ 81/81 |
 | No coercion <br><sub>Rejects `v1.2.3`, `=1.2.3`, `1.2.3pre`, …</sub> | ✓ 11/11 | ◐ 3/11 | ✓ 11/11 |
 | Precedence <br><sub>Major, minor, patch and pre-release ordering</sub> | ✓ 32/32 | ✓ 32/32 | ✓ 32/32 |
-| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 10/10 | ◐ 1/10 | ✓ 10/10 |
-| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 199/199 | ◐ 195/199 | ◐ 134/172 |
-| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 17/17 | ✓ 17/17 | ◐ 7/13 |
+| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 16/16 | ◐ 1/16 | ◐ 15/16 |
+| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 196/196 | ◐ 192/196 | ◐ 134/169 |
+| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 26/26 | ◐ 19/26 | ◐ 9/19 |
 | Pre-release channels <br><sub>`^1.0.0-rc` admits `rc.*`, never `beta`</sub> | ✓ 44/44 | ◐ 33/44 | ◐ 34/44 |
 | Pre-release wildcards <br><sub>`X.Y.Z-*` and `*-*` opt in explicitly</sub> | ✓ 14/14 | ◐ 2/14 | ◐ 2/13 |
-| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 24/24 | ◐ 12/24 | ◐ 12/22 |
+| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 41/41 | ◐ 22/41 | ◐ 19/36 |
 | Contexts <br><sub>`npm:react@18.2.0`, `npm:react@^18`</sub> | ✓ 15/15 | ◐ 3/15 | ◐ 3/15 |
-| **All cases** | **447/447** | **357/447** | **326/413** |
+| **All cases** | **476/476** | **366/476** | **340/436** |
 
 <sub>Cases from the shared conformance suite in [`conformance/`](https://github.com/vltpkg/semantic-versions/tree/main/conformance), drawn from the specification. ✓ all pass · ◐ some pass · ✗ none pass.</sub>
 

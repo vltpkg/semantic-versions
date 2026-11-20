@@ -21,10 +21,6 @@ final class Identifiers {
         return c >= '0' && c <= '9';
     }
 
-    static boolean isDigitInt(int c) {
-        return c >= '0' && c <= '9';
-    }
-
     static boolean isIdentifierChar(char c) {
         return (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '-';
     }
@@ -101,16 +97,19 @@ final class Identifiers {
         }
     }
 
-    private static boolean allDigits(String s, int from, int to) {
+    /**
+     * "0" or digits with no leading zero. A build identifier with a leading
+     * zero ("001") is not numeric: it compares as text, so "+001" and "+1"
+     * are different builds.
+     */
+    private static boolean isNumeric(String s, int from, int to) {
         for (int k = from; k < to; k++) if (!isDigit(s.charAt(k))) return false;
-        return true;
+        return to - from == 1 || s.charAt(from) != '0';
     }
 
     private static int compareOne(String a, int i, int ea, String b, int j, int eb) {
-        boolean da = allDigits(a, i, ea), db = allDigits(b, j, eb);
+        boolean da = isNumeric(a, i, ea), db = isNumeric(b, j, eb);
         if (da && db) {
-            while (i < ea - 1 && a.charAt(i) == '0') i++;
-            while (j < eb - 1 && b.charAt(j) == '0') j++;
             int la = ea - i, lb = eb - j;
             if (la != lb) return la < lb ? -1 : 1;
         } else if (da) {

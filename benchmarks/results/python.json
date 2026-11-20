@@ -4,7 +4,7 @@
   "baseline": "node-semver",
   "environment": {
     "runtime": "CPython 3.13.18",
-    "cpu": "Intel(R) Xeon(R) Processor @ 2.30GHz",
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
     "platform": "linux x86_64",
     "date": "2026-11-19"
   },
@@ -46,16 +46,16 @@
       "description": "5398 published versions",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 919.7,
-          "opsPerSec": 1087365
+          "nsPerOp": 1187.9,
+          "opsPerSec": 841845
         },
         "node-semver": {
-          "nsPerOp": 1438.7,
-          "opsPerSec": 695050
+          "nsPerOp": 1756.5,
+          "opsPerSec": 569320
         },
         "semver": {
-          "nsPerOp": 1379.4,
-          "opsPerSec": 724939
+          "nsPerOp": 1666.0,
+          "opsPerSec": 600254
         }
       }
     },
@@ -65,16 +65,16 @@
       "description": "5398 parsed versions by precedence (per version)",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 657.2,
-          "opsPerSec": 1521549
+          "nsPerOp": 802.7,
+          "opsPerSec": 1245831
         },
         "node-semver": {
-          "nsPerOp": 9900.7,
-          "opsPerSec": 101003
+          "nsPerOp": 11917.0,
+          "opsPerSec": 83914
         },
         "semver": {
-          "nsPerOp": 5887.9,
-          "opsPerSec": 169839
+          "nsPerOp": 6319.8,
+          "opsPerSec": 158233
         }
       }
     },
@@ -84,12 +84,12 @@
       "description": "1996 real dependency ranges",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 4300.4,
-          "opsPerSec": 232537
+          "nsPerOp": 5041.6,
+          "opsPerSec": 198351
         },
         "node-semver": {
-          "nsPerOp": 16019.6,
-          "opsPerSec": 62424
+          "nsPerOp": 18819.3,
+          "opsPerSec": 53137
         }
       }
     },
@@ -99,12 +99,12 @@
       "description": "15604 version \u00d7 range checks",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 247.1,
-          "opsPerSec": 4047372
+          "nsPerOp": 301.7,
+          "opsPerSec": 3314893
         },
         "node-semver": {
-          "nsPerOp": 1761.0,
-          "opsPerSec": 567851
+          "nsPerOp": 1945.4,
+          "opsPerSec": 514046
         }
       }
     },
@@ -114,12 +114,12 @@
       "description": "116 max-satisfying lookups against a package's versions",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 39878.7,
-          "opsPerSec": 25076
+          "nsPerOp": 37297.3,
+          "opsPerSec": 26812
         },
         "node-semver": {
-          "nsPerOp": 267297.8,
-          "opsPerSec": 3741
+          "nsPerOp": 251600.6,
+          "opsPerSec": 3975
         }
       }
     }
@@ -127,16 +127,16 @@
   "conformance": {
     "semantic-versions": {
       "approximate": {
-        "passed": 17,
-        "total": 17
+        "passed": 26,
+        "total": 26
       },
       "build-channels": {
-        "passed": 24,
-        "total": 24
+        "passed": 41,
+        "total": 41
       },
       "build-precedence": {
-        "passed": 10,
-        "total": 10
+        "passed": 16,
+        "total": 16
       },
       "context": {
         "passed": 15,
@@ -159,8 +159,8 @@
         "total": 14
       },
       "ranges": {
-        "passed": 199,
-        "total": 199
+        "passed": 196,
+        "total": 196
       },
       "strict": {
         "passed": 11,
@@ -169,16 +169,16 @@
     },
     "node-semver": {
       "approximate": {
-        "passed": 13,
-        "total": 17
+        "passed": 15,
+        "total": 26
       },
       "build-channels": {
-        "passed": 12,
-        "total": 24
+        "passed": 19,
+        "total": 41
       },
       "build-precedence": {
         "passed": 1,
-        "total": 10
+        "total": 16
       },
       "context": {
         "passed": 3,
@@ -201,8 +201,8 @@
         "total": 14
       },
       "ranges": {
-        "passed": 174,
-        "total": 199
+        "passed": 171,
+        "total": 196
       },
       "strict": {
         "passed": 10,
@@ -212,7 +212,7 @@
     "semver": {
       "build-precedence": {
         "passed": 1,
-        "total": 10
+        "total": 16
       },
       "context": {
         "passed": 0,

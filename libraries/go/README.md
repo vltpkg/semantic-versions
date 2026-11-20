@@ -33,7 +33,7 @@ sv.Satisfies("1.4.0", "^1.2.3")         // true
 sv.Satisfies("1.0.0-rc.1", "^1.0.0-rc") // true: pre-release channel
 sv.Satisfies("1.0.0-beta", "^1.0.0-rc") // false: a different channel
 sv.Satisfies("1.4.2+win.x64", "^1.0.0+win") // true: build channel
-sv.ValidRange("~>1.2")                  // ">=1.2.0 <1.3.0-0", true
+sv.ValidRange("~>1.2")                  // ">=1.2.0 <2.0.0-0", true
 
 // Contexts scope a version or range to an identity.
 react := sv.MustParseRange("npm:react@^18")
@@ -71,13 +71,13 @@ All implementations: [semver.xyz/libraries](https://semver.xyz/libraries/).
 
 | Operation | `semantic-versions@1.0.0` | `Masterminds/semver@3.5.0` | `blang/semver@4.0.0` | semantic-versions vs Masterminds/semver |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **28.0 ns** | 529 ns | 151 ns | **19× faster** |
-| Sort versions | **175 ns** | 444 ns | 233 ns | **2.5× faster** |
-| Parse a range | **357 ns** | 5.49 µs | — | **15× faster** |
-| Range.Test(version) | **23.7 ns** | 579 ns | — | **24× faster** |
-| Resolve a range | **3.67 µs** | 76.0 µs | — | **21× faster** |
+| Parse a version | **29.7 ns** | 591 ns | 170 ns | **20× faster** |
+| Sort versions | **192 ns** | 492 ns | 248 ns | **2.6× faster** |
+| Parse a range | **371 ns** | 6.77 µs | — | **18× faster** |
+| Range.Test(version) | **27.3 ns** | 636 ns | — | **23× faster** |
+| Resolve a range | **4.24 µs** | 91.1 µs | — | **21× faster** |
 
-<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. go1.24.7 · Intel(R) Xeon(R) Processor @ 2.30GHz · linux amd64 · 2026-11-19. `Masterminds/semver`: NewVersion is lenient by design (it accepts v1.2 and coerces it), which is why it fails the strict-parsing cases. `blang/semver`: Its range syntax has no ^, ~ or x-ranges, so it is compared on versions only.</sub>
+<sub>Median time per operation (lower is better) on 5,398 published versions and 1,996 dependency ranges from the npm registry. go1.24.7 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux amd64 · 2026-11-19. `Masterminds/semver`: NewVersion is lenient by design (it accepts v1.2 and coerces it), which is why it fails the strict-parsing cases. `blang/semver`: Its range syntax has no ^, ~ or x-ranges, so it is compared on versions only.</sub>
 
 ### Conformance
 
@@ -86,14 +86,14 @@ All implementations: [semver.xyz/libraries](https://semver.xyz/libraries/).
 | Version grammar <br><sub>Valid and invalid versions per the BNF</sub> | ✓ 81/81 | ◐ 74/81 | ✓ 81/81 |
 | No coercion <br><sub>Rejects `v1.2.3`, `=1.2.3`, `1.2.3pre`, …</sub> | ✓ 11/11 | ◐ 10/11 | ✓ 11/11 |
 | Precedence <br><sub>Major, minor, patch and pre-release ordering</sub> | ✓ 32/32 | ✓ 32/32 | ✓ 32/32 |
-| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 10/10 | ◐ 1/10 | ◐ 1/10 |
-| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 199/199 | ◐ 167/172 | ◐ 114/172 |
-| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 17/17 | ✓ 13/13 | ◐ 7/13 |
+| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 16/16 | ◐ 1/16 | ◐ 1/16 |
+| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 196/196 | ◐ 164/169 | ◐ 114/169 |
+| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 26/26 | ◐ 15/19 | ◐ 9/19 |
 | Pre-release channels <br><sub>`^1.0.0-rc` admits `rc.*`, never `beta`</sub> | ✓ 44/44 | ◐ 28/44 | ◐ 29/44 |
 | Pre-release wildcards <br><sub>`X.Y.Z-*` and `*-*` opt in explicitly</sub> | ✓ 14/14 | ◐ 2/13 | ◐ 2/13 |
-| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 24/24 | ◐ 12/22 | ◐ 14/22 |
+| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 41/41 | ◐ 19/36 | ◐ 21/36 |
 | Contexts <br><sub>`npm:react@18.2.0`, `npm:react@^18`</sub> | ✓ 15/15 | ◐ 3/15 | ◐ 3/15 |
-| **All cases** | **447/447** | **342/413** | **294/413** |
+| **All cases** | **476/476** | **348/436** | **303/436** |
 
 <sub>Cases from the shared conformance suite in [`conformance/`](https://github.com/vltpkg/semantic-versions/tree/main/conformance), drawn from the specification. ✓ all pass · ◐ some pass · ✗ none pass.</sub>
 

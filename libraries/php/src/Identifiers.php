@@ -53,11 +53,9 @@ final class Identifiers
             if ($p === $q) {
                 continue;
             }
-            $dp = ctype_digit($p);
-            $dq = ctype_digit($q);
+            $dp = self::isNumeric($p);
+            $dq = self::isNumeric($q);
             if ($dp && $dq) {
-                $p = ltrim($p, '0');
-                $q = ltrim($q, '0');
                 if (\strlen($p) !== \strlen($q)) {
                     return \strlen($p) < \strlen($q) ? -1 : 1;
                 }
@@ -74,6 +72,16 @@ final class Identifiers
             }
         }
         return \count($x) <=> \count($y);
+    }
+
+    /**
+     * "0" or digits with no leading zero. A build identifier with a leading
+     * zero ("001") is not numeric: it compares as text, so "+001" and "+1"
+     * are different builds.
+     */
+    private static function isNumeric(string $id): bool
+    {
+        return ctype_digit($id) && (\strlen($id) === 1 || $id[0] !== '0');
     }
 
     /** Identifier-wise prefix: "rc" begins "rc.1" but not "rc1". */

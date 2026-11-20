@@ -76,9 +76,15 @@ def _pre_safe(pre: str) -> bool:
     return True
 
 
+def _is_numeric(i: str) -> bool:
+    # `0` or digits with no leading zero. A build identifier with a leading zero
+    # (`001`) is not numeric: it compares as text, so `+001` and `+1` differ.
+    return i.isdigit() and (len(i) == 1 or i[0] != "0")
+
+
 def _ids_key(ids: str) -> tuple:
     # Numeric identifiers sort numerically and below alphanumeric ones.
-    return tuple((0, int(i), "") if i.isdigit() else (1, 0, i) for i in ids.split("."))
+    return tuple((0, int(i), "") if _is_numeric(i) else (1, 0, i) for i in ids.split("."))
 
 
 # A release ranks above its pre-releases; a build ranks above its release.
@@ -372,14 +378,19 @@ def _with_channel(comps: List[Comparator], channel: str) -> List[Comparator]:
     return out
 
 
-def _tilde(p: _Partial) -> List[Comparator]:
+def _tilde(p: _Partial, approximate: bool = False) -> List[Comparator]:
+    # `~` allows patch-level changes when a minor is given, minor-level
+    # otherwise. `~>` keeps its RubyGems meaning: drop the last supplied part
+    # and allow up to the next value of the part before it, so two parts reach
+    # the next major. A trailing x is not a supplied part.
     if p.major is None:
         return [ANY]
     m, mi = p.major, p.minor or 0
     if p.minor is None:
         out = [Comparator.make(">=", _v(m, 0, 0)), Comparator.make("<", _v(m + 1, 0, 0, _ZERO))]
     elif p.patch is None:
-        out = [Comparator.make(">=", _v(m, mi, 0)), Comparator.make("<", _v(m, mi + 1, 0, _ZERO))]
+        upper = _v(m + 1, 0, 0, _ZERO) if approximate else _v(m, mi + 1, 0, _ZERO)
+        out = [Comparator.make(">=", _v(m, mi, 0)), Comparator.make("<", upper)]
     else:
         out = [
             Comparator.make(">=", _v(m, mi, p.patch, p.pre)),
@@ -433,6 +444,8 @@ def _xrange(op: str, p: _Partial) -> List[Comparator]:
 
 
 def _hyphen(a: _Partial, b: _Partial) -> List[Comparator]:
+    # Each endpoint keeps its own labels: a pre-release as that endpoint's
+    # pre-release channel and a build as its build channel.
     out = []
     if a.major is not None:
         if a.minor is None:
@@ -441,14 +454,15 @@ def _hyphen(a: _Partial, b: _Partial) -> List[Comparator]:
             v = _v(a.major, a.minor, 0)
         else:
             v = _v(a.major, a.minor, a.patch, a.pre)
-        out.append(Comparator.make(">=", v))
+        out.extend(_with_channel([Comparator.make(">=", v)], a.build))
     if b.major is not None:
         if b.minor is None:
-            out.append(Comparator.make("<", _v(b.major + 1, 0, 0, _ZERO)))
+            c = Comparator.make("<", _v(b.major + 1, 0, 0, _ZERO))
         elif b.patch is None:
-            out.append(Comparator.make("<", _v(b.major, b.minor + 1, 0, _ZERO)))
+            c = Comparator.make("<", _v(b.major, b.minor + 1, 0, _ZERO))
         else:
-            out.append(Comparator.make("<=", _v(b.major, b.minor, b.patch, b.pre)))
+            c = Comparator.make("<=", _v(b.major, b.minor, b.patch, b.pre))
+        out.extend(_with_channel([c], b.build))
     return out or [ANY]
 
 
@@ -463,7 +477,9 @@ def _comparator_token(tok: str, raw: str) -> List[Comparator]:
     if c == "^":
         return _caret(_partial(tok[1:], raw))
     if c == "~":
-        return _tilde(_partial(tok[2:] if tok.startswith("~>") else tok[1:], raw))
+        if tok.startswith("~>"):
+            return _tilde(_partial(tok[2:], raw), approximate=True)
+        return _tilde(_partial(tok[1:], raw))
     for op in _PREFIXES:
         if tok.startswith(op):
             return _xrange("" if op == "=" else op, _partial(tok[len(op) :], raw))

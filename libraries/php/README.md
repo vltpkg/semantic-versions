@@ -34,7 +34,7 @@ SV::satisfies('1.4.0', '^1.2.3');             // true
 SV::satisfies('1.0.0-rc.1', '^1.0.0-rc');     // true: pre-release channel
 SV::satisfies('1.0.0-beta', '^1.0.0-rc');     // false: a different channel
 SV::satisfies('1.4.2+win.x64', '^1.0.0+win'); // true: build channel
-SV::validRange('~>1.2');                      // '>=1.2.0 <1.3.0-0'
+SV::validRange('~>1.2');                      // '>=1.2.0 <2.0.0-0'
 
 // Contexts scope a version or range to an identity.
 $react = Range::parse('npm:react@^18');
@@ -71,13 +71,13 @@ All implementations: [semver.xyz/libraries](https://semver.xyz/libraries/).
 
 | Operation | `semantic-versions@1.0.0` | `composer/semver@3.6.0` | `z4kn4fein/php-semver@3.0.0` | semantic-versions vs composer/semver |
 | --- | ---: | ---: | ---: | --- |
-| Parse a version | **354 ns** | 819 ns | 664 ns | **2.3× faster** |
-| Sort versions | **1.55 µs** | 1.63 µs | 2.16 µs | **1.1× faster** |
-| Parse a range | **2.23 µs** | 2.40 µs | 3.65 µs | **1.1× faster** |
-| range->test(version) | **169 ns** | 621 ns | 474 ns | **3.7× faster** |
-| Resolve a range | **26.7 µs** | 101.9 µs | 71.0 µs | **3.8× faster** |
+| Parse a version | **434 ns** | 1.03 µs | 789 ns | **2.4× faster** |
+| Sort versions | **1.96 µs** | 1.98 µs | 2.64 µs | about the same |
+| Parse a range | **2.69 µs** | 2.92 µs | 4.47 µs | **1.1× faster** |
+| range->test(version) | **211 ns** | 740 ns | 634 ns | **3.5× faster** |
+| Resolve a range | **32.2 µs** | 92.6 µs | 65.8 µs | **2.9× faster** |
 
-<sub>Median time per operation (lower is better) on 5,398 published versions and 797 dependency ranges from the npm registry. PHP 8.3.6 · Intel(R) Xeon(R) Processor @ 2.30GHz · linux x86_64 · 2026-11-19. `composer/semver`: Composer's model differs by design: versions normalize to four parts with stability flags (1.0.0-rc.1 becomes 1.0.0.0-RC1), builds are dropped, and pre-release names outside alpha, beta, RC and patch are rejected. Versions are scored on parsing to the same value.</sub>
+<sub>Median time per operation (lower is better) on 5,398 published versions and 797 dependency ranges from the npm registry. PHP 8.3.6 · Intel(R) Xeon(R) Processor @ 2.10GHz · linux x86_64 · 2026-11-20. `composer/semver`: Composer's model differs by design: versions normalize to four parts with stability flags (1.0.0-rc.1 becomes 1.0.0.0-RC1), builds are dropped, and pre-release names outside alpha, beta, RC and patch are rejected. Versions are scored on parsing to the same value.</sub>
 
 ### Conformance
 
@@ -86,14 +86,14 @@ All implementations: [semver.xyz/libraries](https://semver.xyz/libraries/).
 | Version grammar <br><sub>Valid and invalid versions per the BNF</sub> | ✓ 81/81 | ◐ 57/81 | ◐ 80/81 |
 | No coercion <br><sub>Rejects `v1.2.3`, `=1.2.3`, `1.2.3pre`, …</sub> | ✓ 11/11 | ◐ 8/11 | ✓ 11/11 |
 | Precedence <br><sub>Major, minor, patch and pre-release ordering</sub> | ✓ 32/32 | ◐ 18/32 | ✓ 32/32 |
-| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 10/10 | ◐ 1/10 | ◐ 1/10 |
-| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 199/199 | ◐ 139/172 | ◐ 164/172 |
-| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 17/17 | ◐ 7/13 | ✓ 13/13 |
+| Build precedence <br><sub>A build ranks above its release: `1.0.0 < 1.0.0+b`</sub> | ✓ 16/16 | ◐ 1/16 | ◐ 1/16 |
+| Ranges <br><sub>Comparators, `\|\|`, x-ranges, `~`, `^`, hyphen ranges</sub> | ✓ 196/196 | ◐ 138/169 | ◐ 161/169 |
+| Approximate ranges <br><sub>The pessimistic operator `~>`</sub> | ✓ 26/26 | ◐ 9/19 | ◐ 15/19 |
 | Pre-release channels <br><sub>`^1.0.0-rc` admits `rc.*`, never `beta`</sub> | ✓ 44/44 | ◐ 26/44 | ◐ 19/44 |
 | Pre-release wildcards <br><sub>`X.Y.Z-*` and `*-*` opt in explicitly</sub> | ✓ 14/14 | ◐ 2/13 | ◐ 2/13 |
-| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 24/24 | ◐ 12/22 | ◐ 12/22 |
+| Build channels <br><sub>`^1.0.0+win` admits `+win.*` builds only</sub> | ✓ 41/41 | ◐ 20/36 | ◐ 19/36 |
 | Contexts <br><sub>`npm:react@18.2.0`, `npm:react@^18`</sub> | ✓ 15/15 | ◐ 3/15 | ◐ 3/15 |
-| **All cases** | **447/447** | **273/413** | **337/413** |
+| **All cases** | **476/476** | **282/436** | **343/436** |
 
 <sub>Cases from the shared conformance suite in [`conformance/`](https://github.com/vltpkg/semantic-versions/tree/main/conformance), drawn from the specification. ✓ all pass · ◐ some pass · ✗ none pass.</sub>
 
