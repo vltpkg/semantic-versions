@@ -173,10 +173,14 @@ project's root directory is `site/` and not a copy of it.
 
 ### Registry
 
-[`vlt.json`](vlt.json) pins the npm registry alias to `https://registry.npmjs.org/`
-under its `config` key, so `vlt-lock.json` resolves from the public registry for
-everyone (CI included) rather than from whatever registry a contributor's
-user-level vlt config points at.
+[`vlt.json`](vlt.json) pins the registry aliases under its `config` key: `npm`
+to `https://registry.npmjs.org/`, so `vlt-lock.json` resolves from the public
+registry for everyone (CI included) rather than from whatever registry a
+contributor's user-level vlt config points at, and `main` to vlt's registry,
+because vlt writes every alias it knows into the lockfile's options and a
+frozen install fails when they differ ([vltpkg/vltpkg#2208](https://github.com/vltpkg/vltpkg/issues/2208)).
+Pinning both means a lockfile written on a machine with a user-level `main`
+alias is the lockfile CI and Vercel expect.
 
 ## License
 
