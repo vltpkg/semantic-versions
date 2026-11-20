@@ -25,16 +25,9 @@ function useMount(load: () => Promise<Mountable>) {
   }, [load]);
 }
 
-const loadSelector = () => import("@/lib/interactive/selector");
 const loadVariants = () => import("@/lib/interactive/variants");
 const loadIntegrity = () => import("@/lib/interactive/integrity");
 const loadLockGenerator = () => import("@/lib/interactive/lock-generator");
-
-/** The range selector (/selector/). */
-export function SelectorScript() {
-  useMount(loadSelector);
-  return null;
-}
 
 /** The Build Variants channel matrix (/extensions/variants/). */
 export function VariantsScript() {

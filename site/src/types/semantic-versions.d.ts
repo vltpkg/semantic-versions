@@ -1,5 +1,5 @@
 // The reference parser ships untyped JavaScript; this is the part of its API
-// the site's actions use. See libraries/javascript/README.md for the whole.
+// the site uses. See libraries/javascript/README.md for the whole.
 declare module "semantic-versions" {
   export class Version {
     constructor(version: string | Version);
@@ -20,6 +20,12 @@ declare module "semantic-versions" {
     constructor(comp: string);
     operator: string;
     value: string;
+    /** True for the empty comparator (`*`), which has no version. */
+    ANY?: boolean;
+    /** The build channel the comparator filters by; empty when it has none. */
+    channel: string[];
+    /** The comparator's version without its build: what the bound is compared on. */
+    core: Version;
     test(version: string | Version): boolean;
   }
   export class Range {
