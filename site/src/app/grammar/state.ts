@@ -9,5 +9,5 @@ export default defineState(
     page: pageEntity("/grammar/", "BNF grammars", "Backus–Naur forms for versions, ranges, comparators, references and the extensions, with the reference parser's regular expressions."),
     grammars: GRAMMARS.map(([file, note]) => ({ file, note, url: `/spec/${file}` })),
   }),
-  { nav: () => SITE_NAV },
+  { description: "The BNF grammars; readGrammar returns one.", nav: () => SITE_NAV },
 );

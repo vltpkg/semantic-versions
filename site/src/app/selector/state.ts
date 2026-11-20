@@ -12,5 +12,5 @@ export default defineState(
     examples: EXAMPLES,
     samples: Object.entries(SAMPLE_SETS).map(([id, s]) => ({ id, label: s.label, note: s.note, versions: s.versions })),
   }),
-  { nav: () => SITE_NAV },
+  { description: "The range selector: test, desugar, parse, order and bump versions with the reference parser.", nav: () => SITE_NAV },
 );

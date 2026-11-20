@@ -9,5 +9,5 @@ export default defineState(
     extension: { ...extension("variants"), note: "The Markdown is normative; the page is a presentation of it." },
     extensions: EXTENSIONS.map(({ id, title, url }) => ({ id, title, url })),
   }),
-  { nav: () => [{ to: "/extensions/", label: "All extensions" }, ...SITE_NAV] },
+  { description: "The Build Variants extension: os, arch, abi and feature coordinates in build metadata.", nav: () => [{ to: "/extensions/", label: "All extensions" }, ...SITE_NAV] },
 );

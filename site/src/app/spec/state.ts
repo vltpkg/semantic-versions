@@ -17,5 +17,5 @@ export default defineState(
     },
     sections: specSections().map(({ id, title }) => ({ id, title, url: `/spec/#${id}` })),
   }),
-  { nav: () => SITE_NAV },
+  { description: "The specification, with its sections; readSection returns one as Markdown.", nav: () => SITE_NAV },
 );

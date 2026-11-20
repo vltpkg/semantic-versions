@@ -13,7 +13,7 @@ const CURL = {
   call: `curl ${SITE}/selector/ \\
   -H 'Content-Type: application/vnd.affordances+json' \\
   -d '{"action":"select","input":{"range":"^1.0.0-rc","versions":["1.0.0-beta.2","1.0.0-rc.1","1.0.0","1.0.0+build.7"]}}'`,
-  mcp: `npx @affordances/mcp ${SITE}`,
+  mcp: `claude mcp add --transport http semver ${SITE}/mcp`,
 };
 
 function Snippet({ title, code }: { title: string; code: string }) {
@@ -81,14 +81,15 @@ export default function Page() {
             </p>
             <div className="card-arrow">Site index →</div>
           </a>
-          <a className="card reveal" href="https://www.affordances.sh/docs/guides/mcp" target="_blank" rel="noopener">
+          <a className="card reveal" href="/mcp">
             <span className="card-kicker">MCP</span>
             <h3>Connect an MCP client</h3>
             <p>
-              <code>@affordances/mcp</code> serves this site to Claude, Cursor and other MCP clients as two tools:
-              open a page, call an action. No token is needed; every action here is public and read-only.
+              The site is an MCP server at <code>/mcp</code> (streamable HTTP, no auth) with two tools: open a page,
+              call an action. Add it to Claude, Cursor or any client by URL, or run <code>@affordances/mcp</code>{" "}
+              locally for the same tools.
             </p>
-            <div className="card-arrow">How →</div>
+            <div className="card-arrow">Endpoint →</div>
           </a>
         </div>
       </section>
@@ -98,14 +99,14 @@ export default function Page() {
           <p className="eyebrow">Try it</p>
           <h2 className="section-title big">Three requests.</h2>
           <p className="lead">
-            The graph of the range selector, one call to its <code>select</code> action, and the MCP server. Each
-            answers with JSON; the Markdown twins answer with text.
+            The graph of the range selector, one call to its <code>select</code> action, and the MCP server added to
+            Claude Code. Each answers with JSON; the Markdown twins answer with text.
           </p>
         </div>
         <div className="snippets reveal">
           <Snippet title="read a page's graph" code={CURL.graph} />
           <Snippet title="call an action" code={CURL.call} />
-          <Snippet title="serve the site to an MCP client" code={CURL.mcp} />
+          <Snippet title="connect an MCP client" code={CURL.mcp} />
         </div>
       </section>
 

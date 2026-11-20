@@ -9,5 +9,5 @@ export default defineState(
     page: pageEntity("/extensions/", "Extensions", "Three extensions that encode build variants, artifact integrity and whole resolved dependency graphs inside a version string, in layering order."),
     extensions: EXTENSIONS,
   }),
-  { nav: () => [...EXTENSIONS.map((e) => ({ to: e.url, label: e.title })), ...SITE_NAV] },
+  { description: "The extensions index: Build Variants, Package Integrity and Dependency Locks.", nav: () => [...EXTENSIONS.map((e) => ({ to: e.url, label: e.title })), ...SITE_NAV] },
 );

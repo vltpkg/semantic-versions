@@ -14,5 +14,5 @@ export default defineState(
       libraries: listed().map(libraryEntity),
     };
   },
-  { nav: () => SITE_NAV },
+  { description: "Implementations in eight languages, with install commands, conformance and benchmarks.", nav: () => SITE_NAV },
 );

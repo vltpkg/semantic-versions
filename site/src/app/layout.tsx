@@ -25,6 +25,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head>
         {/* The Markdown index of the site, for agents (also the llms.txt convention). */}
         <link rel="describedby" type="text/markdown" href="/llms.txt" />
+        {/* Every page has an Affordances graph at its own URL; the Link header says the same. */}
+        <link rel="affordances" href="?affordances=1" />
       </head>
       <body>
         <ThemeProvider>

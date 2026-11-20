@@ -9,5 +9,5 @@ export default defineState(
     extension: { ...extension("integrity"), note: "The Markdown is normative; the page is a presentation of it." },
     extensions: EXTENSIONS.map(({ id, title, url }) => ({ id, title, url })),
   }),
-  { nav: () => [{ to: "/extensions/", label: "All extensions" }, ...SITE_NAV] },
+  { description: "The Package Integrity extension: a content digest in the version.", nav: () => [{ to: "/extensions/", label: "All extensions" }, ...SITE_NAV] },
 );

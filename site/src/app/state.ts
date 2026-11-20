@@ -13,5 +13,5 @@ export default defineState(
       { title: "llms.txt", url: "/llms.txt" },
     ],
   }),
-  { nav: () => SITE_NAV },
+  { description: "The home page: what Semantic Versions is and where to start.", nav: () => SITE_NAV },
 );

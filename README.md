@@ -164,9 +164,9 @@ what it shows, and its `actions.ts` what an agent can do there. The range
 selector's actions (`select`, `desugar`, `parse`, `compare`, `bump`) run the
 reference parser, the spec's `readSection` returns one section, and the
 grammars' `readGrammar` returns a BNF; all are public and read-only.
-`/.well-known/affordances.json` is the site index, `npx @affordances/mcp
-https://semver.xyz` serves it to MCP clients, and [`/agents/`](https://semver.xyz/agents/)
-explains it to agents. `@affordances/next` regenerates `site/.affordances/manifest.ts`
+`/.well-known/affordances.json` is the site index, `/mcp` is the site as an
+MCP server (streamable HTTP, the same two tools as `npx @affordances/mcp`),
+and [`/agents/`](https://semver.xyz/agents/) explains it to agents. `@affordances/next` regenerates `site/.affordances/manifest.ts`
 (gitignored) from those files on every build.
 
 The [range selector](https://semver.xyz/selector/) imports the `semantic-versions`
