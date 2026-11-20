@@ -736,20 +736,10 @@ a.card:hover { background: var(--hover); }
 .video-facade:hover .video-play { transform: translate(-50%, -50%) scale(1.06); }
 .video-play svg { width: 26px; height: 26px; fill: currentColor; margin-left: 3px; }
 .talk figcaption { margin-top: 12px; font: 400 0.8125rem/1.5 var(--mono); color: var(--faint); }
-/* Home: the talk sits beside its blurb, not full-width. */
-.talk-grid {
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 440px);
-  gap: 52px; align-items: center;
-}
-.talk-grid .section-head { margin: 0; max-width: 520px; }
-.talk-grid .talk { max-width: 440px; justify-self: end; width: 100%; }
-.talk-grid .video-play { width: 56px; height: 56px; }
-.talk-grid .video-play svg { width: 22px; height: 22px; }
-@media (max-width: 880px) {
-  .talk-grid { grid-template-columns: 1fr; gap: 28px; }
-  .talk-grid .section-head { max-width: none; }
-  .talk-grid .talk { max-width: 560px; justify-self: start; }
-}
+/* FAQ: the talk is a modest figure inside its answer, not a section of its own. */
+.doc .talk { max-width: 440px; margin: 18px 0 6px; }
+.doc .talk .video-play { width: 56px; height: 56px; }
+.doc .talk .video-play svg { width: 22px; height: 22px; }
 
 .doc-status { margin-top: 72px; padding-top: 36px; border-top: 1px solid var(--border); }
 .doc-status .eyebrow { margin-bottom: 12px; }

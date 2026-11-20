@@ -1,4 +1,5 @@
 import { PageActions } from "@/components/page-actions";
+import { YouTube } from "@/components/youtube";
 import type { Metadata, Viewport } from "next";
 
 export const metadata: Metadata = {
@@ -50,7 +51,8 @@ export default function Page() {
           <a href="#public-api">Public API &amp; products</a> <a href="#deprecated">Deprecation</a>{" "}
           <div className="toc-title">Ecosystem</div> <a href="#purl">Do I still need purl?</a>{" "}
           <a href="#pep-440">Python's PEP 440</a> <div className="toc-title">The project</div>{" "}
-          <a href="#grammar">Grammar</a> <a href="#contributing">Contributing</a> <a href="#license">License</a>
+          <a href="#grammar">Grammar</a> <a href="#talk">Talk</a> <a href="#contributing">Contributing</a>{" "}
+          <a href="#license">License</a>
         </aside>
         <article className="doc reveal">
           <h2 id="misconceptions">Common misconceptions</h2>
@@ -451,6 +453,23 @@ export default function Page() {
             Ports of the parser for Rust, Python, Go, Ruby, Java, .NET and PHP pass the same conformance suite; they are
             listed, with benchmarks, on the <a href="/libraries/">libraries page</a>.
           </p>
+          <h3 id="talk">Is there a talk about it?</h3>
+          <p>
+            Yes.{" "}
+            <a href="https://www.youtube.com/watch?v=5x7jVqXzAAM" target="_blank" rel="noopener">
+              Spec-tacular: SemVer &amp; Beyond
+            </a>
+            , from DevOps.js Conf 2024, is 21 minutes on where the Semantic Versioning spec falls short and what it
+            takes to close the gaps. It is background, not part of the specification.
+          </p>
+          <figure className="talk">
+            <YouTube
+              id="5x7jVqXzAAM"
+              title="Spec-tacular: SemVer & Beyond (DevOps.js Conf 2024)"
+              label="Play the talk “Spec-tacular: SemVer & Beyond” (21 minutes)"
+            />
+            <figcaption>Darcy Clarke · DevOps.js Conf 2024 · 21 min</figcaption>
+          </figure>
           <h3 id="contributing">Can I contribute, or propose an extension?</h3>
           <p>
             Yes. The specification, reference parser and extensions are developed in the open at{" "}

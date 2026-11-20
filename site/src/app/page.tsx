@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { HeroLanguages } from "@/components/benchmarks";
 import { HeroArt, VersionSort } from "@/components/interactive";
-import { YouTube } from "@/components/youtube";
 
 export const metadata: Metadata = {
   title: "semver.xyz — Semantic Versions, a modern versioning specification",
@@ -162,27 +161,6 @@ export default function Page() {
               a compliant library.
             </p>
           </article>
-        </div>
-      </section>
-      {/* ───────────────────────── The talk ───────────────────────── */}
-      <section className="wrap home-talk">
-        <div className="talk-grid">
-          <div className="section-head left reveal">
-            <p className="eyebrow">The talk</p>
-            <h2 className="section-title big">Spec-tacular: SemVer &amp; Beyond.</h2>
-            <p className="lead">
-              The case for this work in 21 minutes: where the Semantic Versioning spec falls short, and what it takes to
-              close the gaps. From DevOps.js Conf 2024.
-            </p>
-          </div>
-          <figure className="talk reveal">
-            <YouTube
-              id="5x7jVqXzAAM"
-              title="Spec-tacular: SemVer & Beyond (DevOps.js Conf 2024)"
-              label="Play the talk “Spec-tacular: SemVer & Beyond” (21 minutes)"
-            />
-            <figcaption>Darcy Clarke · DevOps.js Conf 2024 · 21 min</figcaption>
-          </figure>
         </div>
       </section>
       {/* ───────────────────────── Explore cards ──────────────────── */}
