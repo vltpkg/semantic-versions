@@ -1,4 +1,0 @@
-# The Tools page was renamed Libraries; keep old links working.
-/tools /libraries/ 301
-/tools/ /libraries/ 301
-/tools/* /libraries/:splat 301

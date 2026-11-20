@@ -37,7 +37,7 @@ repository.
 
 ## Go: the vanity import path
 
-`semver.xyz/go` resolves through [`site/public/go/index.html`](../site/public/go/index.html),
+`semver.xyz/go` resolves through [`site/src/app/go/route.ts`](../site/src/app/go/route.ts),
 whose `go-import` tag points at `libraries/go`. If the directory ever moves, update
 that tag, not the module path. After tagging, request the version at
 `https://pkg.go.dev/semver.xyz/go@vX.Y.Z` if it doesn't appear on its own.

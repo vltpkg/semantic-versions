@@ -1,0 +1,5 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "npm install vlt@latest --force --prefix=/vlt/ --install-strategy=nested --no-save && vlt --version && vlt install --frozen-lockfile",
+  "buildCommand": "vlt run build"
+}

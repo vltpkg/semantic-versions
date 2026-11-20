@@ -35,6 +35,8 @@ jobs:
 
       - name: Build site
         run: vlt run build -w site
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
 
   # The JavaScript package runs unchanged on servers and in browsers; run the
   # conformance suite in each runtime (libraries/javascript/runtimes).

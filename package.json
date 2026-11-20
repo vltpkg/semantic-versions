@@ -7,17 +7,10 @@
   "scripts": {
     "dev": "vlt run dev -w site",
     "build": "vlt run build -w site",
-    "preview": "vlt run preview -w site",
-    "deploy": "vlt run build -w site && vlt run deploy:site",
-    "deploy:site": "wrangler pages deploy site/dist --project-name semver-xyz --branch main --commit-dirty=true",
-    "deploy:preview": "vlt run build -w site && wrangler pages deploy site/dist --project-name semver-xyz --branch preview --commit-dirty=true",
-    "cf:whoami": "wrangler whoami",
+    "start": "vlt run start -w site",
     "test": "vlt run test -w libraries/javascript",
     "bench": "vlt run bench -w libraries/javascript && cd libraries/rust && cargo bench --bench compare && cd ../.. && node benchmarks/report.mjs",
     "publish:dry": "vlt publish --dry-run --workspace libraries/javascript",
     "release": "vlt run test -w libraries/javascript && vlt publish --workspace libraries/javascript --access public"
-  },
-  "devDependencies": {
-    "wrangler": "^4.121.0"
   }
 }

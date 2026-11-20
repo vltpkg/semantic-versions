@@ -53,8 +53,8 @@ than keeping a second copy.
 | --- | --- | --- |
 | The specification | [`spec/SPEC.md`](spec/SPEC.md) | [`/spec/`](https://semver.xyz/spec/), rendered from the Markdown at build time |
 | Extensions | [`extensions/*/*.md`](extensions) | [`/extensions/`](https://semver.xyz/extensions/), one presentation page each |
-| FAQ | [`site/faq/index.html`](site/faq/index.html) | [`/faq/`](https://semver.xyz/faq/) |
-| Comparison with SemVer 2.0.0 | [`site/proposal/index.html`](site/proposal/index.html) | [`/proposal/#compare`](https://semver.xyz/proposal/#compare) |
+| FAQ | [`site/src/app/faq/page.tsx`](site/src/app/faq/page.tsx) | [`/faq/`](https://semver.xyz/faq/) |
+| Comparison with SemVer 2.0.0 | [`site/src/app/proposal/page.tsx`](site/src/app/proposal/page.tsx) | [`/proposal/#compare`](https://semver.xyz/proposal/#compare) |
 | BNF grammars | [`site/public/spec/*.bnf`](site/public/spec) | [`/grammar/`](https://semver.xyz/grammar/) |
 | Conformance cases | [`conformance/*.json`](conformance) | run by every implementation's test suite |
 | Implementations (for the page and READMEs) | [`benchmarks/languages.mjs`](benchmarks/languages.mjs) | [`/libraries/`](https://semver.xyz/libraries/) |
@@ -90,22 +90,28 @@ This repository is a [vlt](https://www.vlt.io) workspace (`vlt.json`):
 │   └── php/                  #   Packagist `vltpkg/semantic-versions`
 ├── benchmarks/               # Real-world corpus, results, and the shared table renderer
 ├── assets/                   # README banner (and the script that draws it)
-└── site/                     # The semver.xyz static site (Vite, vanilla HTML/CSS/JS)
-    ├── index.html            # Home
-    ├── spec/                 # Template; content rendered from spec/SPEC.md
-    ├── extensions/           # One page per extension, in layering order
-    ├── grammar/              # BNF grammars + downloads
-    ├── selector/             # Client-side range selector (uses the parser)
-    ├── proposal/             # Semantic Versioning 3.0.0 proposal + 2.0.0 comparison
-    ├── origin/               # History of build metadata
-    ├── faq/                  # Frequently asked questions
-    ├── libraries/            # Libraries in every language, benchmarks and conformance tables
-    ├── license/
-    ├── scripts/
-    │   ├── render-spec.mjs   # Markdown → /spec/ (used by vite.config.js)
-    │   └── ai-artifacts.mjs  # llms.txt, sitemap.xml, robots.txt, Markdown mirrors
+└── site/                     # The semver.xyz site (Next.js, deployed on Vercel)
+    ├── next.config.ts        # Trailing-slash URLs, /tools redirects, @affordances/md
+    ├── vercel.json           # Installs vlt, then `vlt run build -w site`
     ├── public/               # favicon, fonts, downloadable *.bnf grammars
-    └── src/                  # Shared design system (style.css) + shell (nav/footer)
+    └── src/
+        ├── app/              # One folder per page (page.tsx), plus the text routes
+        │   ├── page.tsx      # Home
+        │   ├── spec/         # Page shell; content rendered from spec/SPEC.md
+        │   ├── extensions/   # One page per extension, in layering order
+        │   ├── grammar/      # BNF grammars + downloads
+        │   ├── selector/     # Client-side range selector (uses the parser)
+        │   ├── proposal/     # Semantic Versioning 3.0.0 proposal + 2.0.0 comparison
+        │   ├── origin/       # A short history of Semantic Versioning
+        │   ├── faq/          # Frequently asked questions
+        │   ├── libraries/    # Libraries in every language, benchmarks and conformance tables
+        │   ├── license/
+        │   ├── llms.txt/, llms-full.txt/, sitemap.xml/, robots.txt/, spec/SPEC.md/, …
+        │   │                 # Route handlers for the machine-readable files, built from the Markdown
+        │   ├── api/affordances/md/   # Every page as Markdown (@affordances/md)
+        │   └── globals.css   # The design system
+        ├── components/       # Nav, footer, theme, the pages' interactive parts
+        └── lib/              # Spec renderer, corpus (llms.txt), benchmarks, DOM modules
 ```
 
 ## Develop
@@ -115,9 +121,9 @@ Node 22.22 or newer), then:
 
 ```sh
 vlt install
-vlt run dev -w site                    # start the site (Vite) at http://localhost:5173
-vlt run build -w site                  # build the static site into site/dist
-vlt run preview -w site                # preview the production build
+vlt run dev -w site                    # start the site (Next.js) at http://localhost:3000
+vlt run build -w site                  # production build into site/.next
+vlt run start -w site                  # serve the production build
 vlt run test -w libraries/javascript   # run the parser test suite (tap), incl. conformance
 vlt run bench -w libraries/javascript  # benchmark against node-semver, refresh the tables
 ```
@@ -142,41 +148,28 @@ renders the same results files at build time. To add a language, add it to
 
 The root `package.json` also exposes convenience wrappers, e.g. `vlt run build`.
 
-`dev` and `build` first run `site/scripts/ai-artifacts.mjs`, which writes the
-machine-readable files served from the site root (`/llms.txt`, `/llms-full.txt`,
-`/sitemap.xml`, `/robots.txt` and Markdown mirrors of the spec and extensions).
-They are gitignored; never edit the copies under `site/public/`.
+The machine-readable files served from the site root (`/llms.txt`,
+`/llms-full.txt`, `/sitemap.xml`, `/robots.txt` and the Markdown mirrors of
+the spec and extensions) are route handlers under `site/src/app`, built from
+the canonical Markdown at build time; `site/src/lib/corpus.ts` lists what goes
+where. Every page is also served as Markdown by
+[`@affordances/md`](https://github.com/vltpkg/affordances): add `.md` to its
+path (`/faq.md`) or request it with `Accept: text/markdown`.
 
 The [range selector](https://semver.xyz/selector/) imports the `semantic-versions`
 parser directly, so the site and the reference implementation never drift.
 
-## Deployment (Cloudflare Pages)
+## Deployment (Vercel)
 
-The site is a static [Cloudflare Pages](https://developers.cloudflare.com/pages/)
-project, `semver-xyz`, served at [`semver.xyz`](https://semver.xyz). The custom
-domain is attached to the Pages project in the Cloudflare dashboard;
-[`wrangler.toml`](wrangler.toml) points Wrangler at `site/dist`.
-
-```sh
-vlt run deploy           # build, then publish site/dist to production (branch main)
-vlt run deploy:preview   # build, then publish a preview deployment
-vlt run cf:whoami        # check which Cloudflare account Wrangler is using
-```
-
-Use `wrangler pages deploy`, not `wrangler deploy`: the latter is the Workers
-command and fails on a Pages project with "Missing entry-point to Worker script
-or to assets directory".
-
-[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) does the same on
-every push to `main` once two repository secrets are set:
-
-- `CLOUDFLARE_API_TOKEN`: an API token with the **Cloudflare Pages: Edit** permission
-- `CLOUDFLARE_ACCOUNT_ID`: the account that owns the `semver-xyz` project
-
-Without them the workflow still builds the site and skips the publish step.
-
-Vite is configured with `base: "/"` because the site is served from the domain
-root.
+The site is a [Vercel](https://vercel.com) project with its root directory set
+to `site/`, served at [`semver.xyz`](https://semver.xyz). Every push to `main`
+deploys production and every pull request gets a preview, through Vercel's Git
+integration; there is no deploy workflow in this repository.
+[`site/vercel.json`](site/vercel.json) installs vlt on the build machine and
+runs `vlt run build -w site`, so Vercel builds with the same lockfile as CI.
+The build reads `spec/SPEC.md`, the extension Markdown and
+`benchmarks/results/*.json` from the repository root, which is why the
+project's root directory is `site/` and not a copy of it.
 
 ### Registry
 
