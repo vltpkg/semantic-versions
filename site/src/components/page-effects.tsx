@@ -2,6 +2,8 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { createRoot } from "react-dom/client";
+import { SnippetActions, type Snippet } from "@/components/snippet-actions";
 
 /*
  * The behaviours every page shares, attached after each navigation and torn
@@ -60,8 +62,37 @@ function initCopy(): Cleanup {
     };
     btn.addEventListener("click", onClick);
     offs.push(() => btn.removeEventListener("click", onClick));
+
+    // Open in: a menu beside Copy that hands the snippet to a chat.
+    const mount = document.createElement("div");
+    mount.className = "code-actions-mount";
+    mount.setAttribute("data-affordances-md", "skip");
+    if (win.classList.contains("bnf")) win.insertBefore(mount, btn);
+    else btn.after(mount);
+    const root = createRoot(mount);
+    root.render(<SnippetActions {...describe(win, code)} />);
+    offs.push(() => {
+      // Not synchronously: this cleanup runs inside React's own commit, which can't unmount a root mid-render.
+      setTimeout(() => root.unmount());
+      mount.remove();
+    });
   });
   return () => offs.forEach((fn) => fn());
+}
+
+/** What a code window holds, for the prompt that opens it in a chat. */
+function describe(win: HTMLElement, code: HTMLElement): Snippet {
+  const text = code.innerText.trim();
+  const card = win.closest<HTMLElement>(".tool-card");
+  if (card) return { code: text, title: "install", kind: "install", language: card.querySelector(".tool-lang")?.textContent?.trim() ?? "" };
+  if (win.classList.contains("bnf")) {
+    // the grammar's download link names the file; else the section heading
+    const section = win.closest("section") ?? win.parentElement;
+    const file = section?.querySelector<HTMLAnchorElement>("a[download]")?.getAttribute("href")?.split("/").pop();
+    const heading = section?.querySelector("h2, h3")?.textContent?.trim();
+    return { code: text, title: file ?? heading ?? "BNF", kind: "grammar" };
+  }
+  return { code: text, title: win.querySelector(".code-title")?.textContent?.trim() || "code", kind: "snippet" };
 }
 
 const ANCHOR_ICON =
