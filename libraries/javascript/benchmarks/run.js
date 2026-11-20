@@ -1,6 +1,6 @@
-// Benchmarks `semantic-versions` against `semver` (node-semver) on real-world
-// inputs, and scores both against the shared Semantic Versions conformance
-// suite. Writes ../../benchmarks/results/javascript.json; run
+// Benchmarks `semantic-versions` against `semver` (node-semver) and
+// `@vltpkg/semver` (vlt's parser) on real-world inputs, and scores all three
+// against the shared Semantic Versions conformance suite. Writes ../../benchmarks/results/javascript.json; run
 // `node ../../benchmarks/report.mjs` afterwards to refresh the README tables.
 //
 //   vlt run bench            (from libraries/javascript)
@@ -11,6 +11,7 @@ import os from 'node:os'
 import { fileURLToPath } from 'node:url'
 import * as sv from '../index.js'
 import semver from 'semver'
+import * as vs from '@vltpkg/semver'
 
 const require = createRequire(import.meta.url)
 const root = (p) => fileURLToPath(new URL(`../../../${p}`, import.meta.url))
@@ -27,6 +28,8 @@ const LIBS = {
     validRange: (r) => sv.validRange(r),
     satisfies: (v, r) => sv.satisfies(v, r),
     maxSatisfying: (l, r) => sv.maxSatisfying(l, r),
+    // Any option bypasses the parsed-range cache.
+    rangeUncached: (r) => new sv.Range(r, { bench: true }),
     context: true,
   },
   semver: {
@@ -47,6 +50,25 @@ const LIBS = {
     validRange: (r) => semver.validRange(r),
     satisfies: (v, r) => semver.satisfies(v, r),
     maxSatisfying: (l, r) => semver.maxSatisfying(l, r),
+    // node-semver memoizes each comparator set in an LRU of 1,000; the corpus
+    // has more ranges than that, so a pass over it parses every one.
+    rangeUncached: (r) => new semver.Range(r),
+    context: false,
+  },
+  '@vltpkg/semver': {
+    version: require('@vltpkg/semver/package.json').version,
+    // Returns undefined rather than null for invalid input, and a Version
+    // whose toString() keeps the build; a Range's toString() is its desugared
+    // form, so it is scored on desugaring like node-semver.
+    parse: (v) => { const p = vs.parse(v); return p ? { version: p.toString() } : null },
+    valid: (v) => (vs.valid(v) ? v : null),
+    compare: (a, b) => vs.compare(a, b),
+    sort: (l) => vs.sort(l),
+    validRange: (r) => { try { const p = vs.parseRange(r); return p ? p.toString() : null } catch { return null } },
+    satisfies: (v, r) => vs.satisfies(v, r),
+    maxSatisfying: (l, r) => { const h = vs.highest(l, r); return h ? h.toString() : null },
+    // The constructor parses; parseRange() answers from a 4,096-entry cache.
+    rangeUncached: (r) => new vs.Range(r),
     context: false,
   },
 }
@@ -86,7 +108,12 @@ const pairs = resolutions.flatMap(([name, r]) => corpus.packages[name].map((v) =
 const tasks = [
   { id: 'parse', label: 'Parse a version', description: `${versions.length.toLocaleString()} published versions`, ops: versions.length, run: (l) => () => { for (const v of versions) keep(l.parse(v)) } },
   { id: 'sort', label: 'Sort versions', description: `${versions.length.toLocaleString()} versions by precedence (per version)`, ops: versions.length, run: (l) => () => keep(l.sort(versions.slice()).length) },
-  { id: 'range', label: 'Parse a range', description: `${ranges.length.toLocaleString()} real dependency ranges`, ops: ranges.length, run: (l) => () => { for (const r of ranges) keep(l.validRange(r)) } },
+  // Every library caches parsed ranges (semantic-versions and @vltpkg/semver
+  // hold 4,096, node-semver an LRU of 1,000), and the corpus fits two of the
+  // three caches, so parsing is timed on the constructors, which bypass them:
+  // the cost of a parse, not of a Map lookup. satisfies and resolve go through
+  // the string API, caches included, as they are called in practice.
+  { id: 'range', label: 'Parse a range', description: `${ranges.length.toLocaleString()} real dependency ranges (uncached)`, ops: ranges.length, run: (l) => () => { for (const r of ranges) keep(l.rangeUncached(r)) } },
   { id: 'satisfies', label: 'satisfies(version, range)', description: `${pairs.length.toLocaleString()} version × range checks`, ops: pairs.length, run: (l) => () => { for (const [v, r] of pairs) keep(l.satisfies(v, r)) } },
   { id: 'resolve', label: 'Resolve a range', description: `${resolutions.length.toLocaleString()} maxSatisfying lookups against a package's versions`, ops: resolutions.length, run: (l) => () => { for (const [name, r] of resolutions) keep(l.maxSatisfying(corpus.packages[name], r)) } },
 ]

@@ -3,9 +3,9 @@
   "subject": "semantic-versions",
   "baseline": "semver",
   "environment": {
-    "runtime": "Node.js 24.18.0",
-    "cpu": "Apple M3",
-    "platform": "darwin arm64",
+    "runtime": "Node.js 22.23.5",
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "platform": "linux x64",
     "date": "2026-11-20"
   },
   "libraries": {
@@ -14,6 +14,9 @@
     },
     "semver": {
       "version": "7.8.5"
+    },
+    "@vltpkg/semver": {
+      "version": "1.8.1"
     }
   },
   "corpus": {
@@ -30,6 +33,10 @@
     "semver": {
       "versions": 5398,
       "ranges": 1996
+    },
+    "@vltpkg/semver": {
+      "versions": 5398,
+      "ranges": 1996
     }
   },
   "tasks": [
@@ -39,12 +46,16 @@
       "description": "5,398 published versions",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 59.3,
-          "opsPerSec": 16872239
+          "nsPerOp": 100.4,
+          "opsPerSec": 9957575
         },
         "semver": {
-          "nsPerOp": 163,
-          "opsPerSec": 6136051
+          "nsPerOp": 283.7,
+          "opsPerSec": 3524789
+        },
+        "@vltpkg/semver": {
+          "nsPerOp": 267.1,
+          "opsPerSec": 3743667
         }
       }
     },
@@ -54,27 +65,35 @@
       "description": "5,398 versions by precedence (per version)",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 257.4,
-          "opsPerSec": 3885723
+          "nsPerOp": 427.7,
+          "opsPerSec": 2338159
         },
         "semver": {
-          "nsPerOp": 2514.5,
-          "opsPerSec": 397689
+          "nsPerOp": 4554.6,
+          "opsPerSec": 219561
+        },
+        "@vltpkg/semver": {
+          "nsPerOp": 3359.3,
+          "opsPerSec": 297679
         }
       }
     },
     {
       "id": "range",
       "label": "Parse a range",
-      "description": "1,996 real dependency ranges",
+      "description": "1,996 real dependency ranges (uncached)",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 2139.9,
-          "opsPerSec": 467322
+          "nsPerOp": 3043.2,
+          "opsPerSec": 328600
         },
         "semver": {
-          "nsPerOp": 3054.9,
-          "opsPerSec": 327343
+          "nsPerOp": 7431.4,
+          "opsPerSec": 134564
+        },
+        "@vltpkg/semver": {
+          "nsPerOp": 793.3,
+          "opsPerSec": 1260503
         }
       }
     },
@@ -84,12 +103,16 @@
       "description": "15,604 version × range checks",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 335.8,
-          "opsPerSec": 2977897
+          "nsPerOp": 183.8,
+          "opsPerSec": 5440175
         },
         "semver": {
-          "nsPerOp": 677.1,
-          "opsPerSec": 1476881
+          "nsPerOp": 1063.3,
+          "opsPerSec": 940465
+        },
+        "@vltpkg/semver": {
+          "nsPerOp": 313.1,
+          "opsPerSec": 3193781
         }
       }
     },
@@ -99,12 +122,16 @@
       "description": "116 maxSatisfying lookups against a package's versions",
       "results": {
         "semantic-versions": {
-          "nsPerOp": 10607.9,
-          "opsPerSec": 94270
+          "nsPerOp": 18058.2,
+          "opsPerSec": 55376
         },
         "semver": {
-          "nsPerOp": 32710.5,
-          "opsPerSec": 30571
+          "nsPerOp": 56211,
+          "opsPerSec": 17790
+        },
+        "@vltpkg/semver": {
+          "nsPerOp": 33243.6,
+          "opsPerSec": 30081
         }
       }
     }
@@ -191,6 +218,48 @@
       },
       "prerelease-wildcards": {
         "passed": 2,
+        "total": 14
+      }
+    },
+    "@vltpkg/semver": {
+      "parse": {
+        "passed": 78,
+        "total": 81
+      },
+      "strict": {
+        "passed": 9,
+        "total": 11
+      },
+      "context": {
+        "passed": 3,
+        "total": 15
+      },
+      "precedence": {
+        "passed": 32,
+        "total": 32
+      },
+      "build-precedence": {
+        "passed": 1,
+        "total": 16
+      },
+      "ranges": {
+        "passed": 195,
+        "total": 196
+      },
+      "build-channels": {
+        "passed": 23,
+        "total": 41
+      },
+      "prerelease-channels": {
+        "passed": 33,
+        "total": 44
+      },
+      "approximate": {
+        "passed": 19,
+        "total": 26
+      },
+      "prerelease-wildcards": {
+        "passed": 7,
         "total": 14
       }
     }

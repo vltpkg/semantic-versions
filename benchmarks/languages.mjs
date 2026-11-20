@@ -16,7 +16,7 @@ export const LANGUAGES = [
     readme: 'libraries/javascript/README.md',
     links: [['npm', 'https://www.npmjs.com/package/semantic-versions']],
     tagline: 'The reference implementation: plain ES2020 with zero dependencies, so it runs unchanged in Node, Deno, Bun, browsers and edge workers. It powers the <a href="/selector/">range selector</a>.',
-    method: `Timed against ${a('https://www.npmjs.com/package/semver', 'node-semver')} through each library's string API: the way <code>satisfies</code>, <code>maxSatisfying</code> and <code>sort</code> are called in practice.`,
+    method: `Timed against ${a('https://www.npmjs.com/package/semver', 'node-semver')} and ${a('https://www.npmjs.com/package/@vltpkg/semver', '@vltpkg/semver')}, the parser inside vlt, through each library's string API: the way <code>satisfies</code>, <code>maxSatisfying</code> and <code>sort</code> are called in practice. All three cache parsed ranges (this library and vlt's hold 4,096, node-semver an LRU of 1,000), so <em>Parse a range</em> is timed on the constructors, which bypass the caches, while <code>satisfies</code> and <code>maxSatisfying</code> run with them, as in practice.`,
   },
   {
     id: 'rust',

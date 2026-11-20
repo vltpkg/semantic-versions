@@ -33,7 +33,7 @@ Every implementation passes the same [conformance suite](conformance) and is
 
 | Language | Package | Conformance | Compared with | Speed vs. it |
 | --- | --- | :---: | --- | ---: |
-| [JavaScript](libraries/javascript) | `semantic-versions` (npm) | 476/476 | `semver` 396/476 | 1.4–9.8× |
+| [JavaScript](libraries/javascript) | `semantic-versions` (npm) | 476/476 | `semver` 396/476 | 2.4–11× |
 | [Rust](libraries/rust) | `semantic-versions` (crates.io) | 476/476 | `nodejs-semver` 366/476 | 0.9–1.3× |
 | [Python](libraries/python) | `semantic-versions` (PyPI) | 476/476 | `node-semver` 366/476 | 1.5–17× |
 | [Go](libraries/go) | `semver.xyz/go` (pkg.go.dev) | 476/476 | `Masterminds/semver` 348/436 | 2.8–23× |
@@ -127,7 +127,7 @@ vlt run dev -w site                    # start the site (Next.js) at http://loca
 vlt run build -w site                  # production build into site/.next
 vlt run start -w site                  # serve the production build
 vlt run test -w libraries/javascript   # run the parser test suite (tap), incl. conformance
-vlt run bench -w libraries/javascript  # benchmark against node-semver, refresh the tables
+vlt run bench -w libraries/javascript  # benchmark against node-semver and @vltpkg/semver, refresh the tables
 ```
 
 The other implementations live outside the vlt workspace and use their own

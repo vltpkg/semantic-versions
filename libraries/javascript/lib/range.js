@@ -1,25 +1,21 @@
 import { Comparator } from './compare.js'
 import { Version, splitReference } from './version.js'
 
-// Parsed ranges are immutable, so cache them by their source string, as
-// node-semver does: `satisfies(v, r)` is usually called with the same handful
-// of ranges many times over.
-const CACHE_MAX = 1000
+// Parsed ranges are immutable, so cache them by their source string:
+// `satisfies(v, r)` is usually called with the same ranges many times over.
+// A hit is one Map lookup, and the cache is cleared whole once it is full
+// rather than kept in LRU order, which costs a delete and a set on every hit.
+// An install sees a few hundred to a few thousand distinct ranges, so the cap
+// holds all of them; a cycle through more than the cap would thrash an LRU of
+// the same size (as node-semver's 1,000 does) and here just clears now and then.
+const CACHE_MAX = 4096
 const cache = new Map()
-const cached = (raw) => {
-  const hit = cache.get(raw)
-  if (hit !== undefined) {
-    // refresh recency
-    cache.delete(raw)
-    cache.set(raw, hit)
-  }
-  return hit
-}
+const cached = (raw) => cache.get(raw)
 const remember = (raw, range) => {
-  cache.set(raw, range)
-  if (cache.size > CACHE_MAX) {
-    cache.delete(cache.keys().next().value)
+  if (cache.size >= CACHE_MAX) {
+    cache.clear()
   }
+  cache.set(raw, range)
 }
 import {
   MAX_LENGTH,
