@@ -48,11 +48,10 @@ impl Ord for Identifier<'_> {
     /// alphanumeric, so `+001` and `+1` are different builds.
     fn cmp(&self, other: &Self) -> Ordering {
         match (self, other) {
-            (Identifier::Numeric(a), Identifier::Numeric(b)) => {
-                a.len()
-                    .cmp(&b.len())
-                    .then_with(|| a.as_bytes().cmp(b.as_bytes()))
-            }
+            (Identifier::Numeric(a), Identifier::Numeric(b)) => a
+                .len()
+                .cmp(&b.len())
+                .then_with(|| a.as_bytes().cmp(b.as_bytes())),
             (Identifier::Numeric(_), Identifier::AlphaNumeric(_)) => Ordering::Less,
             (Identifier::AlphaNumeric(_), Identifier::Numeric(_)) => Ordering::Greater,
             (Identifier::AlphaNumeric(a), Identifier::AlphaNumeric(b)) => {
@@ -68,8 +67,6 @@ impl PartialOrd for Identifier<'_> {
     }
 }
 
-/// Compare two identifiers given as bytes (always ASCII).
-#[inline]
 /// A numeric identifier is `0` or digits with no leading zero; a leading-zero
 /// identifier (which a build may carry) compares as text.
 #[inline]
@@ -77,6 +74,8 @@ fn is_numeric(s: &[u8]) -> bool {
     s.iter().all(u8::is_ascii_digit) && (s.len() == 1 || s[0] != b'0')
 }
 
+/// Compare two identifiers given as bytes (always ASCII).
+#[inline]
 fn cmp_id_bytes(a: &[u8], b: &[u8]) -> Ordering {
     match (is_numeric(a), is_numeric(b)) {
         (true, true) => a.len().cmp(&b.len()).then_with(|| a.cmp(b)),

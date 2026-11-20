@@ -274,9 +274,7 @@ impl Hash for Version {
         self.pre().hash(state);
         for id in self.build().iter() {
             match id {
-                crate::Identifier::Numeric(n) | crate::Identifier::AlphaNumeric(n) => {
-                    n.hash(state)
-                }
+                crate::Identifier::Numeric(n) | crate::Identifier::AlphaNumeric(n) => n.hash(state),
             }
         }
     }
