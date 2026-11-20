@@ -2,6 +2,7 @@ import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
+import { Agents } from "@/components/agents";
 import { Footer } from "@/components/footer";
 import { Nav } from "@/components/nav";
 import { PageEffects } from "@/components/page-effects";
@@ -15,7 +16,8 @@ export const metadata: Metadata = {
 
 /*
  * Every page: the header, the page's own <main>, the footer. The chrome is
- * the layout's, so a navigation re-renders the page and nothing else.
+ * the layout's, so a navigation re-renders the page and nothing else. The
+ * Agents provider gives browser agents the page's Affordances graph.
  */
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
@@ -26,10 +28,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </head>
       <body>
         <ThemeProvider>
-          <Nav />
-          {children}
-          <Footer />
-          <PageEffects />
+          <Agents>
+            <Nav />
+            {children}
+            <Footer />
+            <PageEffects />
+          </Agents>
         </ThemeProvider>
         <Analytics />
       </body>

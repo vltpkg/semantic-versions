@@ -1,12 +1,13 @@
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { withMd } from "@affordances/md/next";
+import { md } from "@affordances/md/next";
+import { withAffordances } from "@affordances/next/config";
 import type { NextConfig } from "next";
 
 /**
- * The repository root, one level up. The site reads the specification
- * (spec/SPEC.md), the extension Markdown and the benchmark results from there
- * at build time, and vlt installs into a content-addressed store at the
+ * The repository root, one level up. The site bundles the specification
+ * (spec/SPEC.md), the extension Markdown, the grammars and the benchmark
+ * results from there, and vlt installs into a content-addressed store at the
  * workspace root that `next` itself resolves through, so Turbopack's
  * filesystem root has to be the repository, not this directory.
  */
@@ -20,7 +21,16 @@ const nextConfig: NextConfig = {
   // Markdown twin (/faq.md); both forms answer directly instead.
   trailingSlash: true,
   skipTrailingSlashRedirect: true,
-  turbopack: { root: repoRoot },
+  turbopack: {
+    root: repoRoot,
+    // The canonical Markdown and the BNF grammars are imported as strings
+    // (src/lib/sources.ts), so they ship inside the bundle and the graph can
+    // answer from them at request time.
+    rules: {
+      "*.md": { loaders: ["raw-loader"], as: "*.js" },
+      "*.bnf": { loaders: ["raw-loader"], as: "*.js" },
+    },
+  },
   outputFileTracingRoot: repoRoot,
   // The grammars are plain text to read in the browser, not downloads.
   headers: async () => [
@@ -34,10 +44,12 @@ const nextConfig: NextConfig = {
 };
 
 /*
- * Every page's Markdown twin (`/faq.md`, `/faq/index.md`, or the page's URL
- * with `Accept: text/markdown`) is @affordances/md's: its rewrites send each
- * to app/api/affordances/md, which converts the page's own rendered HTML. The
- * normative Markdown (spec/SPEC.md and the extensions') is served as itself
+ * Affordances (https://www.affordances.sh): every page answers agents with a
+ * graph of what it shows and what can be done there (its state.ts and
+ * actions.ts), at its own URL with `Accept: application/vnd.affordances+json`,
+ * and the md plugin serves every page as Markdown (`/faq.md`, `/faq/index.md`,
+ * or `Accept: text/markdown`), converted from the page's own rendered HTML.
+ * The normative Markdown (spec/SPEC.md and the extensions') is served as itself
  * beside the pages, and llms.txt points there first.
  */
-export default withMd(nextConfig);
+export default withAffordances(nextConfig, { name: "Semantic Versions", plugins: [md()] });

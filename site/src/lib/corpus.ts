@@ -9,14 +9,15 @@
  *   /extensions/**.md
  *   /parser.md
  *
- * Everything here is built from the canonical Markdown in the repository at
- * build time; the route handlers under src/app serve the results.
+ * Everything here is built from the canonical Markdown in the repository
+ * (bundled by src/lib/sources.ts); the route handlers under src/app serve
+ * the results.
  */
 
 import { execFileSync } from "node:child_process";
 import path from "node:path";
-import { REPO_ROOT, readRepoFile } from "@/lib/repo";
 import { REPO, SITE } from "@/lib/site";
+import { readRepoFile } from "@/lib/sources";
 
 const BLOB = `${REPO}/blob/main`;
 
@@ -113,6 +114,7 @@ export const PAGES: [url: string, title: string][] = [
   ["/extensions/integrity/", "Package Integrity"],
   ["/extensions/dependency-locks/", "Dependency Locks"],
   ["/license/", "License"],
+  ["/agents/", "For agents: llms.txt, Markdown twins, the Affordances graph and MCP"],
 ];
 
 const bySrc = new Map(DOCS.map((d) => [d.src, d]));
@@ -158,7 +160,7 @@ export function llmsTxt(): string {
     "",
     "The Markdown linked below is normative. https://semver.xyz/spec/ is rendered directly from the core specification, so the two never differ. The extension pages are separately authored presentations of their Markdown; where an extension page and its Markdown disagree, the Markdown governs.",
     "",
-    "Every page of the site is also available as Markdown: add `.md` to its path (https://semver.xyz/faq.md), or request the page with an `Accept: text/markdown` header.",
+    "Every page of the site is also available as Markdown: add `.md` to its path (https://semver.xyz/faq.md), or request the page with an `Accept: text/markdown` header. Every page also answers with an Affordances graph (https://www.affordances.sh) when requested with `Accept: application/vnd.affordances+json`: what it shows, actions to call, and where to go next. The range selector's actions (`select`, `desugar`, `parse`, `compare`, `bump`) run the reference parser, the spec's `readSection` returns one section as Markdown, and the grammars' `readGrammar` returns a BNF. The site index is at https://semver.xyz/.well-known/affordances.json; `npx @affordances/mcp https://semver.xyz` serves it to MCP clients. See https://semver.xyz/agents/.",
     "",
   ];
   for (const section of sections) {
@@ -200,11 +202,11 @@ export function llmsFullTxt(): string {
 
 // ── sitemap.xml ────────────────────────────────────────────────────────────
 
-/** The date a page's source last changed, from git where available. */
+/** The date a page's source last changed, from git where available (at build time, in the repository). */
 export const lastModified = (url: string): string => {
-  const src = `site/src/app${url === "/" ? "" : url.slice(0, -1)}/page.tsx`;
+  const src = `src/app${url === "/" ? "" : url.slice(0, -1)}/page.tsx`;
   try {
-    const out = execFileSync("git", ["log", "-1", "--format=%cs", "--", src], { cwd: REPO_ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
+    const out = execFileSync("git", ["log", "-1", "--format=%cs", "--", src], { cwd: process.cwd(), encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim();
     if (out) return out;
   } catch {
     /* not a git checkout, a shallow one, or the file is untracked */

@@ -5,7 +5,7 @@ import { Range, Version, validRange, splitReference } from "semantic-versions";
 // Curated sample sets. Public registries never publish build metadata and rarely
 // expose long pre-release trains, so these hand-built sets are how you actually
 // exercise the parts of the grammar that make Semantic Versions different.
-const SAMPLE_SETS = {
+export const SAMPLE_SETS = {
   mixed: {
     label: "Mixed",
     note: "A little of everything: releases, a pre-release and one build.",
@@ -88,7 +88,7 @@ const DEFAULT_SET = "mixed";
 
 // Example ranges chosen to actually resolve meaningfully against the sample sets:
 // pre-release trains, exact build pins and build-variant comparators included.
-const EXAMPLES = [
+export const EXAMPLES = [
   "^1.2.3",
   "~>1.2",
   "1.2.x",

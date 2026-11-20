@@ -13,7 +13,7 @@
  */
 
 import MarkdownIt from "markdown-it";
-import { readRepoFile } from "@/lib/repo";
+import { readRepoFile } from "@/lib/sources";
 import { SITE } from "@/lib/site";
 
 /** GitHub-compatible heading slug (github-slugger semantics, without the emoji table). */
@@ -85,3 +85,30 @@ export function renderSpec(markdown: string): { html: string; toc: TocEntry[] } 
 
 /** The specification, rendered for the page. */
 export const renderSpecFile = () => renderSpec(readRepoFile("spec/SPEC.md"));
+
+export type SpecSection = { id: string; title: string; markdown: string };
+
+/**
+ * The specification's `##` sections as Markdown, with the same ids the page
+ * gives their headings, so an agent can read one section by its anchor.
+ */
+export function specSections(): SpecSection[] {
+  const sections: SpecSection[] = [];
+  const seen = new Map<string, number>();
+  let fence = false;
+  let current: SpecSection | null = null;
+  for (const line of readRepoFile("spec/SPEC.md").split("\n")) {
+    if (/^```/.test(line)) fence = !fence;
+    const heading = !fence && /^## (.+)$/.exec(line);
+    if (heading) {
+      const title = heading[1]!.trim();
+      const base = slug(title.replace(/`/g, ""));
+      const n = seen.get(base) ?? 0;
+      seen.set(base, n + 1);
+      current = { id: n ? `${base}-${n}` : base, title, markdown: "" };
+      sections.push(current);
+    }
+    if (current) current.markdown += `${line}\n`;
+  }
+  return sections.map((s) => ({ ...s, markdown: s.markdown.trim() }));
+}

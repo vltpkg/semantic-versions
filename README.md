@@ -106,12 +106,14 @@ This repository is a [vlt](https://www.vlt.io) workspace (`vlt.json`):
         │   ├── faq/          # Frequently asked questions
         │   ├── libraries/    # Libraries in every language, benchmarks and conformance tables
         │   ├── license/
+        │   ├── agents/       # For agents: llms.txt, Markdown twins, the graph, MCP
+        │   ├── */state.ts, */actions.ts  # Each page's Affordances graph: what it shows, what can be done
         │   ├── llms.txt/, llms-full.txt/, sitemap.xml/, robots.txt/, spec/SPEC.md/, …
         │   │                 # Route handlers for the machine-readable files, built from the Markdown
-        │   ├── api/affordances/md/   # Every page as Markdown (@affordances/md)
+        │   ├── api/affordances/      # The graph (@affordances/next) and every page as Markdown (@affordances/md)
         │   └── globals.css   # The design system
         ├── components/       # Nav, footer, theme, the pages' interactive parts
-        └── lib/              # Spec renderer, corpus (llms.txt), benchmarks, DOM modules
+        └── lib/              # Spec renderer, corpus (llms.txt), benchmarks, bundled sources, DOM modules
 ```
 
 ## Develop
@@ -151,10 +153,21 @@ The root `package.json` also exposes convenience wrappers, e.g. `vlt run build`.
 The machine-readable files served from the site root (`/llms.txt`,
 `/llms-full.txt`, `/sitemap.xml`, `/robots.txt` and the Markdown mirrors of
 the spec and extensions) are route handlers under `site/src/app`, built from
-the canonical Markdown at build time; `site/src/lib/corpus.ts` lists what goes
-where. Every page is also served as Markdown by
-[`@affordances/md`](https://github.com/vltpkg/affordances): add `.md` to its
-path (`/faq.md`) or request it with `Accept: text/markdown`.
+the canonical Markdown, which `site/src/lib/sources.ts` bundles into the site;
+`site/src/lib/corpus.ts` lists what goes where.
+
+The site runs on [Affordances](https://www.affordances.sh). Every page is
+served as Markdown by `@affordances/md` (add `.md` to its path, `/faq.md`, or
+request it with `Accept: text/markdown`), and answers with a graph when asked
+with `Accept: application/vnd.affordances+json`: each page's `state.ts` says
+what it shows, and its `actions.ts` what an agent can do there. The range
+selector's actions (`select`, `desugar`, `parse`, `compare`, `bump`) run the
+reference parser, the spec's `readSection` returns one section, and the
+grammars' `readGrammar` returns a BNF; all are public and read-only.
+`/.well-known/affordances.json` is the site index, `npx @affordances/mcp
+https://semver.xyz` serves it to MCP clients, and [`/agents/`](https://semver.xyz/agents/)
+explains it to agents. `@affordances/next` regenerates `site/.affordances/manifest.ts`
+(gitignored) from those files on every build.
 
 The [range selector](https://semver.xyz/selector/) imports the `semantic-versions`
 parser directly, so the site and the reference implementation never drift.
