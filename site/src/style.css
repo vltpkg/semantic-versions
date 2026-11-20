@@ -709,6 +709,33 @@ a.card:hover { background: var(--hover); }
   border: 1px solid var(--border); border-radius: var(--radius); padding: 60px 30px;
 }
 /* Understated standards-style colophon (replaces the marketing CTA) */
+/* Talk video: a 16:9 thumbnail that becomes the YouTube player on click
+   (initVideos in shell.js). */
+.talk { margin: 0; }
+.video {
+  position: relative; aspect-ratio: 16 / 9; overflow: hidden;
+  border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-2);
+}
+.video img, .video iframe {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  border: 0; display: block; object-fit: cover;
+}
+.video-facade { position: absolute; inset: 0; display: block; }
+.video-facade img { transition: transform 0.4s ease; }
+.video-facade:hover img { transform: scale(1.015); }
+.video-facade:focus-visible { outline: 2px solid var(--text); outline-offset: -6px; border-radius: var(--radius); }
+.video-play {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 68px; height: 68px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--text); color: var(--bg); box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease;
+}
+.video-facade:hover .video-play { transform: translate(-50%, -50%) scale(1.06); }
+.video-play svg { width: 26px; height: 26px; fill: currentColor; margin-left: 3px; }
+.talk figcaption { margin-top: 12px; font: 400 0.8125rem/1.5 var(--mono); color: var(--faint); }
+.home-talk .talk { max-width: 880px; }
+.tl-item .talk { margin-top: 16px; max-width: 560px; }
+
 .doc-status { margin-top: 72px; padding-top: 36px; border-top: 1px solid var(--border); }
 .doc-status .eyebrow { margin-bottom: 12px; }
 .doc-status p:not(.eyebrow) { color: var(--muted); font-size: 0.98rem; line-height: 1.75; max-width: 720px; margin: 0; }

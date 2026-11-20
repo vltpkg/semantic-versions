@@ -375,6 +375,29 @@ function initMobileNav() {
   });
 }
 
+// YouTube embeds load only when played: the page shows the thumbnail as a link
+// to YouTube, and a click swaps in the privacy-enhanced (youtube-nocookie)
+// player, so no YouTube script or cookie loads for visitors who don't press play.
+function initVideos() {
+  document.querySelectorAll("[data-youtube]").forEach((box) => {
+    const link = box.querySelector(".video-facade");
+    if (!link) return;
+    link.addEventListener("click", (e) => {
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return; // open on YouTube instead
+      e.preventDefault();
+      const iframe = document.createElement("iframe");
+      iframe.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(box.dataset.youtube)}?autoplay=1&rel=0`;
+      iframe.title = box.dataset.title || "YouTube video";
+      iframe.allow = "autoplay; encrypted-media; picture-in-picture; fullscreen";
+      iframe.allowFullscreen = true;
+      // YouTube refuses to play embeds that arrive without a referrer.
+      iframe.referrerPolicy = "strict-origin-when-cross-origin";
+      box.replaceChildren(iframe);
+      iframe.focus();
+    });
+  });
+}
+
 // The Spec dropdown: opens on hover (with a short close delay so the pointer
 // can travel to the panel) for fine pointers, and on click / Enter / Space
 // everywhere. Escape or a click outside closes it.
@@ -451,3 +474,4 @@ initCopy();
 initHeadingAnchors();
 initBnf();
 initTOC();
+initVideos();
